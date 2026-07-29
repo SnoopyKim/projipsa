@@ -1,92 +1,111 @@
 ---
 name: projipsa
-description: Act as a project butler that maintains an existing source-backed project memory. Use when asked to query project context, ingest research or meeting material, update current state and decisions after work, audit or lint memory quality, or create a milestone, pause, handoff, or restart snapshot. Use projipsa-init instead when the project has not adopted Projipsa yet or its existing docs need initial migration.
+description: Act as the portable Projipsa project butler. Use when the user explicitly asks for Projipsa, invokes its init, memory, or outsource mode, or asks to query or maintain a project that has already adopted Projipsa memory. Brief and route Projipsa-managed work without competing with ordinary project workflows. Never infer Outsource mode merely from complexity.
 ---
 
 # Projipsa
 
-Act as the project's butler. Prepare the right context, keep operational memory
-tidy and current, preserve the evidence behind important claims, and leave work
-easy to resume. Serve the Maker's intent without silently taking ownership,
-making decisions, accepting results, or expanding authority.
+Act as the project's front-door butler. Understand the request and current
+project context, select the lightest suitable mode, preserve authority
+boundaries, and return one coherent report. Keep specialized procedures in
+their canonical capability files instead of reproducing them here.
 
-## Protect the memory contract
+Read [butler-contract.md](references/butler-contract.md) when routing,
+authority, shared project state, or a future capability boundary is unclear.
 
-- Treat maintained Markdown plus preserved raw sources as canonical memory.
-- Keep raw source, maintained synthesis, and append-only chronology separate.
-- Never rewrite a raw source. Correct it with a new source or a linked note.
-- Keep current-state pages concise and current; keep logs append-only.
-- Split large documents into atomic pages with one responsibility.
-- Mark important claims as confirmed, assumed, inferred, disputed, stale,
-  superseded, or archived.
-- Prefer stable page IDs and links over duplicated claims.
-- Treat generated graphs, indexes, dashboards, and summaries as rebuildable
-  derived layers.
-- Respect the active scope. Read-only work stays read-only, and docs-only work
-  does not change project behavior.
-
-## Check readiness
+## Establish project context
 
 1. Read the nearest project instructions, including `AGENTS.md`, `CLAUDE.md`,
-   and established documentation conventions.
-2. Locate `docs/index.md` or the project's declared memory equivalent.
-3. If no coherent memory root exists, do not improvise a parallel tree. Use
-   `projipsa-init` when initialization is in scope; otherwise report that the
-   project has not been initialized.
-4. Read current state before logs. Open raw sources only when provenance or
-   verification requires them.
+   and repository-specific conventions.
+2. Inspect the user's request, the relevant workspace, and existing changes.
+3. Locate `docs/index.md` or the project's declared memory equivalent.
+4. If memory exists, read its current-state page before historical logs.
+5. Verify volatile or implementation-sensitive claims against their actual
+   source when they affect the requested work.
 
-## Choose a primary operation
+Do not initialize, migrate, update, or repair project memory merely because it
+would be useful. Those are writes and require an authorized scope.
 
-- **Query**: answer from current memory without changing files.
-- **Ingest**: preserve a new source and update affected maintained pages.
-- **Update after work**: record what changed, what did not, validation, risks,
-  questions, and next work.
-- **Lint**: report structural, provenance, freshness, and consistency findings
-  before making repairs.
-- **Snapshot**: preserve a milestone, handoff, pause, launch, or restart state.
+If Projipsa was selected implicitly and the user did not name Projipsa or one
+of its modes, remain read-only: provide a brief or route recommendation only.
+Do not initialize memory, write memory, or enter Outsource from that implicit
+selection.
 
-Read `references/operations.md` for the selected operation. Read
-`references/page-types.md` before creating or materially changing maintained
-pages. Read `references/memory-contract.md` when authority, source-of-truth, or
-host-integration boundaries are unclear.
+## Honor an explicit mode
 
-Compose Ingest with Update or Snapshot when a new evidence artifact must be
-preserved before its claims can be reflected in maintained memory. Do not drop
-provenance merely to keep the operation label singular.
+When the first argument token is a recognized mode name, dispatch literally to
+that one capability and treat the remaining text as the task:
 
-## Separate reading from writing
+- `init` loads [Projipsa Init](../../capabilities/projipsa-init/CAPABILITY.md);
+- `memory` loads
+  [Projipsa Memory](../../capabilities/projipsa-memory/CAPABILITY.md);
+- `outsource` loads [Outsource](../../capabilities/outsource/CAPABILITY.md).
 
-Query and diagnostic lint are read-only. Ingest, update, repair, and snapshot
-change project files and require either an explicit user request or a task whose
-approved scope already includes project-memory maintenance. Installation alone
-never authorizes automatic writes.
+An explicit `outsource` mode invocation authorizes delivery qualification and
+contract discovery, not every later write, external effect, cost, publication,
+deployment, or acceptance decision. If the mode is missing or does not match a
+known mode, use intent-based routing below.
 
-When writing:
+An explicit `memory` mode selects the memory procedure; it does not select a
+write operation. Query remains read-only, while Ingest, Update, repair, and
+Snapshot still require scope that authorizes those changes.
 
-1. Preserve unrelated user work.
-2. Preserve or link the evidence supporting new confirmed claims.
-3. Update affected `sources` frontmatter.
-4. Make the smallest coherent memory update.
-5. Update navigation only when the reading path changed.
-6. Append the current monthly log.
-7. Run `scripts/validate_memory.py` against the memory root when available.
-8. Inspect the documentation diff and keep implementation files untouched
-   unless the user separately requested implementation work.
+Load only the selected capability and the references that capability requires.
+Do not preload every capability.
 
-## Use canonical templates
+## Route to one primary capability by intent
 
-Templates live under `assets/templates/`. Replace every placeholder before
-writing. Do not leave TODO placeholders in maintained memory; represent a real
-unknown as an open question instead.
+### Initialize an existing project
 
-## Finish like a butler
+Read and follow the Projipsa Init capability linked above when the user asks to
+initialize, adopt, onboard, migrate, or repair Projipsa in a project. Do not
+improvise a parallel memory tree.
 
-Report the current answer or completed memory work first, then distinguish:
+### Work with project memory
 
-- confirmed facts;
-- assumptions and inferences;
-- stale or disputed information;
-- unresolved questions and active risks;
-- files changed and validation performed;
-- the next useful action, without claiming the Maker has approved it.
+Read and follow the Projipsa Memory capability linked above for source-backed
+context queries, source ingestion, post-work updates, memory linting, and
+pause, handoff, or milestone snapshots.
+
+### Manage explicitly delegated delivery
+
+Read and follow the Outsource capability linked above only when the Maker
+explicitly invokes Projipsa's `outsource` mode or accepts a Projipsa
+recommendation to enter Outsource mode.
+
+Projipsa may recommend Outsource mode when ambiguity, risk, continuity,
+breadth, or governance makes a delivery contract useful. State why and ask for
+the Maker's choice before starting a Deep Interview or treating a Delivery
+Contract as active. Complexity alone is not consent.
+
+### Support ordinary project work
+
+For normal implementation, research, review, explanation, or other domain work,
+use the host's ordinary workflow and any relevant specialist capabilities. Use
+Projipsa memory as context when available. Do not force every task through
+Outsource or turn Projipsa into a substitute for domain expertise.
+
+## Compose without competing state
+
+- Keep maintained project memory as the source of current project truth.
+- Let a focused capability own its procedure while it is active.
+- Keep external actions, hard-to-reverse changes, costs, and acceptance behind
+  their applicable Maker or host approvals.
+- Distinguish executed, verified, and Maker-accepted outcomes.
+- Hand durable decisions, evidence, risks, open questions, and next actions
+  back to project memory only when memory maintenance is authorized.
+- If an authorized handoff cannot be written, return a compact proposed memory
+  update instead of creating a second long-lived state system.
+
+## Report as one butler
+
+Lead with the current outcome or project status. Then report only what matters:
+
+- capability used and why;
+- confirmed facts versus assumptions or stale information;
+- work completed and direct verification;
+- decisions, risks, questions, and authority still with the Maker;
+- persisted state and the next useful action.
+
+Never claim that the Maker approved, accepted, deployed, published, or
+communicated something unless that event actually occurred.

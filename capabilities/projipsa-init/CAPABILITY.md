@@ -1,8 +1,3 @@
----
-name: projipsa-init
-description: Initialize Projipsa in an existing project and make its current documentation usable as source-backed project memory. Use when asked to init, initialize, set up, adopt, onboard, migrate, or repair a project's project-memory structure, especially when existing docs, handoffs, decision logs, research notes, or status files must be preserved and reorganized. Do not use for routine updates after initialization; use projipsa instead.
----
-
 # Projipsa Init
 
 Onboard an existing project into Projipsa. Create one durable, repo-local
@@ -34,14 +29,15 @@ scope.
 Initialization is idempotent. A second run audits and repairs the existing
 structure rather than starting over.
 
-Read `references/initialization.md` for the detailed inventory, mapping, and
-validation workflow. Read the sibling canonical resources before writing:
+Read [the initialization workflow](references/initialization.md) for the
+detailed inventory, mapping, and validation workflow. Read the sibling
+canonical resources before writing:
 
-- `../projipsa/references/memory-contract.md`
-- `../projipsa/references/page-types.md`
-- `../projipsa/assets/templates/`
+- [memory contract](../projipsa-memory/references/memory-contract.md)
+- [page types](../projipsa-memory/references/page-types.md)
+- [templates](../projipsa-memory/assets/templates/)
 
-Resolve these paths relative to this skill directory.
+Resolve these paths relative to this capability directory.
 
 ## Create the minimum useful core
 
@@ -59,8 +55,9 @@ docs/
 ```
 
 Create `raw/YYYY-MM/` content when real source material exists. Add optional
-page families only when the inventory justifies them. Do not create empty
-folders merely to match an example.
+page families only when the inventory justifies them. In particular, do not
+create `wiki/deliveries/` until a substantial delegated engagement needs
+durable state. Do not create empty folders merely to match an example.
 
 Replace all template placeholders with verified project facts. When something
 is unknown, record it as an explicit open question rather than a TODO or an
@@ -88,12 +85,19 @@ Create an adoption decision that states:
 - justified optional page families;
 - known gaps and follow-up work.
 
+For a new decision, use the canonical ID
+`decision.projipsa-adoption.<yyyy-mm-dd>`, a filename ending in
+`projipsa-adoption.md`, and `projipsa_adoption: true` frontmatter. If an
+equivalent decision already exists, preserve its stable ID and path, add the
+explicit adoption marker, and do not create a second decision.
+
 Append the monthly log and make `index.md` the clear reading entry point.
 
 ## Validate and hand off
 
-1. Run the sibling `../projipsa/scripts/validate_memory.py` against the memory
-   root.
+1. Run the sibling
+   [memory validator](../projipsa-memory/scripts/validate_memory.py) against
+   the memory root.
 2. Check that maintained pages are reachable from the index or related pages.
 3. Inspect the diff for unintended non-documentation changes.
 4. Confirm raw sources were preserved and old full copies were not left as a
@@ -101,5 +105,6 @@ Append the monthly log and make `index.md` the clear reading entry point.
 5. Report the selected root, files created or moved, preserved sources,
    validation, unresolved questions, and the next useful Projipsa operation.
 
-After successful initialization, use `projipsa` for ongoing Query, Ingest,
-Update, Lint, and Snapshot work.
+After successful initialization, return through Projipsa's `memory` mode for
+ongoing Query, Ingest, Update, Lint, and Snapshot work, or use the default
+front-door router.

@@ -4,8 +4,9 @@
 
 1. Read `index.md`.
 2. Read `wiki/project/current-state.md`.
-3. Open only relevant maintained pages.
-4. Open raw sources only for evidence or provenance.
+3. Read a linked active delivery page when the requested work belongs to it.
+4. Open only other relevant maintained pages.
+5. Open raw sources only for evidence or provenance.
 
 ## Maintenance rules
 
@@ -16,6 +17,8 @@
 - Give maintained pages stable IDs and required frontmatter.
 - Mark assumptions, disputes, staleness, and supersession explicitly.
 - Add optional page families only when the project needs them.
+- Keep one maintained delivery page for each active substantial delegated
+  engagement; do not turn it into a transcript.
 - Preserve project implementation during docs-only work.
 
 ## Updates

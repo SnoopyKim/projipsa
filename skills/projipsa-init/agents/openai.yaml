@@ -1,4 +1,0 @@
-interface:
-  display_name: "Projipsa Init"
-  short_description: "Initialize an existing project with Projipsa"
-  default_prompt: "Use $projipsa-init to onboard this existing project into source-backed project memory."

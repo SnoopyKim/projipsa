@@ -18,7 +18,13 @@ provenance is needed.
 
 Add links only for page families this project actually uses.
 
+## Active Deliveries
+
+Add links only for substantial delegated engagements that require durable
+state. Remove or move closed engagements according to the project's archive
+convention.
+
 ## History And Sources
 
-- `logs/YYYY-MM.md`: append-only chronology
+- [Current project log](logs/YYYY-MM.md)
 - `raw/YYYY-MM/`: preserved source material

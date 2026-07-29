@@ -33,11 +33,16 @@ Required fields:
 - `status`: `active`, `draft`, `stale`, `superseded`, or `archived`.
 - `confidence`: `confirmed`, `assumed`, `inferred`, or `disputed`.
 - `updated`: ISO date of the last meaningful content update.
-- `sources`: raw-source paths or maintained pages supporting the page.
+- `sources`: project-local regular-file paths, HTTP(S) sources, or maintained
+  pages supporting the page. A confirmed page's source chain must eventually
+  reach primary project evidence; self-reference or a maintained-page-only
+  cycle is not evidence.
 - `related`: related page IDs.
 
 Optional fields include `owner`, `supersedes`, `superseded_by`, `depends_on`,
-and `blocks`.
+and `blocks`. Use `projipsa_adoption: true` only on the one decision that
+records adoption of Projipsa; this marker lets migrated projects preserve an
+equivalent decision's stable ID and path.
 
 ## Universal core
 
@@ -73,6 +78,10 @@ state.
 - **Procedure**: repeatable operating steps with validation and recovery.
 - **External**: a party, tool, contract, service, source, API, or dependency.
 - **Milestone**: a launch, event, checkpoint, handoff, pause, or snapshot.
+- **Delivery**: the current contract and resumable state for one substantial
+  explicitly delegated engagement. Keep history in its change log and project
+  chronology; keep draft or changed contracts distinct from confirmed ones;
+  archive or supersede the page when the engagement closes.
 
 ## Page ID conventions
 
@@ -80,11 +89,13 @@ state.
 - Current state: `project.current-state`
 - Area: `area.<slug>`
 - Decision: `decision.<slug>.<yyyy-mm-dd>`
+- Projipsa adoption: `decision.projipsa-adoption.<yyyy-mm-dd>`
 - Assumption: `assumption.<slug>`
 - Risk: `risk.<slug>`
 - Procedure: `procedure.<slug>`
 - External dependency: `external.<slug>`
 - Question: `question.<slug>`
 - Milestone: `milestone.<slug>`
+- Delivery: `delivery.<slug>`
 
 Prefer stable IDs over path-derived IDs when pages may move.

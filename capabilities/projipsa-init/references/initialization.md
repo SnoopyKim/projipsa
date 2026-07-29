@@ -94,8 +94,8 @@ Add optional families only when the inventory justifies them:
 
 ## 5. Core creation
 
-Use the templates in `../projipsa/assets/templates/` relative to the init
-skill directory.
+Use the templates in `../projipsa-memory/assets/templates/` relative to the
+init capability directory.
 
 At minimum:
 
@@ -131,7 +131,8 @@ When a memory root already exists:
 - keep its stable IDs and working paths;
 - fill missing core responsibilities rather than replacing the tree;
 - repair navigation and frontmatter in place;
-- do not recreate the adoption decision if an equivalent decision exists;
+- preserve an equivalent adoption decision's stable ID and path, add
+  `projipsa_adoption: true`, and do not create a second page;
 - do not append duplicate init log entries;
 - treat user customizations as intentional unless evidence shows otherwise;
 - report divergence from the default instead of normalizing it automatically.
@@ -141,7 +142,7 @@ When a memory root already exists:
 Run:
 
 ```bash
-python3 <plugin-root>/skills/projipsa/scripts/validate_memory.py <memory-root>
+python3 <plugin-root>/capabilities/projipsa-memory/scripts/validate_memory.py <memory-root>
 ```
 
 Then review what deterministic checks cannot prove:

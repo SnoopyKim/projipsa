@@ -32,9 +32,9 @@ docs/
   logs/YYYY-MM.md
 ```
 
-Add `areas`, `assumptions`, `risks`, `procedures`, `external`, or `milestones`
-only when the project's real operating model needs them. Do not create empty
-families for symmetry.
+Add `areas`, `assumptions`, `risks`, `procedures`, `external`, `milestones`, or
+`deliveries` only when the project's real operating model needs them. Do not
+create empty families for symmetry.
 
 ## Authority boundaries
 
@@ -56,10 +56,12 @@ Projipsa may not:
 
 ## Host integration
 
-Other agents and plugins may consume project memory, but the maintained wiki
-remains the project-level source of current truth. Delivery systems may keep
-their own engagement state, then hand verified project facts and decisions to
-Projipsa for an authorized update.
+Other agents, plugins, and Projipsa capabilities may consume project memory,
+but the maintained wiki remains the project-level source of current truth.
+Project-mode delegated work may keep its current Delivery Contract and outer
+state in one maintained `wiki/deliveries/` page. It must still link durable
+decisions, risks, questions, milestones, and evidence rather than silently
+duplicating them.
 
 Avoid hard runtime dependencies at first. If Projipsa is unavailable, another
 agent may preserve a compact handoff, but it should not create a second

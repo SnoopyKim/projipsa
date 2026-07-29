@@ -8,7 +8,7 @@ Use Query to answer a project question without changing files.
 2. Read `wiki/project/current-state.md`.
 3. Open only directly relevant maintained pages.
 4. Follow linked decisions, questions, assumptions, risks, areas, procedures,
-   external dependencies, or milestones when relevant.
+   external dependencies, deliveries, or milestones when relevant.
 5. Open raw sources only when a claim needs verification or provenance.
 6. Check whether current state contradicts older logs or sources.
 7. Answer with confirmed facts first, followed by assumptions, stale risks,
@@ -50,7 +50,9 @@ meeting, review, or handoff.
 7. Add or supersede decision pages for meaningful choices.
 8. Update assumptions, risks, mitigations, and open questions.
 9. Record validation evidence and residual gaps.
-10. Append a compact factual monthly-log entry.
+10. Update an active delivery page when the work belongs to an authorized
+    delegated engagement.
+11. Append a compact factual monthly-log entry.
 
 Example:
 
@@ -63,6 +65,8 @@ Example:
 ```
 
 Do not turn an unverified implementation claim into confirmed current state.
+Do not copy a complete Delivery Contract into current state; link its delivery
+page and summarize only the project-level consequence.
 
 ## Lint
 
@@ -80,6 +84,8 @@ Check:
 - duplicate claims likely to drift;
 - raw sources edited instead of appended;
 - optional page families without a real project need;
+- active delivery pages whose contract, state, evidence, or next action has
+  drifted from the work they describe;
 - broken relative links.
 
 Report findings first. Fix them only when repair is authorized. Use
@@ -102,5 +108,6 @@ Create or update a milestone page containing:
 - open questions and important decisions;
 - the exact next useful action.
 
-Link it from the index when it should remain discoverable and append the
-monthly log.
+For delegated work, link the relevant delivery page and record its outer state
+and contract version. Link the milestone from the index when it should remain
+discoverable and append the monthly log.
