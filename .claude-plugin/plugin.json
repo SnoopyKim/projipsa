@@ -1,0 +1,18 @@
+{
+  "name": "projipsa",
+  "version": "0.1.0",
+  "description": "A project butler that keeps source-backed operational memory current for Codex and Claude Code.",
+  "author": {
+    "name": "SnoopyDev",
+    "url": "https://github.com/SnoopyKim"
+  },
+  "repository": "https://github.com/SnoopyKim/projipsa",
+  "license": "MIT",
+  "keywords": [
+    "project-memory",
+    "project-management",
+    "documentation",
+    "handoff",
+    "butler"
+  ]
+}

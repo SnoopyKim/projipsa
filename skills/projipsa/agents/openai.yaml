@@ -1,0 +1,4 @@
+interface:
+  display_name: "Projipsa"
+  short_description: "A project butler for durable project memory"
+  default_prompt: "Use $projipsa to keep this project's memory current, tidy, and source-backed."

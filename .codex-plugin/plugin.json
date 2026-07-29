@@ -1,0 +1,31 @@
+{
+  "name": "projipsa",
+  "version": "0.1.0",
+  "description": "A project butler that keeps source-backed operational memory current for Codex and Claude Code.",
+  "author": {
+    "name": "SnoopyDev",
+    "url": "https://github.com/SnoopyKim"
+  },
+  "repository": "https://github.com/SnoopyKim/projipsa",
+  "license": "MIT",
+  "keywords": [
+    "project-memory",
+    "project-management",
+    "documentation",
+    "handoff",
+    "butler"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Projipsa",
+    "shortDescription": "A project butler for durable project memory.",
+    "longDescription": "Projipsa acts as a project butler: it initializes source-backed project memory, prepares the right context, keeps current state and decisions tidy, preserves evidence, and makes paused work easy to resume.",
+    "developerName": "SnoopyDev",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Use $projipsa to update this project's memory after the work.",
+      "Use $projipsa-init to onboard this existing project."
+    ]
+  }
+}
