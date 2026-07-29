@@ -1,4 +1,6 @@
 interface:
   display_name: "Projipsa"
-  short_description: "Route project memory, coordination, and delivery"
-  default_prompt: "Use $projipsa to understand this project, brief me on its state, and route the next work."
+  short_description: "Query and maintain source-backed project memory"
+  default_prompt: "Use $projipsa to brief me from this project's maintained memory and identify stale or uncertain context."
+policy:
+  allow_implicit_invocation: true

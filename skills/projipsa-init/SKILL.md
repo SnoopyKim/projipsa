@@ -1,9 +1,19 @@
+---
+name: projipsa-init
+description: Initialize, migrate, audit, or repair Projipsa project memory in an existing project. Use when the user explicitly invokes $projipsa-init or explicitly asks to adopt, install, migrate, or repair Projipsa documentation. Treat initialization as docs-only unless the user expands the scope. Do not invoke merely because project memory would be useful.
+---
+
 # Projipsa Init
 
 Onboard an existing project into Projipsa. Create one durable, repo-local
 memory system around the project's real documentation and conventions. Treat
 initialization as a docs-only operation unless the user explicitly expands the
 scope.
+
+This is an explicit, infrequent workflow. Do not load or run it merely because
+project memory would be useful. Start only when the user invokes
+`$projipsa-init` or clearly asks to initialize, adopt, migrate, audit, or repair
+Projipsa memory.
 
 ## Establish the boundary
 
@@ -33,11 +43,9 @@ Read [the initialization workflow](references/initialization.md) for the
 detailed inventory, mapping, and validation workflow. Read the sibling
 canonical resources before writing:
 
-- [memory contract](../projipsa-memory/references/memory-contract.md)
-- [page types](../projipsa-memory/references/page-types.md)
-- [templates](../projipsa-memory/assets/templates/)
-
-Resolve these paths relative to this capability directory.
+- [memory contract](../projipsa/references/memory-contract.md)
+- [page types](../projipsa/references/page-types.md)
+- [templates](../projipsa/assets/templates/)
 
 ## Create the minimum useful core
 
@@ -96,7 +104,7 @@ Append the monthly log and make `index.md` the clear reading entry point.
 ## Validate and hand off
 
 1. Run the sibling
-   [memory validator](../projipsa-memory/scripts/validate_memory.py) against
+   [memory validator](../projipsa/scripts/validate_memory.py) against
    the memory root.
 2. Check that maintained pages are reachable from the index or related pages.
 3. Inspect the diff for unintended non-documentation changes.
@@ -105,6 +113,5 @@ Append the monthly log and make `index.md` the clear reading entry point.
 5. Report the selected root, files created or moved, preserved sources,
    validation, unresolved questions, and the next useful Projipsa operation.
 
-After successful initialization, return through Projipsa's `memory` mode for
-ongoing Query, Ingest, Update, Lint, and Snapshot work, or use the default
-front-door router.
+After successful initialization, use `$projipsa` for ongoing Query, Ingest,
+Update, Lint, and Snapshot work.

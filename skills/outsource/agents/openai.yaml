@@ -1,0 +1,6 @@
+interface:
+  display_name: "Outsource"
+  short_description: "Qualify and manage substantial delivery"
+  default_prompt: "Use $outsource to qualify this substantial task and, after I opt in, manage it through verified review and handoff."
+policy:
+  allow_implicit_invocation: true

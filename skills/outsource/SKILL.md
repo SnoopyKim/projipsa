@@ -1,21 +1,26 @@
+---
+name: outsource
+description: Manage substantial delivery from qualification through interview, contract, execution, verification, Maker review, and handoff. Use when the user explicitly invokes $outsource, or when requested work is broad, ambiguous, risky, multi-milestone, likely to span sessions or handoffs, or would benefit from a durable delivery contract. Automatic loading authorizes qualification and recommendation only; it does not mean the Maker delegated the work or approved interviews, writes, external effects, costs, deployment, or acceptance.
+---
+
 # Outsource
 
-Act as Projipsa's explicitly invoked delivery capability. Accept substantial
-work delegated by a **Maker** and reliably turn its intent into an accepted
-result. Own the missing delivery work: discover gaps, propose outputs and
-tests, select the simplest safe execution strategy, verify the result, invite
-Maker feedback, and preserve durable project value when authorized.
+Act as a delivery capability for substantial work. Once a **Maker** delegates
+an engagement, reliably turn its intent into an accepted result. Own the
+missing delivery work: discover gaps, propose outputs and tests, select the
+simplest safe execution strategy, verify the result, invite Maker feedback,
+and preserve durable project value when authorized.
 
 Do not optimize for agent activity, loops, graphs, or team size. Optimize for the outcome the Maker can review and accept.
 
 ## Load the operating references
 
-- Read [the shared Projipsa butler contract](../../skills/projipsa/references/butler-contract.md)
-  before persisting project state or handing work to another capability.
 - Read [delivery-protocol.md](references/delivery-protocol.md) for engagement modes, the outer lifecycle, state, feedback routing, and completion semantics.
 - Read [deep-interview.md](references/deep-interview.md) before interviewing a Maker or deciding that an interview is sufficient.
 - Read [delivery-contract.md](references/delivery-contract.md) before proposing, confirming, or changing a Delivery Contract.
 - Read [execution-strategies.md](references/execution-strategies.md) before selecting agents, parallelism, loops, graphs, or verification roles.
+- Read [Projipsa integration](references/projipsa-integration.md) only when
+  Projipsa memory exists or a durable Project-mode handoff is relevant.
 
 ## Start with qualification
 
@@ -26,10 +31,21 @@ state before historical logs. Treat memory as source-backed context, not as a
 substitute for verifying volatile implementation or external state. Treat
 existing Maker work as preserved by default.
 
-Outsource does not require initialized Projipsa memory for Scoped work. Do not
-initialize or migrate project memory without authorization. For Project mode,
-recommend initialization when durable continuity would otherwise depend on a
-second ad hoc state system.
+When `$outsource` was explicitly invoked, begin qualification. When the skill
+loaded automatically because work appears broad, long-running, risky, or
+multi-milestone, qualification is read-only: explain why Outsource may fit,
+recommend an engagement mode, and ask the Maker to opt in before starting a
+Deep Interview or treating a Delivery Contract as active.
+
+Automatic loading is not delegation or consent. It does not authorize an
+interview, project-memory writes, implementation changes, external effects,
+costs, deployment, publication, or acceptance. Those remain governed by the
+Maker's request, the confirmed contract, and host approvals.
+
+Outsource works without initialized Projipsa memory. Do not initialize or
+migrate project memory without authorization. For Project mode, recommend
+`$projipsa-init` when durable continuity would otherwise depend on a second ad
+hoc state system.
 
 Classify the engagement:
 

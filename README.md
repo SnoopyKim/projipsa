@@ -1,60 +1,59 @@
 # Projipsa
 
-> A project butler for memory, coordination, and delegated delivery.
+> A project butler for memory, onboarding, and substantial delivery.
 
 Projipsa helps Codex and Claude Code understand an existing project, keep its
-operating context current, coordinate the next work, and manage substantial
-explicitly delegated work through verified review and handoff.
+operating context current, and manage substantial work through verified review
+and handoff.
 
-It is one Plugin and one portable Skill entry point with four focused modes:
+It is one Plugin containing three portable Skills with deliberately different
+trigger boundaries:
 
 ```text
 projipsa
-├── default           front-door routing and consolidated reporting
-├── init              existing-project onboarding and repair
-├── memory            source-backed project memory
-└── outsource         explicitly delegated substantial delivery
+├── projipsa         frequent project-memory work
+├── projipsa-init    explicit, infrequent onboarding and repair
+└── outsource        substantial or long-running delivery
 ```
 
-The public Skill lives under `skills/projipsa/`; canonical mode procedures live
-under `capabilities/` and are loaded only when the router selects that mode.
-Using one public entry point prevents Codex and Claude Code from applying
-different automatic-invocation rules to overlapping specialist entry points.
+| Skill | Codex | Claude Code Plugin | Automatic loading |
+| --- | --- | --- | --- |
+| Project memory | `$projipsa` | `/projipsa:projipsa` | Yes, read-only context work |
+| Project onboarding | `$projipsa-init` | `/projipsa:projipsa-init` | No |
+| Substantial delivery | `$outsource` | `/projipsa:outsource` | Yes, qualification only |
 
-Invoke the same capability with each host's native syntax:
+Automatic loading is not additional authority. It helps the host notice the
+right workflow, but does not authorize writes, external effects, costs,
+deployment, publication, acceptance, or other actions outside the user's
+request and host approvals.
 
-| Capability | Codex | Claude Code Plugin |
-| --- | --- | --- |
-| Main project butler | `$projipsa` | `/projipsa:projipsa` |
-| Project onboarding | `$projipsa init` | `/projipsa:projipsa init` |
-| Project memory | `$projipsa memory` | `/projipsa:projipsa memory` |
-| Delegated delivery | `$projipsa outsource` | `/projipsa:projipsa outsource` |
+## `$projipsa`: project memory
 
-Projipsa serves the project without silently taking authority from its Maker.
-It may prepare context, recommend a route, preserve evidence, and surface
-decisions. It never treats a recommendation as approval or a passing check as
-Maker acceptance.
+`projipsa` is the everyday Skill after a project has adopted Projipsa. It
+supports:
 
-## How the modes work together
+- querying current project context without writing;
+- ingesting source material with provenance;
+- updating current state, decisions, risks, questions, and next work;
+- linting structure, freshness, links, and evidence;
+- creating milestone, pause, handoff, and restart snapshots;
+- persisting authorized Outsource delivery state.
 
-### `$projipsa`
+It may load implicitly for project briefing or memory lookup, but implicit use
+remains read-only. Ingest, update, repair, and snapshot require an explicit
+request or an already authorized memory-maintenance scope.
 
-Use the main Skill when you want one project-butler entry point. It:
+If no coherent Projipsa memory exists, the Skill reports that state and may
+suggest `$projipsa-init`; it does not initialize a project automatically.
 
-- reads project instructions and current context;
-- briefs current state and meaningful unknowns;
-- routes onboarding to `init`;
-- routes project-memory work to `memory`;
-- routes explicitly delegated substantial work to `outsource`;
-- leaves ordinary domain work in the host's normal specialist workflow;
-- returns one consolidated project report.
+Maintained Markdown and preserved source material are the canonical memory
+layer. Search indexes, graphs, dashboards, and summaries remain optional
+derived layers.
 
-Projipsa may recommend Outsource mode, but it does not begin a Deep Interview or
-Delivery Contract solely because a task is complex.
+## `$projipsa-init`: onboarding and repair
 
-### `$projipsa init`
-
-Use the initialization mode once when onboarding an existing project. It:
+`projipsa-init` is an explicit, infrequent workflow for adopting Projipsa in an
+existing project. It:
 
 - inventories current instructions and documentation;
 - selects `docs/` or an established durable equivalent as the memory root;
@@ -64,37 +63,36 @@ Use the initialization mode once when onboarding an existing project. It:
 - records the adoption decision and validates the result.
 
 Initialization is idempotent. A later run audits and repairs the existing setup
-instead of creating a second memory tree.
+instead of creating a second memory tree. The Skill does not load merely
+because memory would be useful, and its default boundary is docs-only.
 
-### `$projipsa memory`
+## `$outsource`: substantial delivery
 
-Use the memory mode after a project has adopted Projipsa. It supports:
+`outsource` is for work that is broad, ambiguous, risky, multi-milestone,
+likely to span sessions or handoffs, or likely to benefit from a durable
+delivery contract. It:
 
-- querying project context without writing;
-- ingesting source material with provenance;
-- updating current state, decisions, risks, questions, and next work;
-- linting structure, freshness, links, and evidence;
-- creating milestone, pause, handoff, and restart snapshots;
-- persisting authorized Outsource delivery state.
-
-Maintained Markdown and preserved source material are the canonical memory
-layer. Search indexes, graphs, dashboards, and summaries remain optional
-derived layers.
-
-### `$projipsa outsource`
-
-Use Outsource only when the Maker explicitly delegates substantial work. It:
-
-- routes ordinary work out and qualifies Scoped or Project engagement weight;
+- qualifies work as Ordinary, Scoped, or Project;
 - runs an adaptive Deep Interview for consequential uncertainty;
 - proposes and versions a Delivery Contract;
 - selects direct, sequential, parallel, graph, or human-gated execution;
 - separates executed, verified, and Maker-accepted outcomes;
 - manages feedback, change, pause, review, acceptance, and handoff;
-- hands durable outcomes back to project memory when authorized.
+- integrates durable outcomes with Projipsa memory when available and
+  authorized.
 
-Project-mode delivery uses a maintained Projipsa `delivery` page when memory
-writes are authorized. It does not create a competing long-lived state system.
+Codex or Claude Code may load `outsource` automatically when a request appears
+substantial or long-running. That automatic load authorizes only read-only
+qualification and a recommendation. Before starting a Deep Interview or
+treating a Delivery Contract as active, the Maker must opt in.
+
+Explicit `$outsource` invocation begins qualification, not blanket approval for
+every later write, external effect, cost, deployment, publication, or
+acceptance decision.
+
+Outsource works independently when Projipsa memory is absent. Project-mode work
+may recommend `$projipsa-init` rather than creating a competing long-lived
+state system.
 
 ## Shared project-memory layout
 
@@ -134,6 +132,7 @@ linked rather than duplicated.
 - Read-only work remains read-only.
 - Docs-only work does not change project behavior.
 - Installation grants no additional runtime permissions.
+- Automatic Skill loading is not delegation or consent.
 - External, costly, sensitive, and hard-to-reverse actions remain separately
   gated by the Maker and host.
 - Secrets stay in an approved secret store.
@@ -156,33 +155,50 @@ python3 scripts/validate_package.py
 python3 -m unittest discover -s tests
 ```
 
-Validate the public Skill with the host skill validator and validate the Plugin
-with the Codex and Claude Code plugin validators before publishing.
+Validate all three public Skills with the host skill validator and validate the
+Plugin with the Codex and Claude Code plugin validators before publishing.
 
-## v0.1 invocation migration
+## v0.3 invocation migration
 
-Version 0.2 intentionally replaces the separate `$projipsa-init`,
-`$projipsa-memory`, and `$outsource` entry points with `$projipsa init`,
-`$projipsa memory`, and `$projipsa outsource`. Claude Code uses the same mode
-names after `/projipsa:projipsa`.
+Version 0.3 replaces the v0.2 router modes with three independent Skills:
 
-Projipsa does not ship legacy alias Skills because Claude Code would discover
-those aliases as additional model-invocable entry points, recreating the
-routing overlap this version removes.
+| v0.2 | v0.3 |
+| --- | --- |
+| `$projipsa memory` | `$projipsa` |
+| `$projipsa init` | `$projipsa-init` |
+| `$projipsa outsource` | `$outsource` |
+| `/projipsa:projipsa memory` | `/projipsa:projipsa` |
+| `/projipsa:projipsa init` | `/projipsa:projipsa-init` |
+| `/projipsa:projipsa outsource` | `/projipsa:outsource` |
 
-## Distribution
+The split keeps the frequent memory workflow short and broadly useful, keeps
+one-time initialization out of implicit routing, and lets hosts notice when
+Outsource fits without mistaking that notice for Maker delegation.
 
-The public source is
-[`SnoopyKim/projipsa`](https://github.com/SnoopyKim/projipsa). Publication
-through the SnoopyDev marketplace is a separate release step; marketplace
-manifests should pin a reviewed commit SHA.
+## Install from the SnoopyDev marketplace
 
-For a source checkout, Claude Code can load the Plugin directly during
-development with `claude --plugin-dir /path/to/projipsa`. Codex installation
-should use the reviewed marketplace entry once that separate publication step
-is complete.
+Codex:
 
-The `outsource` mode was integrated from
+```bash
+codex plugin marketplace add SnoopyKim/marketplace --ref main
+codex plugin add projipsa@snoopydev
+```
+
+Claude Code:
+
+```bash
+claude plugin marketplace add SnoopyKim/marketplace
+claude plugin install projipsa@snoopydev
+```
+
+Start a new Codex task or restart Claude Code after installation. The public
+source is [`SnoopyKim/projipsa`](https://github.com/SnoopyKim/projipsa), and
+the marketplace pins a reviewed source commit.
+
+For local Claude Code development, load a source checkout directly with
+`claude --plugin-dir /path/to/projipsa`.
+
+The `outsource` Skill was integrated from
 [`SnoopyKim/Outsource`](https://github.com/SnoopyKim/Outsource) at commit
 `c4a5292e9579b67ecf6eda74558a9785f6305c77`. That repository may remain as a
 temporary compatibility and migration surface, but Projipsa is the intended

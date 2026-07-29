@@ -1,7 +1,7 @@
 {
   "name": "projipsa",
-  "version": "0.2.0",
-  "description": "A project butler that remembers context, coordinates project work, and manages delegated delivery for Codex and Claude Code.",
+  "version": "0.3.0",
+  "description": "A project butler with separate skills for project memory, onboarding, and substantial delivery in Codex and Claude Code.",
   "author": {
     "name": "SnoopyDev",
     "url": "https://github.com/SnoopyKim"

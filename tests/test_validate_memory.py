@@ -8,8 +8,8 @@ from pathlib import Path
 
 SCRIPT = (
     Path(__file__).resolve().parents[1]
-    / "capabilities"
-    / "projipsa-memory"
+    / "skills"
+    / "projipsa"
     / "scripts"
     / "validate_memory.py"
 )

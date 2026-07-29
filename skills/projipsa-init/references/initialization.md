@@ -94,8 +94,8 @@ Add optional families only when the inventory justifies them:
 
 ## 5. Core creation
 
-Use the templates in `../projipsa-memory/assets/templates/` relative to the
-init capability directory.
+Use the templates in `../../projipsa/assets/templates/` relative to this
+reference file.
 
 At minimum:
 
@@ -142,7 +142,7 @@ When a memory root already exists:
 Run:
 
 ```bash
-python3 <plugin-root>/capabilities/projipsa-memory/scripts/validate_memory.py <memory-root>
+python3 <plugin-root>/skills/projipsa/scripts/validate_memory.py <memory-root>
 ```
 
 Then review what deterministic checks cannot prove:

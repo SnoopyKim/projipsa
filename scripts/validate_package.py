@@ -14,15 +14,13 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 CODEX_MANIFEST = ROOT / ".codex-plugin" / "plugin.json"
 CLAUDE_MANIFEST = ROOT / ".claude-plugin" / "plugin.json"
-DEFAULT_SKILLS = {"projipsa"}
-EXPECTED_CAPABILITIES = {"outsource", "projipsa-init", "projipsa-memory"}
-MODE_TARGETS = {
-    "init": "../../capabilities/projipsa-init/CAPABILITY.md",
-    "memory": "../../capabilities/projipsa-memory/CAPABILITY.md",
-    "outsource": "../../capabilities/outsource/CAPABILITY.md",
+SKILL_ROOT = ROOT / "skills"
+EXPECTED_SKILLS = {"projipsa", "projipsa-init", "outsource"}
+EXPECTED_IMPLICIT_POLICY = {
+    "projipsa": True,
+    "projipsa-init": False,
+    "outsource": True,
 }
-DEFAULT_SKILL_ROOT = ROOT / "skills"
-CAPABILITY_ROOT = ROOT / "capabilities"
 DISALLOWED_ROLE = "ste" + "ward"
 SHARED_FIELDS = {
     "name",
@@ -35,24 +33,61 @@ SHARED_FIELDS = {
 }
 MARKDOWN_LINK = re.compile(r"\[[^\]]+]\(([^)]+)\)")
 LINK_SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
-ROUTER_GUARDRAILS = {
-    "implicit selection stays read-only": (
-        "selected implicitly",
-        "remain read-only",
-    ),
-    "mode dispatch uses the first token": (
-        "first argument token",
-        "dispatch literally",
-    ),
-    "only the selected capability is loaded": (
-        "load only the selected capability",
-    ),
-    "Outsource is not inferred from complexity": (
-        "complexity alone is not consent",
-    ),
-    "memory mode does not imply write authority": (
-        "does not select a write operation",
-    ),
+IMPLICIT_POLICY = re.compile(
+    r"^\s*allow_implicit_invocation:\s*(true|false)\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+SKILL_GUARDRAILS = {
+    "projipsa": {
+        "implicit use stays read-only": (
+            "implicit loading",
+            "read-only",
+        ),
+        "writes require authorized scope": (
+            "require either an explicit user request",
+            "project-memory maintenance",
+        ),
+        "missing memory does not auto-initialize": (
+            "do not",
+            "initialize it automatically",
+            "$projipsa-init",
+        ),
+    },
+    "projipsa-init": {
+        "initialization is explicit": (
+            "explicit, infrequent workflow",
+            "$projipsa-init",
+        ),
+        "memory usefulness is not a trigger": (
+            "do not load or run it merely because",
+            "memory would be useful",
+        ),
+        "default scope is docs-only": (
+            "docs-only operation",
+        ),
+        "initialization is idempotent": (
+            "initialization is idempotent",
+        ),
+    },
+    "outsource": {
+        "broad or long work can trigger qualification": (
+            "loaded automatically",
+            "broad, long-running, risky, or",
+            "qualification is read-only",
+        ),
+        "automatic loading is not delegation": (
+            "automatic loading is not delegation or consent",
+        ),
+        "Maker opts in before the engagement starts": (
+            "ask the maker to opt in",
+            "deep interview",
+            "delivery contract as active",
+        ),
+        "ordinary work routes out": (
+            "ordinary workflow",
+            "leave outsource",
+        ),
+    },
 }
 
 
@@ -67,6 +102,30 @@ def discovered_skills(root: Path) -> set[str]:
     return {
         path.parent.name for path in root.glob("*/SKILL.md") if path.is_file()
     }
+
+
+def normalized_text(path: Path) -> str:
+    return " ".join(path.read_text(encoding="utf-8").lower().split())
+
+
+def frontmatter_name(path: Path) -> str | None:
+    text = path.read_text(encoding="utf-8")
+    match = re.match(
+        r"\A---\s*\n(?P<body>.*?)\n---\s*(?:\n|\Z)",
+        text,
+        re.DOTALL,
+    )
+    if not match:
+        return None
+    name = re.search(r"^name:\s*(.+?)\s*$", match.group("body"), re.MULTILINE)
+    return name.group(1).strip() if name else None
+
+
+def implicit_policy(path: Path) -> bool | None:
+    match = IMPLICIT_POLICY.search(path.read_text(encoding="utf-8"))
+    if not match:
+        return None
+    return match.group(1).lower() == "true"
 
 
 def validate_local_links(path: Path) -> list[str]:
@@ -111,11 +170,11 @@ def validate() -> list[str]:
     if claude.get("skills") != "./skills/":
         errors.append("Claude manifest must use the portable skills/ entry point")
 
-    actual_default_skills = discovered_skills(DEFAULT_SKILL_ROOT)
-    if actual_default_skills != DEFAULT_SKILLS:
+    actual_skills = discovered_skills(SKILL_ROOT)
+    if actual_skills != EXPECTED_SKILLS:
         errors.append(
-            "default skill discovery must expose only the implicit Projipsa router; "
-            f"found {sorted(actual_default_skills)}"
+            f"default discovery must expose {sorted(EXPECTED_SKILLS)}; "
+            f"found {sorted(actual_skills)}"
         )
 
     all_skill_files = {
@@ -123,57 +182,63 @@ def validate() -> list[str]:
         for path in ROOT.rglob("SKILL.md")
         if ".git" not in path.parts
     }
-    expected_skill_files = {Path("skills/projipsa/SKILL.md")}
+    expected_skill_files = {
+        Path("skills") / skill / "SKILL.md" for skill in EXPECTED_SKILLS
+    }
     if all_skill_files != expected_skill_files:
         errors.append(
-            "Projipsa must expose one cross-host public Skill; "
+            "Projipsa must expose exactly three cross-host public Skills; "
             f"found {[str(path) for path in sorted(all_skill_files)]}"
         )
 
-    actual_capabilities = {
-        path.parent.name
-        for path in CAPABILITY_ROOT.glob("*/CAPABILITY.md")
-        if path.is_file()
-    }
-    if actual_capabilities != EXPECTED_CAPABILITIES:
+    legacy_capabilities = [
+        path.relative_to(ROOT)
+        for path in ROOT.rglob("CAPABILITY.md")
+        if ".git" not in path.parts
+    ]
+    if legacy_capabilities:
         errors.append(
-            f"expected capabilities {sorted(EXPECTED_CAPABILITIES)}, "
-            f"found {sorted(actual_capabilities)}"
+            "legacy capability entrypoints must be removed; "
+            f"found {[str(path) for path in legacy_capabilities]}"
         )
 
-    main_metadata = DEFAULT_SKILL_ROOT / "projipsa" / "agents" / "openai.yaml"
-    if not main_metadata.is_file():
-        errors.append(
-            f"missing Codex router metadata: {main_metadata.relative_to(ROOT)}"
-        )
-    elif "allow_implicit_invocation: false" in main_metadata.read_text(
-        encoding="utf-8"
-    ):
-        errors.append("the main Projipsa router must remain implicitly invocable")
-
-    router_path = DEFAULT_SKILL_ROOT / "projipsa" / "SKILL.md"
-    if router_path.is_file():
-        router_source = router_path.read_text(encoding="utf-8")
-        router_text = " ".join(router_source.lower().split())
-        for label, phrases in ROUTER_GUARDRAILS.items():
-            if not all(phrase.lower() in router_text for phrase in phrases):
-                errors.append(f"router contract missing guardrail: {label}")
-        for mode, target in MODE_TARGETS.items():
-            mapping = re.compile(
-                rf"- `{re.escape(mode)}` loads\s+"
-                rf"\[[^\]]+\]\({re.escape(target)}\)",
-                re.MULTILINE,
-            )
-            if not mapping.search(router_source):
+    for skill in sorted(EXPECTED_SKILLS):
+        skill_path = SKILL_ROOT / skill / "SKILL.md"
+        metadata_path = SKILL_ROOT / skill / "agents" / "openai.yaml"
+        if not skill_path.is_file():
+            continue
+        if frontmatter_name(skill_path) != skill:
+            errors.append(f"{skill_path.relative_to(ROOT)}: frontmatter name mismatch")
+        if not metadata_path.is_file():
+            errors.append(f"missing Codex metadata: {metadata_path.relative_to(ROOT)}")
+        else:
+            actual_policy = implicit_policy(metadata_path)
+            expected_policy = EXPECTED_IMPLICIT_POLICY[skill]
+            if actual_policy is not expected_policy:
                 errors.append(
-                    f"router must map mode {mode!r} to {target!r}"
+                    f"{metadata_path.relative_to(ROOT)}: "
+                    f"allow_implicit_invocation must be "
+                    f"{str(expected_policy).lower()}"
+                )
+            metadata = metadata_path.read_text(encoding="utf-8")
+            if f"${skill}" not in metadata:
+                errors.append(
+                    f"{metadata_path.relative_to(ROOT)}: default prompt must "
+                    f"mention ${skill}"
                 )
 
-    markdown_entrypoints = (
-        list(DEFAULT_SKILL_ROOT.glob("*/SKILL.md"))
-        + list(CAPABILITY_ROOT.glob("*/CAPABILITY.md"))
-    )
-    for path in markdown_entrypoints:
+        skill_text = normalized_text(skill_path)
+        for label, phrases in SKILL_GUARDRAILS[skill].items():
+            if not all(phrase in skill_text for phrase in phrases):
+                errors.append(f"{skill} contract missing guardrail: {label}")
+
+    markdown_paths = [
+        path
+        for path in ROOT.rglob("*.md")
+        if ".git" not in path.parts
+        and not {"assets", "templates"}.issubset(path.parts)
+    ]
+    for path in markdown_paths:
         errors.extend(validate_local_links(path))
 
     nested_manifests = [
@@ -185,19 +250,20 @@ def validate() -> list[str]:
         errors.append("the package must not contain nested plugin manifests")
 
     required_files = (
-        DEFAULT_SKILL_ROOT / "projipsa" / "references" / "butler-contract.md",
-        CAPABILITY_ROOT
-        / "projipsa-memory"
-        / "assets"
-        / "templates"
-        / "delivery.md",
-        CAPABILITY_ROOT / "outsource" / "references" / "delivery-contract.md",
+        SKILL_ROOT / "projipsa" / "references" / "memory-contract.md",
+        SKILL_ROOT / "projipsa" / "assets" / "templates" / "delivery.md",
+        SKILL_ROOT / "projipsa" / "scripts" / "validate_memory.py",
+        SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
+        SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
+        SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
     )
     for path in required_files:
         if not path.is_file():
-            errors.append(f"missing integrated capability file: {path.relative_to(ROOT)}")
+            errors.append(f"missing Skill resource: {path.relative_to(ROOT)}")
 
-    delivery_template = required_files[1]
+    delivery_template = (
+        SKILL_ROOT / "projipsa" / "assets" / "templates" / "delivery.md"
+    )
     if delivery_template.is_file():
         delivery_text = delivery_template.read_text(encoding="utf-8")
         for marker in (
@@ -209,7 +275,9 @@ def validate() -> list[str]:
             if marker not in delivery_text:
                 errors.append(f"delivery template must preserve {marker!r}")
 
-    if (CAPABILITY_ROOT / "outsource" / "references" / "learning-protocol.md").exists():
+    if (
+        SKILL_ROOT / "outsource" / "references" / "learning-protocol.md"
+    ).exists():
         errors.append("Outsource must not create an automatic learning-state protocol")
 
     text_extensions = {".md", ".json", ".yaml", ".yml"}
@@ -236,17 +304,11 @@ def validate() -> list[str]:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     for invocation in (
         "$projipsa",
-        "$projipsa init",
-        "$projipsa memory",
-        "$projipsa outsource",
-    ):
-        if invocation not in readme:
-            errors.append(f"README must document {invocation}")
-    for invocation in (
+        "$projipsa-init",
+        "$outsource",
         "/projipsa:projipsa",
-        "/projipsa:projipsa init",
-        "/projipsa:projipsa memory",
-        "/projipsa:projipsa outsource",
+        "/projipsa:projipsa-init",
+        "/projipsa:outsource",
     ):
         if invocation not in readme:
             errors.append(f"README must document {invocation}")
