@@ -19,6 +19,11 @@ Use `docs/` in repositories unless the project already has an established,
 durable equivalent. Reuse that equivalent instead of creating a competing
 tree.
 
+Hosts discover that root through different files: Codex reads `AGENTS.md` and
+Claude Code reads `CLAUDE.md`. A `projipsa:memory-pointer` block in the project's
+root instruction files names the selected root for both, and takes precedence
+over the `docs/` default when the two disagree.
+
 The universal core is:
 
 ```text

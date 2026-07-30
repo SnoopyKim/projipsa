@@ -13,7 +13,7 @@ SPEC.loader.exec_module(validate_package)
 
 
 class PackageContractTests(unittest.TestCase):
-    def test_package_and_router_contract_are_aligned(self) -> None:
+    def test_package_and_skill_contracts_are_aligned(self) -> None:
         self.assertEqual([], validate_package.validate())
 
 

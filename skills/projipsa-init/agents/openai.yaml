@@ -1,0 +1,6 @@
+interface:
+  display_name: "Projipsa Init"
+  short_description: "Initialize or repair project memory"
+  default_prompt: "Use $projipsa-init to initialize or repair this project's Projipsa memory as a docs-only change."
+policy:
+  allow_implicit_invocation: false

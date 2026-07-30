@@ -1,9 +1,25 @@
+---
+name: projipsa-init
+description: Initialize, migrate, audit, or repair Projipsa project memory in an existing project. Use when the user explicitly invokes $projipsa-init or /projipsa:projipsa-init, or explicitly asks to adopt, install, migrate, or repair Projipsa documentation. Treat initialization as docs-only unless the user expands the scope. Do not invoke merely because project memory would be useful.
+disable-model-invocation: true
+---
+
 # Projipsa Init
 
 Onboard an existing project into Projipsa. Create one durable, repo-local
 memory system around the project's real documentation and conventions. Treat
 initialization as a docs-only operation unless the user explicitly expands the
 scope.
+
+This is an explicit, infrequent workflow. Do not load or run it merely because
+project memory would be useful. Start only when the user invokes
+`$projipsa-init` in Codex, `/projipsa:projipsa-init` in Claude Code, or clearly
+asks to initialize, adopt, migrate, audit, or repair Projipsa memory.
+
+Both hosts enforce that boundary mechanically rather than by prose alone:
+`allow_implicit_invocation: false` in `agents/openai.yaml` for Codex, and
+`disable-model-invocation: true` in this file's frontmatter for Claude Code.
+Keep the two declarations in sync.
 
 ## Establish the boundary
 
@@ -33,11 +49,9 @@ Read [the initialization workflow](references/initialization.md) for the
 detailed inventory, mapping, and validation workflow. Read the sibling
 canonical resources before writing:
 
-- [memory contract](../projipsa-memory/references/memory-contract.md)
-- [page types](../projipsa-memory/references/page-types.md)
-- [templates](../projipsa-memory/assets/templates/)
-
-Resolve these paths relative to this capability directory.
+- [memory contract](../projipsa/references/memory-contract.md)
+- [page types](../projipsa/references/page-types.md)
+- [templates](../projipsa/assets/templates/)
 
 ## Create the minimum useful core
 
@@ -93,18 +107,46 @@ explicit adoption marker, and do not create a second decision.
 
 Append the monthly log and make `index.md` the clear reading entry point.
 
+## Make the memory root discoverable by every host
+
+An initialized memory root is worthless if the next agent never opens it, and
+each host discovers project instructions differently. Codex reads `AGENTS.md`.
+Claude Code reads `CLAUDE.md` and does not read `AGENTS.md` at all. So
+initialization maintains one marked pointer block in the project's root
+instruction files:
+
+1. Ensure the project root has `AGENTS.md` carrying the pointer block from
+   [the root pointer template](../projipsa/assets/templates/root-pointer.md).
+2. Ensure the project root has `CLAUDE.md`. When none exists, create it as an
+   import of `AGENTS.md` so both hosts read one maintained file. When one
+   already exists, add the same pointer block instead of injecting an import
+   that would duplicate curated instructions.
+3. Delimit the block with `<!-- projipsa:memory-pointer -->` and
+   `<!-- /projipsa:memory-pointer -->`. On a later run, replace that block in
+   place; never append a second copy.
+4. Keep the block short: the selected memory root, the reading entry point, the
+   layer rules, and where the full rules live.
+5. Preserve every surrounding line the Maker wrote.
+
+Root instruction files are documentation, so maintaining this block stays inside
+the docs-only boundary. Report the two paths explicitly anyway, because they sit
+outside the memory root the Maker asked you to create.
+
 ## Validate and hand off
 
 1. Run the sibling
-   [memory validator](../projipsa-memory/scripts/validate_memory.py) against
+   [memory validator](../projipsa/scripts/validate_memory.py) against
    the memory root.
 2. Check that maintained pages are reachable from the index or related pages.
 3. Inspect the diff for unintended non-documentation changes.
 4. Confirm raw sources were preserved and old full copies were not left as a
    second source of truth.
-5. Report the selected root, files created or moved, preserved sources,
-   validation, unresolved questions, and the next useful Projipsa operation.
+5. Confirm root `AGENTS.md` carries exactly one pointer block naming the
+   selected memory root, and root `CLAUDE.md` either imports `AGENTS.md` or
+   carries the same single block. The memory validator checks both.
+6. Report the selected root, files created or moved, the root instruction files
+   touched, preserved sources, validation, unresolved questions, and the next
+   useful Projipsa operation.
 
-After successful initialization, return through Projipsa's `memory` mode for
-ongoing Query, Ingest, Update, Lint, and Snapshot work, or use the default
-front-door router.
+After successful initialization, use `$projipsa` for ongoing Query, Ingest,
+Update, Lint, and Snapshot work.
