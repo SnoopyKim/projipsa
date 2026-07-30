@@ -28,8 +28,9 @@ deployment, publication, acceptance, or other actions outside the user's
 request and host approvals.
 
 Each host enforces that loading policy with its own mechanism instead of with
-prose alone: `allow_implicit_invocation` in `skills/<name>/agents/openai.yaml`
-for Codex, and `disable-model-invocation` in `skills/<name>/SKILL.md`
+prose alone: `allow_implicit_invocation` in
+`plugins/projipsa/skills/<name>/agents/openai.yaml` for Codex, and
+`disable-model-invocation` in `plugins/projipsa/skills/<name>/SKILL.md`
 frontmatter for Claude Code. Every Skill description documents both the
 `$name` and `/projipsa:name` invocation so neither host is left matching a
 trigger it can never see. `scripts/validate_package.py` fails when the two
@@ -161,7 +162,8 @@ Root `AGENTS.md` carries the block. Root `CLAUDE.md` is created as an
 already exists and should not be disturbed. A later initialization run replaces
 the block in place rather than appending a second copy.
 
-`skills/projipsa/scripts/validate_memory.py` enforces all of that: it fails on a
+`plugins/projipsa/skills/projipsa/scripts/validate_memory.py` enforces all of
+that: it fails on a
 missing instruction file, a missing block, a second appended block, and a block
 that names a different root than the one being validated.
 
@@ -185,6 +187,25 @@ Projipsa requires no environment variables, database, background daemon, MCP
 server, or hosted state service. It uses the filesystem and host capabilities
 already available to Codex or Claude Code.
 
+## Repository layout
+
+Installing the Plugin copies its plugin root into a local cache, and Claude Code
+has no ignore mechanism for that copy. The ship boundary is therefore a
+directory boundary:
+
+```text
+plugins/projipsa/     shipped: both manifests and the three Skills
+docs/                 this project's own Projipsa memory
+scripts/  tests/      validators and their tests
+.github/              CI
+```
+
+`scripts/validate_package.py` scans the shipped tree and this README, nothing
+else. Everything under `docs/` belongs to the memory validator instead, so this
+project can adopt Projipsa on itself without its notes gating package
+validation, and without shipping those notes to everyone who installs the
+Plugin.
+
 ## Development validation
 
 The bundled validators require Python 3.9 or newer and otherwise use only the
@@ -193,7 +214,7 @@ standard library.
 ```bash
 python3 scripts/validate_package.py
 python3 -m unittest discover -s tests
-claude plugin validate . --strict
+claude plugin validate ./plugins/projipsa --strict
 ```
 
 `scripts/validate_package.py` checks cross-host alignment: shared manifest
@@ -242,10 +263,11 @@ claude plugin install projipsa@snoopydev
 
 Start a new Codex task or restart Claude Code after installation. The public
 source is [`SnoopyKim/projipsa`](https://github.com/SnoopyKim/projipsa), and
-the marketplace pins a reviewed source commit.
+the marketplace pins a reviewed source commit at the plugin root
+`plugins/projipsa`.
 
 For local Claude Code development, load a source checkout directly with
-`claude --plugin-dir /path/to/projipsa`.
+`claude --plugin-dir /path/to/projipsa/plugins/projipsa`.
 
 The `outsource` Skill was integrated from
 [`SnoopyKim/Outsource`](https://github.com/SnoopyKim/Outsource) at commit

@@ -8,6 +8,8 @@ from pathlib import Path
 
 SCRIPT = (
     Path(__file__).resolve().parents[1]
+    / "plugins"
+    / "projipsa"
     / "skills"
     / "projipsa"
     / "scripts"

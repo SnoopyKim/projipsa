@@ -12,9 +12,13 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CODEX_MANIFEST = ROOT / ".codex-plugin" / "plugin.json"
-CLAUDE_MANIFEST = ROOT / ".claude-plugin" / "plugin.json"
-SKILL_ROOT = ROOT / "skills"
+# Only this directory is copied into a user's plugin cache. Project memory under
+# docs/, tests, scripts, and CI stay in the repository and are deliberately
+# outside every scan below: memory content must never gate package validation.
+PACKAGE_ROOT = ROOT / "plugins" / "projipsa"
+CODEX_MANIFEST = PACKAGE_ROOT / ".codex-plugin" / "plugin.json"
+CLAUDE_MANIFEST = PACKAGE_ROOT / ".claude-plugin" / "plugin.json"
+SKILL_ROOT = PACKAGE_ROOT / "skills"
 TEMPLATE_ROOT = SKILL_ROOT / "projipsa" / "assets" / "templates"
 
 # One declaration per public Skill. Adding a Skill means declaring its
@@ -174,7 +178,7 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
         if codex.get(field) != claude.get(field):
             errors.append(f"manifest field {field!r} differs between hosts")
 
-    if codex.get("name") != ROOT.name:
+    if codex.get("name") != PACKAGE_ROOT.name:
         errors.append("plugin folder and manifest name must both be 'projipsa'")
 
     version = codex.get("version")
@@ -217,13 +221,13 @@ def validate_skill_surface(errors: list[str]) -> None:
             f"found {sorted(actual_skills)}"
         )
 
+    package_prefix = PACKAGE_ROOT.relative_to(ROOT)
     all_skill_files = {
-        path.relative_to(ROOT)
-        for path in ROOT.rglob("SKILL.md")
-        if ".git" not in path.parts
+        path.relative_to(ROOT) for path in PACKAGE_ROOT.rglob("SKILL.md")
     }
     expected_skill_files = {
-        Path("skills") / skill / "SKILL.md" for skill in EXPECTED_SKILLS
+        package_prefix / "skills" / skill / "SKILL.md"
+        for skill in EXPECTED_SKILLS
     }
     if all_skill_files != expected_skill_files:
         errors.append(
@@ -232,9 +236,7 @@ def validate_skill_surface(errors: list[str]) -> None:
         )
 
     legacy_capabilities = [
-        relative(path)
-        for path in ROOT.rglob("CAPABILITY.md")
-        if ".git" not in path.parts
+        relative(path) for path in PACKAGE_ROOT.rglob("CAPABILITY.md")
     ]
     if legacy_capabilities:
         errors.append(
@@ -244,7 +246,7 @@ def validate_skill_surface(errors: list[str]) -> None:
 
     nested_manifests = [
         path
-        for path in ROOT.rglob("plugin.json")
+        for path in PACKAGE_ROOT.rglob("plugin.json")
         if path not in {CODEX_MANIFEST, CLAUDE_MANIFEST}
     ]
     if nested_manifests:
@@ -364,21 +366,26 @@ def validate_resources(errors: list[str]) -> None:
         errors.append("Outsource must not create an automatic learning-state protocol")
 
 
-def validate_prose(errors: list[str]) -> None:
-    markdown_paths = [
-        path
-        for path in ROOT.rglob("*.md")
-        if ".git" not in path.parts
-        and not {"assets", "templates"}.issubset(path.parts)
-    ]
-    for path in markdown_paths:
-        errors.extend(validate_local_links(path))
+def scanned_files() -> list[Path]:
+    """The prose surface this validator owns: everything that ships, plus the
+    repository README. Anything under docs/ belongs to validate_memory.py."""
+    files = [path for path in PACKAGE_ROOT.rglob("*") if path.is_file()]
+    readme = ROOT / "README.md"
+    if readme.is_file():
+        files.append(readme)
+    return sorted(files)
 
+
+def validate_prose(errors: list[str]) -> None:
     text_extensions = {".md", ".json", ".yaml", ".yml"}
-    for path in sorted(ROOT.rglob("*")):
-        if not path.is_file() or path.suffix not in text_extensions:
+    for path in scanned_files():
+        if "__pycache__" in path.parts:
             continue
-        if "__pycache__" in path.parts or ".git" in path.parts:
+        if path.suffix == ".md" and not {"assets", "templates"}.issubset(
+            path.parts
+        ):
+            errors.extend(validate_local_links(path))
+        if path.suffix not in text_extensions:
             continue
         text = path.read_text(encoding="utf-8")
         if re.search(rf"\b{DISALLOWED_ROLE}(?:ship)?\b", text, re.IGNORECASE):
