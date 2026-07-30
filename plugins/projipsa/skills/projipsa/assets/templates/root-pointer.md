@@ -32,6 +32,12 @@ create one that imports the file both hosts should share:
 @AGENTS.md
 ```
 
+## When the memory root is the project root
+
+If the project's durable equivalent turns out to be the repository root itself,
+there is no outer file to point inward and the block is unnecessary. Claude Code
+still needs a root `CLAUDE.md`, because it never reads `AGENTS.md`.
+
 ## Existing root CLAUDE.md
 
 When `CLAUDE.md` already exists, do not inject an import that would duplicate

@@ -50,7 +50,9 @@ POINTER_OPEN = "<!-- projipsa:memory-pointer -->"
 POINTER_CLOSE = "<!-- /projipsa:memory-pointer -->"
 # Codex reads AGENTS.md; Claude Code reads CLAUDE.md and never reads AGENTS.md.
 ROOT_INSTRUCTION_FILES = {"AGENTS.md": "Codex", "CLAUDE.md": "Claude Code"}
-AGENTS_IMPORT = re.compile(r"^@AGENTS\.md\s*$", re.MULTILINE)
+# Claude Code resolves an `@path` import anywhere in the text, and `@./AGENTS.md`
+# is as valid as `@AGENTS.md`.
+AGENTS_IMPORT = re.compile(r"(?:^|\s)@(?:\./)?AGENTS\.md(?![\w./-])")
 LINK_PATTERN = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 SCHEME_PATTERN = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 PLACEHOLDER_PATTERN = re.compile(r"\[TODO:|YYYY-MM(?:-DD)?")
@@ -82,21 +84,64 @@ def prose_only(text: str) -> str:
     return head + INLINE_CODE_PATTERN.sub("", without_fences)
 
 
-def validate_root_pointers(root: Path, project_boundary: Path) -> list[str]:
+def pointer_block(text: str) -> tuple[str | None, str | None]:
+    """The single pointer block's contents, or a reason it is unusable. Both
+    values are None when the file simply has no block."""
+    opened = text.count(POINTER_OPEN)
+    closed = text.count(POINTER_CLOSE)
+    if opened == 0:
+        return None, None
+    if opened != 1 or closed != opened:
+        return None, "must hold exactly one balanced projipsa:memory-pointer block"
+    return text.split(POINTER_OPEN, 1)[1].split(POINTER_CLOSE, 1)[0], None
+
+
+def names_root(block: str, declared: str) -> bool:
+    """Match the declared root as a whole path segment, so a block naming
+    `docs-archive/` does not satisfy a memory root of `docs`."""
+    return (
+        re.search(rf"(?<![\w.-]){re.escape(declared)}(?![\w.-])", block)
+        is not None
+    )
+
+
+def validate_root_pointers(root: Path) -> list[str]:
     """Each host discovers the memory root through its own instruction file.
     Require exactly one pointer block naming this root, so a second
     initialization run cannot silently append a competing one."""
-    errors: list[str] = []
     resolved_root = root.resolve()
-    if project_boundary == resolved_root:
-        return errors
-    try:
-        declared = resolved_root.relative_to(project_boundary).as_posix()
-    except ValueError:
-        return errors
+    boundary = locate_project_boundary(resolved_root)
+    if boundary is None:
+        return [
+            "cannot locate the project root, so the AGENTS.md and CLAUDE.md "
+            "memory pointers were not checked; keep the memory root inside a "
+            "repository or name it docs/"
+        ]
 
+    if boundary == resolved_root:
+        # The memory root is the project root, so no outer file points inward.
+        # Claude Code still needs CLAUDE.md, because it never reads AGENTS.md.
+        claude = boundary / "CLAUDE.md"
+        if not claude.is_file():
+            return [
+                "missing CLAUDE.md: Claude Code never reads AGENTS.md, so it "
+                "cannot discover this memory root"
+            ]
+        text = claude.read_text(encoding="utf-8")
+        block, problem = pointer_block(text)
+        if problem:
+            return [f"{claude}: {problem}"]
+        if block is None and not AGENTS_IMPORT.search(text):
+            return [
+                f"{claude}: must import AGENTS.md or carry a "
+                "projipsa:memory-pointer block"
+            ]
+        return []
+
+    declared = resolved_root.relative_to(boundary).as_posix()
+    errors: list[str] = []
     for name, host in ROOT_INSTRUCTION_FILES.items():
-        path = project_boundary / name
+        path = boundary / name
         if not path.is_file():
             errors.append(
                 f"missing root instruction file {name}: {host} cannot discover "
@@ -105,9 +150,11 @@ def validate_root_pointers(root: Path, project_boundary: Path) -> list[str]:
             continue
 
         text = path.read_text(encoding="utf-8")
-        opened = text.count(POINTER_OPEN)
-        closed = text.count(POINTER_CLOSE)
-        if opened == 0:
+        block, problem = pointer_block(text)
+        if problem:
+            errors.append(f"{path}: {problem}")
+            continue
+        if block is None:
             if name == "CLAUDE.md" and AGENTS_IMPORT.search(text):
                 continue
             errors.append(
@@ -115,15 +162,7 @@ def validate_root_pointers(root: Path, project_boundary: Path) -> list[str]:
                 f"learns about {declared}/"
             )
             continue
-        if opened != 1 or closed != opened:
-            errors.append(
-                f"{path}: must hold exactly one balanced "
-                "projipsa:memory-pointer block"
-            )
-            continue
-
-        block = text.split(POINTER_OPEN, 1)[1].split(POINTER_CLOSE, 1)[0]
-        if declared not in block:
+        if not names_root(block, declared):
             errors.append(
                 f"{path}: pointer block does not name the memory root "
                 f"{declared!r}"
@@ -221,13 +260,21 @@ def local_markdown_targets(path: Path, text: str) -> set[Path]:
     return targets
 
 
-def find_project_boundary(root: Path) -> Path:
+def locate_project_boundary(root: Path) -> Path | None:
+    """The project root holding the instruction files each host reads. None when
+    it cannot be determined, which callers must not treat as a pass."""
     for candidate in (root, *root.parents):
         if (candidate / ".git").exists():
             return candidate.resolve()
     if root.name in {"docs", "documentation", "project-docs"}:
         return root.parent.resolve()
-    return root.resolve()
+    return None
+
+
+def find_project_boundary(root: Path) -> Path:
+    """Widest path a source citation may reference. Falls back to the memory
+    root when the project root cannot be determined."""
+    return locate_project_boundary(root) or root.resolve()
 
 
 def is_within(path: Path, boundary: Path) -> bool:
@@ -283,7 +330,7 @@ def validate(root: Path) -> list[str]:
     ).strip():
         errors.append("AGENTS.md must state this project's memory rules")
 
-    errors.extend(validate_root_pointers(root, project_boundary))
+    errors.extend(validate_root_pointers(root))
 
     wiki_root = root / "wiki"
     wiki_files = sorted(wiki_root.rglob("*.md")) if wiki_root.is_dir() else []
