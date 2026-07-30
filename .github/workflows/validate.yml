@@ -1,0 +1,23 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Lowest version the README promises, plus current.
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Validate cross-host package alignment
+        run: python3 scripts/validate_package.py
+      - name: Run contract and memory tests
+        run: python3 -m unittest discover -s tests -v

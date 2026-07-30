@@ -1,6 +1,6 @@
 ---
 name: outsource
-description: Manage substantial delivery from qualification through interview, contract, execution, verification, Maker review, and handoff. Use when the user explicitly invokes $outsource, or when requested work is broad, ambiguous, risky, multi-milestone, likely to span sessions or handoffs, or would benefit from a durable delivery contract. Automatic loading authorizes qualification and recommendation only; it does not mean the Maker delegated the work or approved interviews, writes, external effects, costs, deployment, or acceptance.
+description: Manage substantial delivery from qualification through interview, contract, execution, verification, Maker review, and handoff. Use when the user invokes $outsource or /projipsa:outsource, or when requested work spans multiple milestones or sessions, needs a durable delivery contract, or is hard to reverse. Do not load it for bounded work the host's ordinary workflow can already deliver and review. Automatic loading authorizes read-only qualification and a recommendation only; it does not mean the Maker delegated the work or approved interviews, writes, external effects, costs, deployment, or acceptance.
 ---
 
 # Outsource
@@ -12,15 +12,6 @@ simplest safe execution strategy, verify the result, invite Maker feedback,
 and preserve durable project value when authorized.
 
 Do not optimize for agent activity, loops, graphs, or team size. Optimize for the outcome the Maker can review and accept.
-
-## Load the operating references
-
-- Read [delivery-protocol.md](references/delivery-protocol.md) for engagement modes, the outer lifecycle, state, feedback routing, and completion semantics.
-- Read [deep-interview.md](references/deep-interview.md) before interviewing a Maker or deciding that an interview is sufficient.
-- Read [delivery-contract.md](references/delivery-contract.md) before proposing, confirming, or changing a Delivery Contract.
-- Read [execution-strategies.md](references/execution-strategies.md) before selecting agents, parallelism, loops, graphs, or verification roles.
-- Read [Projipsa integration](references/projipsa-integration.md) only when
-  Projipsa memory exists or a durable Project-mode handoff is relevant.
 
 ## Start with qualification
 
@@ -59,6 +50,27 @@ Use the lightest path that can deliver reliably. Escalate the mode when new
 evidence increases uncertainty or risk. Do not retain Outsource terminology
 for ordinary work, and do not downgrade substantial work merely to avoid
 necessary discovery or verification.
+
+## Load each reference when its step is next
+
+Qualification itself needs no reference. Load a reference when the step it
+governs is the next thing you will do, not upfront:
+
+- Routed to the ordinary workflow: read nothing further and leave Outsource.
+- [delivery-protocol.md](references/delivery-protocol.md) — engagement modes,
+  the outer lifecycle, durable state, feedback routing, and completion
+  semantics. Read it once the engagement is Scoped or Project.
+- [deep-interview.md](references/deep-interview.md) — read before interviewing a
+  Maker or deciding that an interview is unnecessary.
+- [delivery-contract.md](references/delivery-contract.md) — read before
+  proposing, confirming, or changing a Delivery Contract.
+- [execution-strategies.md](references/execution-strategies.md) — read before
+  selecting agents, parallelism, loops, graphs, or verification roles.
+- [projipsa-integration.md](references/projipsa-integration.md) — read only when
+  Projipsa memory exists or a durable Project-mode handoff is relevant.
+
+Loading all five before knowing the engagement mode spends the Maker's context
+on paths this engagement will never take.
 
 ## Run the outer delivery lifecycle
 

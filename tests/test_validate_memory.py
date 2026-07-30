@@ -54,6 +54,16 @@ class ValidateMemoryTests(unittest.TestCase):
         (docs / "wiki" / "questions").mkdir(parents=True)
         (docs / "wiki" / "decisions").mkdir(parents=True)
         (docs / "logs").mkdir(parents=True)
+        (root / "AGENTS.md").write_text(
+            "# Project Instructions\n\n"
+            f"{validate_memory.POINTER_OPEN}\n"
+            "Memory root: `docs/`. Read `docs/index.md` first.\n"
+            f"{validate_memory.POINTER_CLOSE}\n",
+            encoding="utf-8",
+        )
+        (root / "CLAUDE.md").write_text(
+            "# Project Instructions\n\n@AGENTS.md\n", encoding="utf-8"
+        )
         (docs / "AGENTS.md").write_text("# Instructions\n", encoding="utf-8")
         (docs / "README.md").write_text("# Evidence\n", encoding="utf-8")
         (docs / "index.md").write_text(

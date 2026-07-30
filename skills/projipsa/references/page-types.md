@@ -39,6 +39,11 @@ Required fields:
   cycle is not evidence.
 - `related`: related page IDs.
 
+Templates ship `confidence: inferred` because a template cannot know the
+project's evidence. Raise a page to `confirmed` only in the same edit that lists
+its primary evidence in `sources`. A `confirmed` page with an empty `sources`
+list is a validation error, not an acceptable interim state.
+
 Optional fields include `owner`, `supersedes`, `superseded_by`, `depends_on`,
 and `blocks`. Use `projipsa_adoption: true` only on the one decision that
 records adoption of Projipsa; this marker lets migrated projects preserve an

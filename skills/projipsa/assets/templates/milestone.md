@@ -2,7 +2,7 @@
 id: milestone.slug
 type: milestone
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related: []

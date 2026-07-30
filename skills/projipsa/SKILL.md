@@ -1,6 +1,6 @@
 ---
 name: projipsa
-description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user asks for current project context, source ingestion, a post-work memory update, memory lint or repair, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, repair, and snapshot require authorized write scope.
+description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes $projipsa or /projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, memory lint or repair, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, repair, and snapshot require authorized write scope.
 ---
 
 # Projipsa
@@ -31,7 +31,9 @@ authority.
 
 1. Read the nearest project instructions, including `AGENTS.md`, `CLAUDE.md`,
    and established documentation conventions.
-2. Locate `docs/index.md` or the project's declared memory equivalent.
+2. Locate `docs/index.md` or the project's declared memory equivalent. When a
+   `projipsa:memory-pointer` block exists in a root instruction file, treat the
+   root it names as authoritative over the `docs/` default.
 3. If no coherent memory root exists, do not improvise a parallel tree or
    initialize it automatically. Suggest `$projipsa-init` when adoption,
    migration, or repair would be useful.
@@ -89,6 +91,9 @@ existing stable artifact.
 Templates live under [assets/templates/](assets/templates/). Replace every
 placeholder before writing. Do not leave TODO placeholders in maintained
 memory; represent a real unknown as an open question instead.
+
+Templates start at `confidence: inferred`. Raise a page to `confirmed` only in
+the same edit that lists its primary evidence in `sources`.
 
 ## Finish like a butler
 

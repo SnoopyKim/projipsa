@@ -2,7 +2,7 @@
 id: area.slug
 type: area
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related: []

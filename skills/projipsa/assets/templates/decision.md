@@ -2,7 +2,7 @@
 id: decision.slug.YYYY-MM-DD
 type: decision
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related: []

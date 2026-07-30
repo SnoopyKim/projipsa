@@ -2,7 +2,7 @@
 id: external.slug
 type: external
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related: []

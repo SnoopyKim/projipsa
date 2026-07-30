@@ -86,6 +86,10 @@ Check:
 - optional page families without a real project need;
 - active delivery pages whose contract, state, evidence, or next action has
   drifted from the work they describe;
+- a missing, duplicated, or stale `projipsa:memory-pointer` block in the root
+  instruction files, including a root `CLAUDE.md` that never points at the
+  memory root;
+- pages marked `confirmed` whose `sources` list is empty;
 - broken relative links.
 
 Report findings first. Fix them only when repair is authorized. Use

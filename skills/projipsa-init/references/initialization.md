@@ -100,11 +100,18 @@ reference file.
 At minimum:
 
 1. Make `index.md` the reading entry point.
-2. Add project-specific memory rules in `AGENTS.md`.
+2. Add project-specific memory rules in `<memory-root>/AGENTS.md`.
 3. Create verified project overview and current state pages.
 4. Record the Projipsa adoption decision.
 5. Capture real unknowns in open questions.
 6. Start the current monthly log.
+7. Maintain the pointer block from `root-pointer.md` in the project root's
+   `AGENTS.md` and `CLAUDE.md`. These are the project root's instruction files,
+   not the memory root's, and they are how Codex and Claude Code respectively
+   discover the memory root at all.
+
+Pages created from a template start at `confidence: inferred`. Raise a page to
+`confirmed` only in the same edit that lists its primary evidence in `sources`.
 
 Do not leave generic sample text, placeholder dates, placeholder IDs, or TODOs
 in the initialized project.
@@ -134,6 +141,10 @@ When a memory root already exists:
 - preserve an equivalent adoption decision's stable ID and path, add
   `projipsa_adoption: true`, and do not create a second page;
 - do not append duplicate init log entries;
+- keep exactly one pointer block per root instruction file, replacing its
+  contents in place when the memory root moves or the layer rules change;
+- create a root `CLAUDE.md` on repair when Claude Code would otherwise never
+  see the memory root;
 - treat user customizations as intentional unless evidence shows otherwise;
 - report divergence from the default instead of normalizing it automatically.
 

@@ -2,7 +2,7 @@
 id: procedure.slug
 type: procedure
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related: []

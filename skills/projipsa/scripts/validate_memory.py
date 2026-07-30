@@ -46,9 +46,16 @@ ADOPTION_FILE_PATTERN = re.compile(
     r"^\d{4}-\d{2}-\d{2}-projipsa-adoption\.md$"
 )
 MONTHLY_LOG_PATTERN = re.compile(r"^\d{4}-(?:0[1-9]|1[0-2])\.md$")
+POINTER_OPEN = "<!-- projipsa:memory-pointer -->"
+POINTER_CLOSE = "<!-- /projipsa:memory-pointer -->"
+# Codex reads AGENTS.md; Claude Code reads CLAUDE.md and never reads AGENTS.md.
+ROOT_INSTRUCTION_FILES = {"AGENTS.md": "Codex", "CLAUDE.md": "Claude Code"}
+AGENTS_IMPORT = re.compile(r"^@AGENTS\.md\s*$", re.MULTILINE)
 LINK_PATTERN = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 SCHEME_PATTERN = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 PLACEHOLDER_PATTERN = re.compile(r"\[TODO:|YYYY-MM(?:-DD)?")
+CODE_FENCE_PATTERN = re.compile(r"^[ \t]*(`{3,}|~{3,}).*?(?:^[ \t]*\1|\Z)", re.MULTILINE | re.DOTALL)
+INLINE_CODE_PATTERN = re.compile(r"`[^`\n]+`")
 
 FrontmatterValue = Union[str, list[str]]
 
@@ -60,6 +67,68 @@ def resolve_memory_root(candidate: Path) -> Path:
     if (candidate / "docs" / "index.md").is_file():
         return candidate / "docs"
     return candidate
+
+
+def prose_only(text: str) -> str:
+    """Drop fenced blocks and inline code from the body so documented
+    conventions are not mistaken for unresolved placeholders. Frontmatter is
+    scanned verbatim, so a backticked placeholder there cannot hide."""
+    match = re.match(r"\A---\s*\n.*?\n---\s*(?:\n|\Z)", text, re.DOTALL)
+    if match:
+        head, body = text[: match.end()], text[match.end() :]
+    else:
+        head, body = "", text
+    without_fences = CODE_FENCE_PATTERN.sub("", body)
+    return head + INLINE_CODE_PATTERN.sub("", without_fences)
+
+
+def validate_root_pointers(root: Path, project_boundary: Path) -> list[str]:
+    """Each host discovers the memory root through its own instruction file.
+    Require exactly one pointer block naming this root, so a second
+    initialization run cannot silently append a competing one."""
+    errors: list[str] = []
+    resolved_root = root.resolve()
+    if project_boundary == resolved_root:
+        return errors
+    try:
+        declared = resolved_root.relative_to(project_boundary).as_posix()
+    except ValueError:
+        return errors
+
+    for name, host in ROOT_INSTRUCTION_FILES.items():
+        path = project_boundary / name
+        if not path.is_file():
+            errors.append(
+                f"missing root instruction file {name}: {host} cannot discover "
+                f"{declared}/"
+            )
+            continue
+
+        text = path.read_text(encoding="utf-8")
+        opened = text.count(POINTER_OPEN)
+        closed = text.count(POINTER_CLOSE)
+        if opened == 0:
+            if name == "CLAUDE.md" and AGENTS_IMPORT.search(text):
+                continue
+            errors.append(
+                f"{path}: no projipsa:memory-pointer block, so {host} never "
+                f"learns about {declared}/"
+            )
+            continue
+        if opened != 1 or closed != opened:
+            errors.append(
+                f"{path}: must hold exactly one balanced "
+                "projipsa:memory-pointer block"
+            )
+            continue
+
+        block = text.split(POINTER_OPEN, 1)[1].split(POINTER_CLOSE, 1)[0]
+        if declared not in block:
+            errors.append(
+                f"{path}: pointer block does not name the memory root "
+                f"{declared!r}"
+            )
+    return errors
 
 
 def parse_inline_list(raw: str) -> list[str] | None:
@@ -207,6 +276,14 @@ def validate(root: Path) -> list[str]:
     for relative in REQUIRED_FILES:
         if not (root / relative).is_file():
             errors.append(f"missing required file: {relative}")
+
+    instructions = root / "AGENTS.md"
+    if instructions.is_file() and not instructions.read_text(
+        encoding="utf-8"
+    ).strip():
+        errors.append("AGENTS.md must state this project's memory rules")
+
+    errors.extend(validate_root_pointers(root, project_boundary))
 
     wiki_root = root / "wiki"
     wiki_files = sorted(wiki_root.rglob("*.md")) if wiki_root.is_dir() else []
@@ -414,7 +491,7 @@ def validate(root: Path) -> list[str]:
     for path in files_to_check:
         text = path.read_text(encoding="utf-8")
         errors.extend(local_markdown_links(path, text, root))
-        if PLACEHOLDER_PATTERN.search(text):
+        if PLACEHOLDER_PATTERN.search(prose_only(text)):
             errors.append(f"{path}: unresolved template placeholder")
         if path in monthly_logs and not text.strip():
             errors.append(f"{path}: monthly log must not be empty")

@@ -6,7 +6,9 @@ initialization separately.
 
 ## Detect existing memory
 
-1. Look for `docs/index.md` or a memory root declared by project instructions.
+1. Look for a `projipsa:memory-pointer` block in the root instruction files,
+   then for `docs/index.md` or another memory root declared by project
+   instructions.
 2. Read the current-state page before historical logs.
 3. Verify volatile implementation or external claims against their live source.
 4. Do not auto-initialize memory. Suggest `$projipsa-init` when continuity would

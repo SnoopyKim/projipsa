@@ -1,5 +1,6 @@
 {
   "name": "projipsa",
+  "displayName": "Projipsa",
   "version": "0.3.0",
   "description": "A project butler with separate skills for project memory, onboarding, and substantial delivery in Codex and Claude Code.",
   "author": {

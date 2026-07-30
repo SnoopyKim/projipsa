@@ -2,7 +2,7 @@
 id: project.current-state
 type: project
 status: active
-confidence: confirmed
+confidence: inferred
 updated: YYYY-MM-DD
 sources: []
 related:

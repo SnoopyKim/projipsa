@@ -27,6 +27,14 @@ right workflow, but does not authorize writes, external effects, costs,
 deployment, publication, acceptance, or other actions outside the user's
 request and host approvals.
 
+Each host enforces that loading policy with its own mechanism instead of with
+prose alone: `allow_implicit_invocation` in `skills/<name>/agents/openai.yaml`
+for Codex, and `disable-model-invocation` in `skills/<name>/SKILL.md`
+frontmatter for Claude Code. Every Skill description documents both the
+`$name` and `/projipsa:name` invocation so neither host is left matching a
+trigger it can never see. `scripts/validate_package.py` fails when the two
+declarations disagree.
+
 ## `$projipsa`: project memory
 
 `projipsa` is the everyday Skill after a project has adopted Projipsa. It
@@ -60,6 +68,7 @@ existing project. It:
 - creates the minimum useful project-memory core;
 - reorganizes existing docs without changing project behavior;
 - preserves raw sources and chronology;
+- maintains a marked memory pointer in the project's root instruction files;
 - records the adoption decision and validates the result.
 
 Initialization is idempotent. A later run audits and repairs the existing setup
@@ -81,10 +90,16 @@ delivery contract. It:
 - integrates durable outcomes with Projipsa memory when available and
   authorized.
 
-Codex or Claude Code may load `outsource` automatically when a request appears
-substantial or long-running. That automatic load authorizes only read-only
-qualification and a recommendation. Before starting a Deep Interview or
-treating a Delivery Contract as active, the Maker must opt in.
+Outsource loads each operating reference when the step it governs is next,
+rather than loading all five before the engagement mode is known.
+
+Codex or Claude Code may load `outsource` automatically when a request spans
+multiple milestones or sessions, needs a durable delivery contract, or is hard
+to reverse. That trigger is deliberately narrower than the range of work
+Outsource can handle: a host that loads it for anything broad-sounding spends
+the Maker's context on an engagement they never asked for. The automatic load
+authorizes only read-only qualification and a recommendation. Before starting a
+Deep Interview or treating a Delivery Contract as active, the Maker must opt in.
 
 Explicit `$outsource` invocation begins qualification, not blanket approval for
 every later write, external effect, cost, deployment, publication, or
@@ -127,10 +142,35 @@ evidence, Maker review, and exact next action. Durable decisions, risks,
 questions, sources, and milestones stay in their own canonical pages and are
 linked rather than duplicated.
 
+## Cross-host discovery
+
+A memory root only helps if the next agent opens it, and the two hosts read
+different instruction files. Codex reads `AGENTS.md`. Claude Code reads
+`CLAUDE.md` and does not read `AGENTS.md` at all. Initialization therefore
+maintains one marked block in the project's root instruction files:
+
+```text
+<!-- projipsa:memory-pointer -->
+names the memory root, the reading entry point, the layer rules,
+and where the full memory rules live
+<!-- /projipsa:memory-pointer -->
+```
+
+Root `AGENTS.md` carries the block. Root `CLAUDE.md` is created as an
+`@AGENTS.md` import when it does not exist, or receives the same block when it
+already exists and should not be disturbed. A later initialization run replaces
+the block in place rather than appending a second copy.
+
+`skills/projipsa/scripts/validate_memory.py` enforces all of that: it fails on a
+missing instruction file, a missing block, a second appended block, and a block
+that names a different root than the one being validated.
+
 ## Authority and privacy
 
 - Read-only work remains read-only.
 - Docs-only work does not change project behavior.
+- Initialization maintains a marked pointer block in root `AGENTS.md` and root
+  `CLAUDE.md`, and reports both paths. It changes no implementation file.
 - Installation grants no additional runtime permissions.
 - Automatic Skill loading is not delegation or consent.
 - External, costly, sensitive, and hard-to-reverse actions remain separately
@@ -153,10 +193,19 @@ standard library.
 ```bash
 python3 scripts/validate_package.py
 python3 -m unittest discover -s tests
+claude plugin validate . --strict
 ```
 
+`scripts/validate_package.py` checks cross-host alignment: shared manifest
+fields, matching loading policies, documented invocations for both hosts, and
+the guardrails each Skill contract must keep. `tests/test_memory_fixture.py`
+builds the minimum useful core from the shipped templates and requires the
+shipped memory validator to accept it, so a template cannot drift out of
+contract with its own validator. GitHub Actions runs both on Python 3.9 and
+3.13.
+
 Validate all three public Skills with the host skill validator and validate the
-Plugin with the Codex and Claude Code plugin validators before publishing.
+Plugin with the Codex plugin validator before publishing.
 
 ## v0.3 invocation migration
 
