@@ -196,12 +196,60 @@ class MemoryFixtureTests(unittest.TestCase):
             errors,
         )
 
+    def test_import_may_be_written_as_a_relative_path(self) -> None:
+        """`@./AGENTS.md` is as valid a Claude Code import as `@AGENTS.md`."""
+        (self.project / "CLAUDE.md").write_text(
+            "# Project Instructions\n\n@./AGENTS.md\n", encoding="utf-8"
+        )
+        self.assertEqual([], validate_memory.validate(self.root))
+
+    def test_similar_root_name_does_not_satisfy_the_pointer(self) -> None:
+        """A block naming `docs-archive/` must not pass for a root of `docs`."""
+        replace_in(self.project / "AGENTS.md", "docs/", "docs-archive/")
+        errors = validate_memory.validate(self.root)
+        self.assertTrue(
+            any("does not name the memory root" in error for error in errors),
+            errors,
+        )
+
     def test_memory_instructions_must_not_be_empty(self) -> None:
         (self.root / "AGENTS.md").write_text("\n", encoding="utf-8")
         errors = validate_memory.validate(self.root)
         self.assertTrue(
             any("memory rules" in error for error in errors),
             errors,
+        )
+
+
+class RootPointerBoundaryTests(unittest.TestCase):
+    """A validator that cannot check something must say so, never pass."""
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+
+    def test_unlocatable_project_root_is_reported_not_skipped(self) -> None:
+        memory = self.base / "memory"
+        memory.mkdir()
+        errors = validate_memory.validate_root_pointers(memory)
+        self.assertTrue(
+            any("cannot locate the project root" in error for error in errors),
+            errors,
+        )
+
+    def test_memory_root_at_project_root_still_needs_claude_md(self) -> None:
+        (self.base / ".git").mkdir()
+        errors = validate_memory.validate_root_pointers(self.base)
+        self.assertTrue(
+            any("missing CLAUDE.md" in error for error in errors), errors
+        )
+
+    def test_memory_root_at_project_root_accepts_an_import(self) -> None:
+        (self.base / ".git").mkdir()
+        (self.base / "CLAUDE.md").write_text("@AGENTS.md\n", encoding="utf-8")
+        self.assertEqual(
+            [], validate_memory.validate_root_pointers(self.base)
         )
 
 
