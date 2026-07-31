@@ -107,11 +107,14 @@ At minimum:
 6. Start the current monthly log.
 7. Maintain the pointer block from `root-pointer.md` in the project root's
    `AGENTS.md` and `CLAUDE.md`. These are the project root's instruction files,
-   not the memory root's, and they are how Codex and Claude Code respectively
-   discover the memory root at all.
+   not the memory root's, and they are how an agent discovers the memory root
+   at all: Claude Code reads `CLAUDE.md`, and `AGENTS.md` carries the canonical
+   block for every other agent that follows that convention.
 
-Pages created from a template start at `confidence: inferred`. Raise a page to
-`confirmed` only in the same edit that lists its primary evidence in `sources`.
+Pages created from a template start below `confirmed` — `inferred` for most
+types, `assumed` for `assumption`, `question`, `risk`, and `delivery`. Raise a
+page to `confirmed` only in the same edit that lists its primary evidence in
+`sources`.
 
 Do not leave generic sample text, placeholder dates, placeholder IDs, or TODOs
 in the initialized project.
