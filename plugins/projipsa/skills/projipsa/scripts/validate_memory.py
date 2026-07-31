@@ -48,8 +48,12 @@ ADOPTION_FILE_PATTERN = re.compile(
 MONTHLY_LOG_PATTERN = re.compile(r"^\d{4}-(?:0[1-9]|1[0-2])\.md$")
 POINTER_OPEN = "<!-- projipsa:memory-pointer -->"
 POINTER_CLOSE = "<!-- /projipsa:memory-pointer -->"
-# Codex reads AGENTS.md; Claude Code reads CLAUDE.md and never reads AGENTS.md.
-ROOT_INSTRUCTION_FILES = {"AGENTS.md": "Codex", "CLAUDE.md": "Claude Code"}
+# Claude Code reads CLAUDE.md and never reads AGENTS.md. AGENTS.md is kept as
+# the portable convention every other coding agent reads.
+ROOT_INSTRUCTION_FILES = {
+    "AGENTS.md": "an agent reading AGENTS.md",
+    "CLAUDE.md": "Claude Code",
+}
 # Claude Code resolves an `@path` import anywhere in the text, and `@./AGENTS.md`
 # is as valid as `@AGENTS.md`.
 AGENTS_IMPORT = re.compile(r"(?:^|\s)@(?:\./)?AGENTS\.md(?![\w./-])")
@@ -106,7 +110,7 @@ def names_root(block: str, declared: str) -> bool:
 
 
 def validate_root_pointers(root: Path) -> list[str]:
-    """Each host discovers the memory root through its own instruction file.
+    """An agent discovers the memory root through a root instruction file.
     Require exactly one pointer block naming this root, so a second
     initialization run cannot silently append a competing one."""
     resolved_root = root.resolve()

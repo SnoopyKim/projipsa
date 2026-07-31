@@ -11,6 +11,7 @@ then follow links to deeper pages.
 
 ## Decisions
 
+- [Claude Code only](wiki/decisions/2026-07-31-claude-code-only.md)
 - [Projipsa adoption](wiki/decisions/2026-07-31-projipsa-adoption.md)
 - [Plugin ship boundary](wiki/decisions/2026-07-30-plugin-ship-boundary.md)
 

@@ -1,6 +1,6 @@
 ---
 name: outsource
-description: Manage substantial delivery from qualification through interview, contract, execution, verification, Maker review, and handoff. Use when the user invokes $outsource or /projipsa:outsource, or when requested work spans multiple milestones or sessions, needs a durable delivery contract, or is hard to reverse. Do not load it for bounded work the host's ordinary workflow can already deliver and review. Automatic loading authorizes read-only qualification and a recommendation only; it does not mean the Maker delegated the work or approved interviews, writes, external effects, costs, deployment, or acceptance.
+description: Manage substantial delivery from qualification through interview, contract, execution, verification, Maker review, and handoff. Use when the user invokes /projipsa:outsource, or when requested work spans multiple milestones or sessions, needs a durable delivery contract, or is hard to reverse. Do not load it for bounded work the host's ordinary workflow can already deliver and review. Automatic loading authorizes read-only qualification and a recommendation only; it does not mean the Maker delegated the work or approved interviews, writes, external effects, costs, deployment, or acceptance.
 ---
 
 # Outsource
@@ -22,7 +22,7 @@ state before historical logs. Treat memory as source-backed context, not as a
 substitute for verifying volatile implementation or external state. Treat
 existing Maker work as preserved by default.
 
-When `$outsource` was explicitly invoked, begin qualification. When the skill
+When `/projipsa:outsource` was explicitly invoked, begin qualification. When the skill
 loaded automatically because work appears broad, long-running, risky, or
 multi-milestone, qualification is read-only: explain why Outsource may fit,
 recommend an engagement mode, and ask the Maker to opt in before starting a
@@ -35,7 +35,7 @@ Maker's request, the confirmed contract, and host approvals.
 
 Outsource works without initialized Projipsa memory. Do not initialize or
 migrate project memory without authorization. For Project mode, recommend
-`$projipsa-init` when durable continuity would otherwise depend on a second ad
+`/projipsa:projipsa-init` when durable continuity would otherwise depend on a second ad
 hoc state system.
 
 Classify the engagement:

@@ -1,6 +1,6 @@
 ---
 name: projipsa-init
-description: Initialize, migrate, audit, or repair Projipsa project memory in an existing project. Use when the user explicitly invokes $projipsa-init or /projipsa:projipsa-init, or explicitly asks to adopt, install, migrate, or repair Projipsa documentation. Treat initialization as docs-only unless the user expands the scope. Do not invoke merely because project memory would be useful.
+description: Initialize, migrate, audit, or repair Projipsa project memory in an existing project. Use when the user explicitly invokes /projipsa:projipsa-init, or explicitly asks to adopt, install, migrate, or repair Projipsa documentation. Treat initialization as docs-only unless the user expands the scope. Do not invoke merely because project memory would be useful.
 disable-model-invocation: true
 ---
 
@@ -13,13 +13,12 @@ scope.
 
 This is an explicit, infrequent workflow. Do not load or run it merely because
 project memory would be useful. Start only when the user invokes
-`$projipsa-init` in Codex, `/projipsa:projipsa-init` in Claude Code, or clearly
-asks to initialize, adopt, migrate, audit, or repair Projipsa memory.
+`/projipsa:projipsa-init`, or clearly asks to initialize, adopt, migrate,
+audit, or repair Projipsa memory.
 
-Both hosts enforce that boundary mechanically rather than by prose alone:
-`allow_implicit_invocation: false` in `agents/openai.yaml` for Codex, and
-`disable-model-invocation: true` in this file's frontmatter for Claude Code.
-Keep the two declarations in sync.
+Claude Code enforces that boundary mechanically rather than by prose alone:
+`disable-model-invocation: true` in this file's frontmatter keeps the Skill out
+of implicit routing.
 
 ## Establish the boundary
 
@@ -107,20 +106,21 @@ explicit adoption marker, and do not create a second decision.
 
 Append the monthly log and make `index.md` the clear reading entry point.
 
-## Make the memory root discoverable by every host
+## Make the memory root discoverable
 
-An initialized memory root is worthless if the next agent never opens it, and
-each host discovers project instructions differently. Codex reads `AGENTS.md`.
-Claude Code reads `CLAUDE.md` and does not read `AGENTS.md` at all. So
+An initialized memory root is worthless if the next agent never opens it.
+Claude Code reads `CLAUDE.md` and does not read `AGENTS.md` at all, while
+`AGENTS.md` remains the portable convention other coding agents read. So
 initialization maintains one marked pointer block in the project's root
 instruction files:
 
 1. Ensure the project root has `AGENTS.md` carrying the pointer block from
    [the root pointer template](../projipsa/assets/templates/root-pointer.md).
+   That file is the block's canonical home.
 2. Ensure the project root has `CLAUDE.md`. When none exists, create it as an
-   import of `AGENTS.md` so both hosts read one maintained file. When one
-   already exists, add the same pointer block instead of injecting an import
-   that would duplicate curated instructions.
+   import of `AGENTS.md` so Claude Code reads one maintained file instead of a
+   divergent copy. When one already exists, add the same pointer block instead
+   of injecting an import that would duplicate curated instructions.
 3. Delimit the block with `<!-- projipsa:memory-pointer -->` and
    `<!-- /projipsa:memory-pointer -->`. On a later run, replace that block in
    place; never append a second copy.
@@ -148,5 +148,5 @@ outside the memory root the Maker asked you to create.
    touched, preserved sources, validation, unresolved questions, and the next
    useful Projipsa operation.
 
-After successful initialization, use `$projipsa` for ongoing Query, Ingest,
-Update, Lint, and Snapshot work.
+After successful initialization, use `/projipsa:projipsa` for ongoing Query,
+Ingest, Update, Lint, and Snapshot work.

@@ -1,6 +1,6 @@
 ---
 name: projipsa
-description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes $projipsa or /projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, memory lint or repair, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, repair, and snapshot require authorized write scope.
+description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes /projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, memory lint or repair, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, repair, and snapshot require authorized write scope.
 ---
 
 # Projipsa
@@ -35,7 +35,7 @@ authority.
    `projipsa:memory-pointer` block exists in a root instruction file, treat the
    root it names as authoritative over the `docs/` default.
 3. If no coherent memory root exists, do not improvise a parallel tree or
-   initialize it automatically. Suggest `$projipsa-init` when adoption,
+   initialize it automatically. Suggest `/projipsa:projipsa-init` when adoption,
    migration, or repair would be useful.
 4. Read current state before logs. Open raw sources only when provenance or
    verification requires them.

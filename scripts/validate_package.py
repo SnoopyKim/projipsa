@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate cross-host Projipsa package alignment."""
+"""Validate Projipsa package alignment for Claude Code."""
 
 from __future__ import annotations
 
@@ -16,13 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 # docs/, tests, scripts, and CI stay in the repository and are deliberately
 # outside every scan below: memory content must never gate package validation.
 PACKAGE_ROOT = ROOT / "plugins" / "projipsa"
-CODEX_MANIFEST = PACKAGE_ROOT / ".codex-plugin" / "plugin.json"
 CLAUDE_MANIFEST = PACKAGE_ROOT / ".claude-plugin" / "plugin.json"
 SKILL_ROOT = PACKAGE_ROOT / "skills"
 TEMPLATE_ROOT = SKILL_ROOT / "projipsa" / "assets" / "templates"
 
 # One declaration per public Skill. Adding a Skill means declaring its
-# host-loading policy here, not editing several parallel constants.
+# loading policy here, not editing several parallel constants.
 SKILL_POLICY = {
     "projipsa": {"implicit": True},
     "projipsa-init": {"implicit": False},
@@ -31,21 +30,18 @@ SKILL_POLICY = {
 EXPECTED_SKILLS = set(SKILL_POLICY)
 
 DISALLOWED_ROLE = "steward"
-SHARED_FIELDS = {
+REQUIRED_MANIFEST_FIELDS = (
     "name",
     "version",
     "description",
+    "displayName",
     "author",
     "repository",
     "license",
     "keywords",
-}
+)
 MARKDOWN_LINK = re.compile(r"\[[^\]]+]\(([^)]+)\)")
 LINK_SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
-CODEX_IMPLICIT_POLICY = re.compile(
-    r"^\s*allow_implicit_invocation:\s*(true|false)\s*$",
-    re.MULTILINE | re.IGNORECASE,
-)
 EMPTY_SOURCES = re.compile(r"^sources:\s*\[\s*\]\s*$", re.MULTILINE)
 
 # Short, load-bearing terms of art rather than whole sentences: a contract may
@@ -61,7 +57,7 @@ SKILL_GUARDRAILS = {
             "project-memory maintenance",
         ),
         "missing memory does not auto-initialize": (
-            "$projipsa-init",
+            "/projipsa:projipsa-init",
         ),
     },
     "projipsa-init": {
@@ -77,7 +73,7 @@ SKILL_GUARDRAILS = {
         "initialization is idempotent": (
             "initialization is idempotent",
         ),
-        "the memory root stays discoverable per host": (
+        "the memory root stays discoverable": (
             "projipsa:memory-pointer",
             "claude.md",
             "agents.md",
@@ -141,16 +137,9 @@ def frontmatter_field(body: str, key: str) -> str | None:
 
 
 def mentions_invocation(text: str, invocation: str) -> bool:
-    """Match a whole invocation token, so `$projipsa` is not satisfied by
-    `$projipsa-init`."""
+    """Match a whole invocation token, so `/projipsa:projipsa` is not satisfied
+    by `/projipsa:projipsa-init`."""
     return re.search(rf"{re.escape(invocation)}(?![\w-])", text) is not None
-
-
-def codex_implicit_policy(path: Path) -> bool | None:
-    match = CODEX_IMPLICIT_POLICY.search(path.read_text(encoding="utf-8"))
-    if not match:
-        return None
-    return match.group(1).lower() == "true"
 
 
 def validate_local_links(path: Path) -> list[str]:
@@ -166,51 +155,42 @@ def validate_local_links(path: Path) -> list[str]:
     return errors
 
 
-def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
+def validate_manifests(errors: list[str]) -> dict[str, Any] | None:
     try:
-        codex = load_json(CODEX_MANIFEST)
         claude = load_json(CLAUDE_MANIFEST)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         errors.append(str(exc))
         return None
 
-    for field in sorted(SHARED_FIELDS):
-        if codex.get(field) != claude.get(field):
-            errors.append(f"manifest field {field!r} differs between hosts")
+    for field in REQUIRED_MANIFEST_FIELDS:
+        if not claude.get(field):
+            errors.append(f"plugin manifest must declare {field!r}")
 
-    if codex.get("name") != PACKAGE_ROOT.name:
+    if claude.get("name") != PACKAGE_ROOT.name:
         errors.append("plugin folder and manifest name must both be 'projipsa'")
 
-    version = codex.get("version")
+    version = claude.get("version")
     if not isinstance(version, str) or not re.fullmatch(
         r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?",
         version,
     ):
         errors.append("plugin version must use strict semantic versioning")
 
-    if codex.get("skills") != "./skills/":
-        errors.append("Codex manifest must use the portable skills/ entry point")
     if claude.get("skills") != "./skills/":
-        errors.append("Claude manifest must use the portable skills/ entry point")
+        errors.append("plugin manifest must use the portable skills/ entry point")
 
-    codex_interface = codex.get("interface")
-    codex_display = (
-        codex_interface.get("displayName")
-        if isinstance(codex_interface, dict)
-        else None
-    )
-    if not codex_display:
-        errors.append("Codex manifest must declare interface.displayName")
-    if claude.get("displayName") != codex_display:
-        errors.append(
-            "displayName must match across hosts; Claude Code otherwise shows "
-            "no name where Codex shows one"
-        )
+    # A manifest that still ships another host's fields has been half-migrated.
+    for stale in ("interface", "agents"):
+        if stale in claude:
+            errors.append(
+                f"plugin manifest must not carry the {stale!r} field; Projipsa "
+                "targets Claude Code only"
+            )
 
-    if "project butler" not in (codex.get("description") or "").lower():
+    if "project butler" not in (claude.get("description") or "").lower():
         errors.append("plugin description must state the project butler concept")
 
-    return codex, claude
+    return claude
 
 
 def validate_skill_surface(errors: list[str]) -> None:
@@ -247,15 +227,26 @@ def validate_skill_surface(errors: list[str]) -> None:
     nested_manifests = [
         path
         for path in PACKAGE_ROOT.rglob("plugin.json")
-        if path not in {CODEX_MANIFEST, CLAUDE_MANIFEST}
+        if path != CLAUDE_MANIFEST
     ]
     if nested_manifests:
         errors.append("the package must not contain nested plugin manifests")
 
+    foreign_host_files = [
+        relative(path)
+        for path in PACKAGE_ROOT.rglob("*")
+        if path.is_file()
+        and (path.name == "openai.yaml" or ".codex-plugin" in path.parts)
+    ]
+    if foreign_host_files:
+        errors.append(
+            "the package must not ship another host's metadata; found "
+            f"{sorted(foreign_host_files)}"
+        )
+
 
 def validate_skill(skill: str, errors: list[str]) -> None:
     skill_path = SKILL_ROOT / skill / "SKILL.md"
-    metadata_path = SKILL_ROOT / skill / "agents" / "openai.yaml"
     if not skill_path.is_file():
         return
 
@@ -272,15 +263,20 @@ def validate_skill(skill: str, errors: list[str]) -> None:
     description = frontmatter_field(body, "description") or ""
     if not description:
         errors.append(f"{relative(skill_path)}: frontmatter needs a description")
-    for invocation in (f"${skill}", f"/projipsa:{skill}"):
-        if not mentions_invocation(description, invocation):
-            errors.append(
-                f"{relative(skill_path)}: description must document the "
-                f"{invocation} invocation so both hosts can trigger it"
-            )
+    invocation = f"/projipsa:{skill}"
+    if not mentions_invocation(description, invocation):
+        errors.append(
+            f"{relative(skill_path)}: description must document the "
+            f"{invocation} invocation so the host can trigger it"
+        )
+    if mentions_invocation(description, f"${skill}"):
+        errors.append(
+            f"{relative(skill_path)}: description must not advertise the "
+            f"${skill} invocation; Claude Code cannot trigger it"
+        )
 
-    # Claude Code enforces explicit-only loading through frontmatter; Codex
-    # enforces the same policy through agents/openai.yaml. Both must agree.
+    # Claude Code enforces explicit-only loading through frontmatter. It is the
+    # only mechanical gate the package has, so it must match SKILL_POLICY.
     claude_policy = frontmatter_field(body, "disable-model-invocation")
     if expected_implicit and claude_policy is not None:
         errors.append(
@@ -292,21 +288,6 @@ def validate_skill(skill: str, errors: list[str]) -> None:
             f"{relative(skill_path)}: disable-model-invocation must be true so "
             "Claude Code enforces the explicit-only policy mechanically"
         )
-
-    if not metadata_path.is_file():
-        errors.append(f"missing Codex metadata: {relative(metadata_path)}")
-    else:
-        actual_policy = codex_implicit_policy(metadata_path)
-        if actual_policy is not expected_implicit:
-            errors.append(
-                f"{relative(metadata_path)}: allow_implicit_invocation must be "
-                f"{str(expected_implicit).lower()}"
-            )
-        metadata = metadata_path.read_text(encoding="utf-8")
-        if not mentions_invocation(metadata, f"${skill}"):
-            errors.append(
-                f"{relative(metadata_path)}: default prompt must mention ${skill}"
-            )
 
     skill_text = normalized_text(skill_path)
     for label, phrases in SKILL_GUARDRAILS[skill].items():
@@ -399,9 +380,9 @@ def validate_prose(errors: list[str]) -> None:
 def validate_readme(errors: list[str]) -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     for skill in sorted(EXPECTED_SKILLS):
-        for invocation in (f"${skill}", f"/projipsa:{skill}"):
-            if not mentions_invocation(readme, invocation):
-                errors.append(f"README must document {invocation}")
+        invocation = f"/projipsa:{skill}"
+        if not mentions_invocation(readme, invocation):
+            errors.append(f"README must document {invocation}")
 
 
 def validate() -> list[str]:
@@ -427,7 +408,7 @@ def main() -> int:
         print(f"Package validation failed with {len(errors)} error(s).", file=sys.stderr)
         return 1
 
-    print("Projipsa package is aligned for Codex and Claude Code.")
+    print("Projipsa package is aligned for Claude Code.")
     return 0
 
 

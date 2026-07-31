@@ -1,9 +1,9 @@
 # Project Instructions
 
-Projipsa is a plugin distributed to Codex and Claude Code. Only
-`plugins/projipsa/` is shipped to users; everything else in this repository
-stays here. See [the ship boundary
-decision](docs/wiki/decisions/2026-07-30-plugin-ship-boundary.md).
+Projipsa is a Claude Code plugin. Only `plugins/projipsa/` is shipped to users;
+everything else in this repository stays here. See [the ship boundary
+decision](docs/wiki/decisions/2026-07-30-plugin-ship-boundary.md) and [the host
+scope decision](docs/wiki/decisions/2026-07-31-claude-code-only.md).
 
 <!-- projipsa:memory-pointer -->
 ## Project memory

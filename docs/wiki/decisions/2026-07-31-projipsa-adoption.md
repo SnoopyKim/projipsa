@@ -6,11 +6,13 @@ confidence: confirmed
 updated: 2026-07-31
 projipsa_adoption: true
 sources:
+  - https://github.com/SnoopyKim/projipsa/pull/4
   - README.md
   - https://github.com/SnoopyKim/projipsa/pull/2
 related:
   - project.current-state
   - decision.plugin-ship-boundary.2026-07-30
+  - decision.claude-code-only.2026-07-31
 supersedes: []
 superseded_by: []
 ---
@@ -72,7 +74,7 @@ durable state.
 
 ## Consequences
 
-- Root `AGENTS.md` and root `CLAUDE.md` now exist and carry the host pointer
-  block, so both hosts can find this tree.
+- Root `AGENTS.md` and root `CLAUDE.md` now exist and carry the memory pointer
+  block, so an agent entering the repository can find this tree.
 - Memory health is checked by `validate_memory.py`, separately from the package
   contract, so documentation drift can never block a release.
