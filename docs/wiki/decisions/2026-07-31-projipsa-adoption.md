@@ -6,11 +6,13 @@ confidence: confirmed
 updated: 2026-07-31
 projipsa_adoption: true
 sources:
+  - https://github.com/SnoopyKim/projipsa/pull/4
   - README.md
   - https://github.com/SnoopyKim/projipsa/pull/2
 related:
   - project.current-state
   - decision.plugin-ship-boundary.2026-07-30
+  - question.open-questions
 supersedes: []
 superseded_by: []
 ---
@@ -69,6 +71,10 @@ durable state.
   contract, rather than a per-project rule, is unresolved. See
   [open questions](../questions/open-questions.md).
 - No evaluation harness covers whether a Skill triggers at the right moment.
+- `validate_memory.py` accepts three classes of broken pointer and reference,
+  all reproduced on 2026-07-31 and recorded in
+  [open questions](../questions/open-questions.md). This tree is valid under a
+  validator that is weaker than the contract it enforces.
 
 ## Consequences
 

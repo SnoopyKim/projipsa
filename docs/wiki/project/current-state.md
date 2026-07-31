@@ -7,11 +7,14 @@ updated: 2026-07-31
 sources:
   - https://github.com/SnoopyKim/projipsa/pull/2
   - https://github.com/SnoopyKim/projipsa/pull/3
+  - https://github.com/SnoopyKim/projipsa/pull/4
   - plugins/projipsa/.claude-plugin/plugin.json
+  - .claude-plugin/marketplace.json
 related:
   - project.overview
   - decision.projipsa-adoption.2026-07-31
   - decision.plugin-ship-boundary.2026-07-30
+  - question.open-questions
 ---
 
 # Current State
@@ -33,10 +36,18 @@ use of Projipsa on itself.
 - Only `plugins/projipsa/` is shipped. `scripts/validate_package.py` scans that
   tree and the repository README, nothing else.
 - `validate_memory.py` owns everything under this memory root, including the
-  host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`.
+  host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`. Its
+  pointer checks are incomplete: three gaps were reproduced on 2026-07-31 and
+  are recorded in [open questions](../questions/open-questions.md).
 - 31 tests pass on Python 3.12 and 3.9.6. CI runs them on 3.9 and 3.13.
-- `projipsa` is not listed in the SnoopyDev marketplace, so no installation of
-  it exists anywhere yet.
+- `projipsa` is not listed in the SnoopyDev marketplace. The only installation
+  anywhere is this source checkout, installed through
+  `.claude-plugin/marketplace.json` at the repository root.
+- The ship boundary is confirmed by an actual install, not only by reasoning:
+  `~/.claude/plugins/cache/projipsa/projipsa/0.3.0/` holds exactly the plugin
+  root — `.claude-plugin/`, `.codex-plugin/`, and `skills/`. `docs/`, `tests/`,
+  and `scripts/` were not copied. `claude plugin details projipsa` reports
+  three Skills and no agents, hooks, or MCP servers.
 
 ## In Progress
 
@@ -52,10 +63,14 @@ use of Projipsa on itself.
 ## Active Defaults
 
 - `docs/` is the memory root, and it is public.
-- Pages created from a template start at `confidence: inferred` and are raised
-  to `confirmed` only in the edit that lists their evidence.
-- Development loads the working tree with
-  `claude --plugin-dir ./plugins/projipsa` rather than an installed copy.
+- Pages created from a template start below `confirmed`: `inferred` for most
+  types, `assumed` for `assumption`, `question`, `risk`, and `delivery`. A page
+  is raised to `confirmed` only in the edit that lists its evidence.
+- Development can either install this checkout through the root marketplace
+  manifest or load the working tree with
+  `claude --plugin-dir ./plugins/projipsa`. The installed cache is a
+  version-pinned copy, not a live reference, so an edit reaches it only after a
+  version bump plus `claude plugin update`.
 
 ## Validation
 
@@ -65,9 +80,18 @@ use of Projipsa on itself.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
 - Each pointer-validation fix was reverted individually and failed exactly one
   test each time.
+- `python3 plugins/projipsa/skills/projipsa/scripts/validate_memory.py docs`
+  passes, and three of its gaps were reproduced in a scratch fixture built from
+  this tree.
 
 ## Next Work
 
+- Fix the three reproduced `validate_memory.py` gaps: an unparsed root
+  declaration, Markdown code regions counted as real imports, and unresolved
+  `related` IDs.
+- Correct `page-types.md`, which states that templates ship
+  `confidence: inferred`. Four ship `assumed`. `initialization.md` carried the
+  same claim and was corrected; this copy was not.
 - Decide whether the narrowed `outsource` trigger fires appropriately, using
   real usage rather than prediction.
 - Decide when to list `projipsa` in the marketplace, and at which commit.

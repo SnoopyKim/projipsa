@@ -266,7 +266,17 @@ source is [`SnoopyKim/projipsa`](https://github.com/SnoopyKim/projipsa), and
 the marketplace pins a reviewed source commit at the plugin root
 `plugins/projipsa`.
 
-For local Claude Code development, load a source checkout directly with
+The marketplace entry is not published yet, so until it is, install a source
+checkout through this repository's own marketplace manifest:
+
+```bash
+claude plugin marketplace add /path/to/projipsa
+claude plugin install projipsa@projipsa
+```
+
+The installed copy is version-pinned, so a later edit under
+`plugins/projipsa/` reaches it only after a version bump plus
+`claude plugin update`. To load the working tree for one session instead, use
 `claude --plugin-dir /path/to/projipsa/plugins/projipsa`.
 
 The `outsource` Skill was integrated from
