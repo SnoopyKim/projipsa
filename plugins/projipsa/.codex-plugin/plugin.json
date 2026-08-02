@@ -29,9 +29,9 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $projipsa to brief me from this project's maintained memory.",
-      "Use $projipsa-init to onboard this existing project.",
-      "Use $outsource to qualify this substantial project and manage it after I opt in."
+      "Use $projipsa:projipsa to brief me from this project's maintained memory.",
+      "Use $projipsa:projipsa-init to onboard this existing project.",
+      "Use $projipsa:outsource to qualify this substantial project and manage it after I opt in."
     ]
   }
 }

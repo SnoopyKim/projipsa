@@ -1,0 +1,16 @@
+{
+  "name": "projipsa",
+  "description": "Source checkout of the Projipsa plugin, for local development and testing.",
+  "owner": {
+    "name": "SnoopyDev",
+    "url": "https://github.com/SnoopyKim"
+  },
+  "plugins": [
+    {
+      "name": "projipsa",
+      "source": "./plugins/projipsa",
+      "category": "productivity",
+      "strict": true
+    }
+  ]
+}

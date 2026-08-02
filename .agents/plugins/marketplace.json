@@ -1,0 +1,20 @@
+{
+  "name": "projipsa",
+  "interface": {
+    "displayName": "Projipsa"
+  },
+  "plugins": [
+    {
+      "name": "projipsa",
+      "source": {
+        "source": "local",
+        "path": "./plugins/projipsa"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
