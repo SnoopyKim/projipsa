@@ -97,6 +97,9 @@ use of Projipsa on itself.
 - A fresh Codex process invoked `$projipsa:projipsa-init`, created only the
   minimum memory core in a temporary repository, and passed the shipped memory
   validator with 4 maintained pages.
+- A Claude Code 2.1.220 process loaded the working-tree plugin through
+  `--plugin-dir`, exposed exactly the three Projipsa commands, and resolved
+  `/projipsa:projipsa-init` without tools or writes.
 - Each pointer-validation fix was reverted individually and failed exactly one
   test each time.
 - `python3 plugins/projipsa/skills/projipsa/scripts/validate_memory.py docs`

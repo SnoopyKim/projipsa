@@ -64,8 +64,9 @@ docs-only initialization.
   one canonical workflow body.
 - Keeping Codex at the standard `skills/` path satisfies its authoritative
   plugin validator.
-- Claude Code accepts the manifest-declared `claude-skills/` path, so it does
-  not need to scan or load the Codex adapters.
+- Claude Code accepts the manifest-declared `claude-skills/` path and exposes
+  the three expected `/projipsa:<skill>` commands from it, so it does not need
+  to scan or load the Codex adapters.
 - One plugin root preserves the existing cache and ship boundary and avoids
   duplicated resource trees that could drift.
 
