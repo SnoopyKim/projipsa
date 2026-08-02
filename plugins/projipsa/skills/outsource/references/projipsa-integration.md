@@ -11,8 +11,9 @@ initialization separately.
    instructions.
 2. Read the current-state page before historical logs.
 3. Verify volatile implementation or external claims against their live source.
-4. Do not auto-initialize memory. Suggest `$projipsa-init` when continuity would
-   benefit from adoption, migration, or repair.
+4. Do not auto-initialize memory. Suggest `$projipsa:projipsa-init` in Codex or
+   `/projipsa:projipsa-init` in Claude Code when continuity would benefit from
+   adoption, migration, or repair.
 
 ## Persist only authorized durable state
 

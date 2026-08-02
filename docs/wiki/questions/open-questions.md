@@ -49,17 +49,6 @@ Resolution: collect every declared `id` in the memory root and fail on a
 `related` entry that matches none of them. Decide first whether a forward
 reference to a page that does not exist yet should be an error or a warning.
 
-## Does Codex tolerate the Claude Code frontmatter key?
-
-`projipsa-init/SKILL.md` carries `disable-model-invocation: true`, which only
-Claude Code defines. Two skills installed under `~/.codex/skills` carry keys
-Codex has no semantics for and load normally, so the key is expected to be
-inert. It has not been confirmed by running Codex against this Plugin.
-
-Resolution: invoke `$projipsa-init` in Codex once and record the result. The
-Claude Code side is confirmed: an install from this checkout reports three
-Skills, and `projipsa-init` stays out of the model's skill listing.
-
 ## Is the narrowed `outsource` trigger correct?
 
 The trigger was narrowed to work that spans milestones or sessions, needs a

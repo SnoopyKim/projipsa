@@ -3,17 +3,22 @@ id: project.current-state
 type: project
 status: active
 confidence: confirmed
-updated: 2026-07-31
+updated: 2026-08-02
 sources:
   - https://github.com/SnoopyKim/projipsa/pull/2
   - https://github.com/SnoopyKim/projipsa/pull/3
   - https://github.com/SnoopyKim/projipsa/pull/4
   - plugins/projipsa/.claude-plugin/plugin.json
+  - plugins/projipsa/.codex-plugin/plugin.json
+  - plugins/projipsa/skills/projipsa/references/page-types.md
+  - wiki/decisions/2026-08-02-host-adapter-separation.md
+  - .agents/plugins/marketplace.json
   - .claude-plugin/marketplace.json
 related:
   - project.overview
   - decision.projipsa-adoption.2026-07-31
   - decision.plugin-ship-boundary.2026-07-30
+  - decision.host-adapter-separation.2026-08-02
   - question.open-questions
 ---
 
@@ -29,6 +34,16 @@ use of Projipsa on itself.
 ## Confirmed Current
 
 - Three public Skills ship: `projipsa`, `projipsa-init`, and `outsource`.
+- The public workflows are shared, but their harnesses are isolated: Codex
+  loads thin adapters from `skills/`, while Claude Code loads thin adapters
+  from `claude-skills/`. See [the host-adapter
+  decision](../decisions/2026-08-02-host-adapter-separation.md).
+- Local installation is separated at the repository boundary too: Codex uses
+  `.agents/plugins/marketplace.json`; Claude Code uses
+  `.claude-plugin/marketplace.json`.
+- Codex plugin invocations are namespace-qualified. In particular,
+  `$projipsa:projipsa-init` loaded the correct explicit-only Skill in a fresh
+  process; the shorter `$projipsa-init` did not.
 - `projipsa-init` is explicit-only on both hosts, enforced by
   `allow_implicit_invocation: false` for Codex and `disable-model-invocation:
   true` for Claude Code. A skill listing under `claude --plugin-dir` confirmed
@@ -39,19 +54,19 @@ use of Projipsa on itself.
   host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`. Its
   pointer checks are incomplete: three gaps were reproduced on 2026-07-31 and
   are recorded in [open questions](../questions/open-questions.md).
-- 31 tests pass on Python 3.12 and 3.9.6. CI runs them on 3.9 and 3.13.
-- `projipsa` is not listed in the SnoopyDev marketplace. The only installation
-  anywhere is this source checkout, installed through
-  `.claude-plugin/marketplace.json` at the repository root.
-- The ship boundary is confirmed by an actual install, not only by reasoning:
-  `~/.claude/plugins/cache/projipsa/projipsa/0.3.0/` holds exactly the plugin
-  root — `.claude-plugin/`, `.codex-plugin/`, and `skills/`. `docs/`, `tests/`,
-  and `scripts/` were not copied. `claude plugin details projipsa` reports
-  three Skills and no agents, hooks, or MCP servers.
+- 33 tests pass on Python 3.12. The preceding 31-test suite also passed on
+  Python 3.9.6, and CI runs the current suite on 3.9 and 3.13.
+- `projipsa` is not listed in the SnoopyDev marketplace. Development installs
+  currently use this source checkout: Codex through `.agents/` and Claude Code
+  through `.claude-plugin/` at the repository root.
+- The ship boundary is confirmed by an actual Claude Code install: its cache
+  holds the plugin root while repository `docs/`, `tests/`, and `scripts/`
+  remain outside the installed copy.
 
 ## In Progress
 
-- Adopting Projipsa on this repository. This tree is that work.
+- Pull request 4 carries this repository's Projipsa adoption, dogfood repairs,
+  and the host-adapter separation toward merge.
 
 ## Explicitly Not Current
 
@@ -75,9 +90,13 @@ use of Projipsa on itself.
 ## Validation
 
 - `python3 scripts/validate_package.py` passes.
-- `python3 -m unittest discover -s tests` passes, 31 tests, on Python 3.12 and
-  3.9.6.
+- `python3 -m unittest discover -s tests` passes, 33 tests, on Python 3.12.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
+- The authoritative Codex plugin validator and all three Codex Skill validators
+  pass with the separated adapter layout.
+- A fresh Codex process invoked `$projipsa:projipsa-init`, created only the
+  minimum memory core in a temporary repository, and passed the shipped memory
+  validator with 4 maintained pages.
 - Each pointer-validation fix was reverted individually and failed exactly one
   test each time.
 - `python3 plugins/projipsa/skills/projipsa/scripts/validate_memory.py docs`
@@ -89,9 +108,6 @@ use of Projipsa on itself.
 - Fix the three reproduced `validate_memory.py` gaps: an unparsed root
   declaration, Markdown code regions counted as real imports, and unresolved
   `related` IDs.
-- Correct `page-types.md`, which states that templates ship
-  `confidence: inferred`. Four ship `assumed`. `initialization.md` carried the
-  same claim and was corrected; this copy was not.
 - Decide whether the narrowed `outsource` trigger fires appropriately, using
   real usage rather than prediction.
 - Decide when to list `projipsa` in the marketplace, and at which commit.

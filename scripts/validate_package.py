@@ -16,10 +16,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # docs/, tests, scripts, and CI stay in the repository and are deliberately
 # outside every scan below: memory content must never gate package validation.
 PACKAGE_ROOT = ROOT / "plugins" / "projipsa"
+CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
+CLAUDE_MARKETPLACE = ROOT / ".claude-plugin" / "marketplace.json"
 CODEX_MANIFEST = PACKAGE_ROOT / ".codex-plugin" / "plugin.json"
 CLAUDE_MANIFEST = PACKAGE_ROOT / ".claude-plugin" / "plugin.json"
-SKILL_ROOT = PACKAGE_ROOT / "skills"
-TEMPLATE_ROOT = SKILL_ROOT / "projipsa" / "assets" / "templates"
+CODEX_SKILL_ROOT = PACKAGE_ROOT / "skills"
+CLAUDE_SKILL_ROOT = PACKAGE_ROOT / "claude-skills"
+SHARED_WORKFLOW_ROOT = PACKAGE_ROOT / "shared"
+RESOURCE_SKILL_ROOT = CODEX_SKILL_ROOT
+TEMPLATE_ROOT = RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates"
 
 # One declaration per public Skill. Adding a Skill means declaring its
 # host-loading policy here, not editing several parallel constants.
@@ -29,6 +34,7 @@ SKILL_POLICY = {
     "outsource": {"implicit": True},
 }
 EXPECTED_SKILLS = set(SKILL_POLICY)
+CODEX_PLUGIN_NAMESPACE = "projipsa"
 
 DISALLOWED_ROLE = "steward"
 SHARED_FIELDS = {
@@ -61,7 +67,7 @@ SKILL_GUARDRAILS = {
             "project-memory maintenance",
         ),
         "missing memory does not auto-initialize": (
-            "$projipsa-init",
+            "$projipsa:projipsa-init",
         ),
     },
     "projipsa-init": {
@@ -141,9 +147,13 @@ def frontmatter_field(body: str, key: str) -> str | None:
 
 
 def mentions_invocation(text: str, invocation: str) -> bool:
-    """Match a whole invocation token, so `$projipsa` is not satisfied by
-    `$projipsa-init`."""
+    """Match a whole invocation token, so an unqualified name is not
+    satisfied by a namespaced plugin invocation."""
     return re.search(rf"{re.escape(invocation)}(?![\w-])", text) is not None
+
+
+def codex_invocation(skill: str) -> str:
+    return f"${CODEX_PLUGIN_NAMESPACE}:{skill}"
 
 
 def codex_implicit_policy(path: Path) -> bool | None:
@@ -189,9 +199,9 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
         errors.append("plugin version must use strict semantic versioning")
 
     if codex.get("skills") != "./skills/":
-        errors.append("Codex manifest must use the portable skills/ entry point")
-    if claude.get("skills") != "./skills/":
-        errors.append("Claude manifest must use the portable skills/ entry point")
+        errors.append("Codex manifest must use the standard skills/ entry point")
+    if claude.get("skills") != "./claude-skills/":
+        errors.append("Claude manifest must use the isolated claude-skills/ entry point")
 
     codex_interface = codex.get("interface")
     codex_display = (
@@ -213,12 +223,62 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
     return codex, claude
 
 
+def validate_marketplaces(errors: list[str]) -> None:
+    try:
+        codex = load_json(CODEX_MARKETPLACE)
+        claude = load_json(CLAUDE_MARKETPLACE)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        errors.append(str(exc))
+        return
+
+    if codex.get("name") != "projipsa" or claude.get("name") != "projipsa":
+        errors.append("both development marketplaces must be named 'projipsa'")
+
+    codex_plugins = codex.get("plugins")
+    claude_plugins = claude.get("plugins")
+    if not isinstance(codex_plugins, list) or len(codex_plugins) != 1:
+        errors.append("Codex marketplace must expose exactly one plugin")
+        codex_entry: dict[str, Any] = {}
+    else:
+        codex_entry = codex_plugins[0] if isinstance(codex_plugins[0], dict) else {}
+    if not isinstance(claude_plugins, list) or len(claude_plugins) != 1:
+        errors.append("Claude marketplace must expose exactly one plugin")
+        claude_entry: dict[str, Any] = {}
+    else:
+        claude_entry = (
+            claude_plugins[0] if isinstance(claude_plugins[0], dict) else {}
+        )
+
+    if codex_entry.get("name") != "projipsa":
+        errors.append("Codex marketplace must expose the projipsa plugin")
+    if claude_entry.get("name") != "projipsa":
+        errors.append("Claude marketplace must expose the projipsa plugin")
+    if codex_entry.get("source") != {
+        "source": "local",
+        "path": "./plugins/projipsa",
+    }:
+        errors.append("Codex marketplace must use its local structured source")
+    if claude_entry.get("source") != "./plugins/projipsa":
+        errors.append("Claude marketplace must use its local plugin source")
+    if codex_entry.get("policy") != {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL",
+    }:
+        errors.append("Codex marketplace must declare its installation policy")
+
+
 def validate_skill_surface(errors: list[str]) -> None:
-    actual_skills = discovered_skills(SKILL_ROOT)
-    if actual_skills != EXPECTED_SKILLS:
+    codex_skills = discovered_skills(CODEX_SKILL_ROOT)
+    claude_skills = discovered_skills(CLAUDE_SKILL_ROOT)
+    if codex_skills != EXPECTED_SKILLS:
         errors.append(
-            f"default discovery must expose {sorted(EXPECTED_SKILLS)}; "
-            f"found {sorted(actual_skills)}"
+            f"Codex discovery must expose {sorted(EXPECTED_SKILLS)}; "
+            f"found {sorted(codex_skills)}"
+        )
+    if claude_skills != EXPECTED_SKILLS:
+        errors.append(
+            f"Claude discovery must expose {sorted(EXPECTED_SKILLS)}; "
+            f"found {sorted(claude_skills)}"
         )
 
     package_prefix = PACKAGE_ROOT.relative_to(ROOT)
@@ -226,13 +286,30 @@ def validate_skill_surface(errors: list[str]) -> None:
         path.relative_to(ROOT) for path in PACKAGE_ROOT.rglob("SKILL.md")
     }
     expected_skill_files = {
-        package_prefix / "skills" / skill / "SKILL.md"
+        package_prefix / host_root / skill / "SKILL.md"
+        for host_root in ("skills", "claude-skills")
         for skill in EXPECTED_SKILLS
     }
     if all_skill_files != expected_skill_files:
         errors.append(
-            "every cross-host public Skill needs a SKILL_POLICY row; "
+            "every public Skill needs one isolated adapter per host; "
             f"found {[str(path) for path in sorted(all_skill_files)]}"
+        )
+
+    shared_workflows = {
+        path.stem for path in SHARED_WORKFLOW_ROOT.glob("*.md") if path.is_file()
+    }
+    if shared_workflows != EXPECTED_SKILLS:
+        errors.append(
+            f"shared workflows must match {sorted(EXPECTED_SKILLS)}; "
+            f"found {sorted(shared_workflows)}"
+        )
+
+    claude_metadata = sorted(CLAUDE_SKILL_ROOT.glob("*/agents/openai.yaml"))
+    if claude_metadata:
+        errors.append(
+            "Codex metadata must not live in the Claude adapter tree; "
+            f"found {[relative(path) for path in claude_metadata]}"
         )
 
     legacy_capabilities = [
@@ -254,42 +331,67 @@ def validate_skill_surface(errors: list[str]) -> None:
 
 
 def validate_skill(skill: str, errors: list[str]) -> None:
-    skill_path = SKILL_ROOT / skill / "SKILL.md"
-    metadata_path = SKILL_ROOT / skill / "agents" / "openai.yaml"
-    if not skill_path.is_file():
+    codex_skill_path = CODEX_SKILL_ROOT / skill / "SKILL.md"
+    claude_skill_path = CLAUDE_SKILL_ROOT / skill / "SKILL.md"
+    shared_workflow_path = SHARED_WORKFLOW_ROOT / f"{skill}.md"
+    metadata_path = CODEX_SKILL_ROOT / skill / "agents" / "openai.yaml"
+    if not codex_skill_path.is_file() or not claude_skill_path.is_file():
         return
 
     expected_implicit = bool(SKILL_POLICY[skill]["implicit"])
 
-    body = frontmatter_body(skill_path)
-    if body is None:
-        errors.append(f"{relative(skill_path)}: missing YAML frontmatter")
-        body = ""
+    adapter_bodies: dict[str, str] = {}
+    for host, skill_path, invocation in (
+        ("Codex", codex_skill_path, codex_invocation(skill)),
+        ("Claude", claude_skill_path, f"/projipsa:{skill}"),
+    ):
+        body = frontmatter_body(skill_path)
+        if body is None:
+            errors.append(f"{relative(skill_path)}: missing YAML frontmatter")
+            body = ""
+        adapter_bodies[host] = body
 
-    if frontmatter_field(body, "name") != skill:
-        errors.append(f"{relative(skill_path)}: frontmatter name mismatch")
+        if frontmatter_field(body, "name") != skill:
+            errors.append(f"{relative(skill_path)}: frontmatter name mismatch")
 
-    description = frontmatter_field(body, "description") or ""
-    if not description:
-        errors.append(f"{relative(skill_path)}: frontmatter needs a description")
-    for invocation in (f"${skill}", f"/projipsa:{skill}"):
+        description = frontmatter_field(body, "description") or ""
+        if not description:
+            errors.append(f"{relative(skill_path)}: frontmatter needs a description")
         if not mentions_invocation(description, invocation):
             errors.append(
                 f"{relative(skill_path)}: description must document the "
-                f"{invocation} invocation so both hosts can trigger it"
+                f"{host} invocation {invocation}"
             )
 
-    # Claude Code enforces explicit-only loading through frontmatter; Codex
-    # enforces the same policy through agents/openai.yaml. Both must agree.
-    claude_policy = frontmatter_field(body, "disable-model-invocation")
+        adapter_text = skill_path.read_text(encoding="utf-8")
+        shared_target = f"../../shared/{skill}.md"
+        if shared_target not in adapter_text:
+            errors.append(
+                f"{relative(skill_path)}: adapter must load {shared_target}"
+            )
+
+    codex_policy = frontmatter_field(
+        adapter_bodies.get("Codex", ""), "disable-model-invocation"
+    )
+    if codex_policy is not None:
+        errors.append(
+            f"{relative(codex_skill_path)}: Claude-only "
+            "disable-model-invocation must be absent"
+        )
+
+    # Claude Code enforces explicit-only loading through its adapter
+    # frontmatter; Codex uses only agents/openai.yaml in its separate tree.
+    claude_policy = frontmatter_field(
+        adapter_bodies.get("Claude", ""), "disable-model-invocation"
+    )
     if expected_implicit and claude_policy is not None:
         errors.append(
-            f"{relative(skill_path)}: disable-model-invocation must be absent "
+            f"{relative(claude_skill_path)}: disable-model-invocation must be absent "
             "for a Skill Claude Code may load implicitly"
         )
     if not expected_implicit and claude_policy != "true":
         errors.append(
-            f"{relative(skill_path)}: disable-model-invocation must be true so "
+            f"{relative(claude_skill_path)}: disable-model-invocation must be true so "
             "Claude Code enforces the explicit-only policy mechanically"
         )
 
@@ -303,12 +405,26 @@ def validate_skill(skill: str, errors: list[str]) -> None:
                 f"{str(expected_implicit).lower()}"
             )
         metadata = metadata_path.read_text(encoding="utf-8")
-        if not mentions_invocation(metadata, f"${skill}"):
+        invocation = codex_invocation(skill)
+        if not mentions_invocation(metadata, invocation):
             errors.append(
-                f"{relative(metadata_path)}: default prompt must mention ${skill}"
+                f"{relative(metadata_path)}: default prompt must mention "
+                f"{invocation}"
             )
 
-    skill_text = normalized_text(skill_path)
+    if not shared_workflow_path.is_file():
+        errors.append(f"missing shared workflow: {relative(shared_workflow_path)}")
+        return
+
+    shared_text = shared_workflow_path.read_text(encoding="utf-8")
+    for invocation in (codex_invocation(skill), f"/projipsa:{skill}"):
+        if not mentions_invocation(shared_text, invocation):
+            errors.append(
+                f"{relative(shared_workflow_path)}: shared workflow must "
+                f"document {invocation}"
+            )
+
+    skill_text = normalized_text(shared_workflow_path)
     for label, phrases in SKILL_GUARDRAILS[skill].items():
         missing = [phrase for phrase in phrases if phrase not in skill_text]
         if missing:
@@ -348,20 +464,20 @@ def validate_templates(errors: list[str]) -> None:
 
 def validate_resources(errors: list[str]) -> None:
     required_files = (
-        SKILL_ROOT / "projipsa" / "references" / "memory-contract.md",
-        SKILL_ROOT / "projipsa" / "assets" / "templates" / "delivery.md",
-        SKILL_ROOT / "projipsa" / "assets" / "templates" / "root-pointer.md",
-        SKILL_ROOT / "projipsa" / "scripts" / "validate_memory.py",
-        SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
-        SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
-        SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
+        RESOURCE_SKILL_ROOT / "projipsa" / "references" / "memory-contract.md",
+        RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates" / "delivery.md",
+        RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates" / "root-pointer.md",
+        RESOURCE_SKILL_ROOT / "projipsa" / "scripts" / "validate_memory.py",
+        RESOURCE_SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
+        RESOURCE_SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
+        RESOURCE_SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
     )
     for path in required_files:
         if not path.is_file():
             errors.append(f"missing Skill resource: {relative(path)}")
 
     if (
-        SKILL_ROOT / "outsource" / "references" / "learning-protocol.md"
+        RESOURCE_SKILL_ROOT / "outsource" / "references" / "learning-protocol.md"
     ).exists():
         errors.append("Outsource must not create an automatic learning-state protocol")
 
@@ -399,7 +515,7 @@ def validate_prose(errors: list[str]) -> None:
 def validate_readme(errors: list[str]) -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     for skill in sorted(EXPECTED_SKILLS):
-        for invocation in (f"${skill}", f"/projipsa:{skill}"):
+        for invocation in (codex_invocation(skill), f"/projipsa:{skill}"):
             if not mentions_invocation(readme, invocation):
                 errors.append(f"README must document {invocation}")
 
@@ -409,6 +525,7 @@ def validate() -> list[str]:
     if validate_manifests(errors) is None:
         return errors
 
+    validate_marketplaces(errors)
     validate_skill_surface(errors)
     for skill in sorted(EXPECTED_SKILLS):
         validate_skill(skill, errors)

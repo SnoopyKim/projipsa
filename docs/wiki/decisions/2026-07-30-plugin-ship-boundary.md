@@ -10,6 +10,7 @@ sources:
 related:
   - project.overview
   - decision.projipsa-adoption.2026-07-31
+  - decision.host-adapter-separation.2026-08-02
 supersedes: []
 superseded_by: []
 ---

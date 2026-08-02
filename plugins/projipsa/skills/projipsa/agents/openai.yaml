@@ -1,6 +1,6 @@
 interface:
   display_name: "Projipsa"
   short_description: "Query and maintain source-backed project memory"
-  default_prompt: "Use $projipsa to brief me from this project's maintained memory and identify stale or uncertain context."
+  default_prompt: "Use $projipsa:projipsa to brief me from this project's maintained memory and identify stale or uncertain context."
 policy:
   allow_implicit_invocation: true

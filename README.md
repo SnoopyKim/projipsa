@@ -18,25 +18,30 @@ projipsa
 
 | Skill | Codex | Claude Code Plugin | Automatic loading |
 | --- | --- | --- | --- |
-| Project memory | `$projipsa` | `/projipsa:projipsa` | Yes, read-only context work |
-| Project onboarding | `$projipsa-init` | `/projipsa:projipsa-init` | No |
-| Substantial delivery | `$outsource` | `/projipsa:outsource` | Yes, qualification only |
+| Project memory | `$projipsa:projipsa` | `/projipsa:projipsa` | Yes, read-only context work |
+| Project onboarding | `$projipsa:projipsa-init` | `/projipsa:projipsa-init` | No |
+| Substantial delivery | `$projipsa:outsource` | `/projipsa:outsource` | Yes, qualification only |
 
 Automatic loading is not additional authority. It helps the host notice the
 right workflow, but does not authorize writes, external effects, costs,
 deployment, publication, acceptance, or other actions outside the user's
 request and host approvals.
 
-Each host enforces that loading policy with its own mechanism instead of with
-prose alone: `allow_implicit_invocation` in
-`plugins/projipsa/skills/<name>/agents/openai.yaml` for Codex, and
-`disable-model-invocation` in `plugins/projipsa/skills/<name>/SKILL.md`
-frontmatter for Claude Code. Every Skill description documents both the
-`$name` and `/projipsa:name` invocation so neither host is left matching a
-trigger it can never see. `scripts/validate_package.py` fails when the two
-declarations disagree.
+Each host enforces that loading policy with its own thin adapter instead of
+sharing incompatible harness metadata. Codex uses
+`allow_implicit_invocation` in
+`plugins/projipsa/skills/<name>/agents/openai.yaml`; Claude Code uses
+`disable-model-invocation` in
+`plugins/projipsa/claude-skills/<name>/SKILL.md`. Both adapters load the same
+workflow under `plugins/projipsa/shared/`, and
+`scripts/validate_package.py` fails when their policies or public Skill names
+drift apart.
 
-## `$projipsa`: project memory
+Codex qualifies plugin Skills with the plugin namespace. The colon in
+`$projipsa:projipsa-init`, for example, is part of the actual invocation; the
+shorter `$projipsa-init` text does not select that plugin Skill.
+
+## `$projipsa:projipsa`: project memory
 
 `projipsa` is the everyday Skill after a project has adopted Projipsa. It
 supports:
@@ -53,13 +58,14 @@ remains read-only. Ingest, update, repair, and snapshot require an explicit
 request or an already authorized memory-maintenance scope.
 
 If no coherent Projipsa memory exists, the Skill reports that state and may
-suggest `$projipsa-init`; it does not initialize a project automatically.
+suggest `$projipsa:projipsa-init` in Codex or `/projipsa:projipsa-init` in
+Claude Code; it does not initialize a project automatically.
 
 Maintained Markdown and preserved source material are the canonical memory
 layer. Search indexes, graphs, dashboards, and summaries remain optional
 derived layers.
 
-## `$projipsa-init`: onboarding and repair
+## `$projipsa:projipsa-init`: onboarding and repair
 
 `projipsa-init` is an explicit, infrequent workflow for adopting Projipsa in an
 existing project. It:
@@ -76,7 +82,7 @@ Initialization is idempotent. A later run audits and repairs the existing setup
 instead of creating a second memory tree. The Skill does not load merely
 because memory would be useful, and its default boundary is docs-only.
 
-## `$outsource`: substantial delivery
+## `$projipsa:outsource`: substantial delivery
 
 `outsource` is for work that is broad, ambiguous, risky, multi-milestone,
 likely to span sessions or handoffs, or likely to benefit from a durable
@@ -102,13 +108,14 @@ the Maker's context on an engagement they never asked for. The automatic load
 authorizes only read-only qualification and a recommendation. Before starting a
 Deep Interview or treating a Delivery Contract as active, the Maker must opt in.
 
-Explicit `$outsource` invocation begins qualification, not blanket approval for
-every later write, external effect, cost, deployment, publication, or
-acceptance decision.
+Explicit `$projipsa:outsource` invocation begins qualification, not blanket
+approval for every later write, external effect, cost, deployment, publication,
+or acceptance decision.
 
 Outsource works independently when Projipsa memory is absent. Project-mode work
-may recommend `$projipsa-init` rather than creating a competing long-lived
-state system.
+may recommend `$projipsa:projipsa-init` in Codex or
+`/projipsa:projipsa-init` in Claude Code rather than creating a competing
+long-lived state system.
 
 ## Shared project-memory layout
 
@@ -194,7 +201,12 @@ has no ignore mechanism for that copy. The ship boundary is therefore a
 directory boundary:
 
 ```text
-plugins/projipsa/     shipped: both manifests and the three Skills
+plugins/projipsa/                 shipped plugin root
+  .codex-plugin/                  Codex manifest
+  .claude-plugin/                 Claude Code manifest
+  skills/                         Codex adapters and shared resources
+  claude-skills/                  Claude Code adapters
+  shared/                         host-neutral workflow bodies
 docs/                 this project's own Projipsa memory
 scripts/  tests/      validators and their tests
 .github/              CI
@@ -234,9 +246,9 @@ Version 0.3 replaces the v0.2 router modes with three independent Skills:
 
 | v0.2 | v0.3 |
 | --- | --- |
-| `$projipsa memory` | `$projipsa` |
-| `$projipsa init` | `$projipsa-init` |
-| `$projipsa outsource` | `$outsource` |
+| `$projipsa memory` | `$projipsa:projipsa` |
+| `$projipsa init` | `$projipsa:projipsa-init` |
+| `$projipsa outsource` | `$projipsa:outsource` |
 | `/projipsa:projipsa memory` | `/projipsa:projipsa` |
 | `/projipsa:projipsa init` | `/projipsa:projipsa-init` |
 | `/projipsa:projipsa outsource` | `/projipsa:outsource` |
@@ -267,7 +279,16 @@ the marketplace pins a reviewed source commit at the plugin root
 `plugins/projipsa`.
 
 The marketplace entry is not published yet, so until it is, install a source
-checkout through this repository's own marketplace manifest:
+checkout through this repository's own marketplace manifest.
+
+Codex:
+
+```bash
+codex plugin marketplace add /path/to/projipsa
+codex plugin add projipsa@projipsa
+```
+
+Claude Code:
 
 ```bash
 claude plugin marketplace add /path/to/projipsa
@@ -275,8 +296,9 @@ claude plugin install projipsa@projipsa
 ```
 
 The installed copy is version-pinned, so a later edit under
-`plugins/projipsa/` reaches it only after a version bump plus
-`claude plugin update`. To load the working tree for one session instead, use
+`plugins/projipsa/` requires the host's marketplace/install refresh. Published
+releases must bump the plugin version. To load the working tree for one Claude
+Code session instead, use
 `claude --plugin-dir /path/to/projipsa/plugins/projipsa`.
 
 The `outsource` Skill was integrated from

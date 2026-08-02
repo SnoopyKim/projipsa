@@ -3,12 +3,15 @@ id: project.overview
 type: project
 status: active
 confidence: confirmed
-updated: 2026-07-31
+updated: 2026-08-02
 sources:
   - README.md
   - plugins/projipsa/.claude-plugin/plugin.json
+  - plugins/projipsa/.codex-plugin/plugin.json
+  - wiki/decisions/2026-08-02-host-adapter-separation.md
 related:
   - project.current-state
+  - decision.host-adapter-separation.2026-08-02
 ---
 
 # Project Overview
@@ -20,8 +23,9 @@ Claude Code. It helps an agent understand an existing project, keep its
 operating context current, and manage substantial work through verified review
 and handoff.
 
-It exists because the same person works across more than one agent host, and
-wants one workflow rather than one per host.
+It exists because the same person works across more than one agent host and
+wants the same workflow on each, without forcing the hosts to share
+incompatible harness metadata.
 
 ## Scope
 
@@ -56,8 +60,8 @@ marketplace.
 
 ## Operating Constraints
 
-- Both hosts read one shared `SKILL.md` per Skill, so per-host divergence must
-  stay small and mechanical.
+- Both hosts read thin, host-specific adapters that point to one shared
+  workflow body per Skill. Adapter divergence stays small and mechanical.
 - Claude Code copies a plugin's root into a local cache with no ignore
   mechanism, so only `plugins/projipsa/` may hold shipped content.
 - Validators use the Python standard library only, and must run on Python 3.9.
