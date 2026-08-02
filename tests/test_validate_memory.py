@@ -10,7 +10,7 @@ SCRIPT = (
     Path(__file__).resolve().parents[1]
     / "plugins"
     / "projipsa"
-    / "skills"
+    / "codex-skills"
     / "projipsa"
     / "scripts"
     / "validate_memory.py"

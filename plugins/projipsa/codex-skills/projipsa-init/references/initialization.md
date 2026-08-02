@@ -155,7 +155,7 @@ When a memory root already exists:
 Run:
 
 ```bash
-python3 <plugin-root>/skills/projipsa/scripts/validate_memory.py <memory-root>
+python3 <plugin-root>/codex-skills/projipsa/scripts/validate_memory.py <memory-root>
 ```
 
 Then review what deterministic checks cannot prove:

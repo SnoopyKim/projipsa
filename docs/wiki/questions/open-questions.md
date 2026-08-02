@@ -3,11 +3,13 @@ id: question.open-questions
 type: question
 status: active
 confidence: assumed
-updated: 2026-07-31
+updated: 2026-08-03
 sources:
-  - plugins/projipsa/skills/projipsa/scripts/validate_memory.py
+  - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
+  - plugins/projipsa/.codex-plugin/plugin.json
 related:
   - project.current-state
+  - decision.host-adapter-separation.2026-08-02
 ---
 
 # Open Questions
@@ -48,6 +50,19 @@ deleted page leaves silent dangling references in every page that named it.
 Resolution: collect every declared `id` in the memory root and fail on a
 `related` entry that matches none of them. Decide first whether a forward
 reference to a page that does not exist yet should be an error or a warning.
+
+## Does a publish-time Codex validator still require `skills/`?
+
+The 2026-08-02 layout kept Codex at `skills/` because an official Codex plugin
+validator had rejected `codex-skills/`. On 2026-08-03, codex-cli 0.146.0
+installed a plugin declaring `"skills": "./codex-skills/"` and listed its Skill
+from that path in `codex debug prompt-input`, so the runtime accepts it. The
+validator that produced the original rejection is not available in this
+repository, so it could not be re-run.
+
+Resolution: re-run the authoritative Codex plugin validator against
+`plugins/projipsa/` before a first marketplace listing, and record whether
+runtime acceptance and publish-time acceptance agree.
 
 ## Is the narrowed `outsource` trigger correct?
 

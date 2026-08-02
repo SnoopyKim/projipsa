@@ -49,11 +49,11 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
   before making repairs.
 - **Snapshot**: preserve a milestone, handoff, pause, launch, or restart state.
 
-Read [operations](../skills/projipsa/references/operations.md) for the selected
+Read [operations](../codex-skills/projipsa/references/operations.md) for the selected
 operation. Read
-[page types](../skills/projipsa/references/page-types.md) before creating or materially changing
+[page types](../codex-skills/projipsa/references/page-types.md) before creating or materially changing
 maintained pages. Read the
-[memory contract](../skills/projipsa/references/memory-contract.md) when authority,
+[memory contract](../codex-skills/projipsa/references/memory-contract.md) when authority,
 source-of-truth, or host-integration boundaries are unclear.
 
 Compose Ingest with Update or Snapshot when a new evidence artifact must be
@@ -75,7 +75,7 @@ When writing:
 4. Make the smallest coherent memory update.
 5. Update navigation only when the reading path changed.
 6. Append the current monthly log.
-7. Run [the memory validator](../skills/projipsa/scripts/validate_memory.py) against the memory
+7. Run [the memory validator](../codex-skills/projipsa/scripts/validate_memory.py) against the memory
    root when available.
 8. Inspect the documentation diff and keep implementation files untouched
    unless the user separately requested implementation work.
@@ -89,7 +89,7 @@ existing stable artifact.
 ## Use canonical templates
 
 Templates live under
-[assets/templates/](../skills/projipsa/assets/templates/). Replace every
+[assets/templates/](../codex-skills/projipsa/assets/templates/). Replace every
 placeholder before writing. Do not leave TODO placeholders in maintained
 memory; represent a real unknown as an open question instead.
 
