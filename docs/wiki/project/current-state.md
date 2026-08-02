@@ -118,6 +118,10 @@ exposing every public Skill twice.
   `/projipsa:projipsa-init` without tools or writes. Counting commands that way
   hid the duplicate Skills; `claude plugin details projipsa` counts loaded
   Skills and is the check that found it.
+- After `claude plugin update projipsa@projipsa`, the user-scope cache holds
+  `0.3.1/claude-skills/` and `0.3.1/codex-skills/` and no `skills/`, and a
+  fresh Claude Code session listed `projipsa:projipsa` and `projipsa:outsource`
+  once each, with `projipsa-init` hidden as designed.
 - Each pointer-validation fix was reverted individually and failed exactly one
   test each time.
 - `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py docs`
