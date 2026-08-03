@@ -16,8 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = ROOT / "plugins" / "projipsa"
-SCRIPT = PACKAGE_ROOT / "skills" / "projipsa" / "scripts" / "validate_memory.py"
-TEMPLATES = PACKAGE_ROOT / "skills" / "projipsa" / "assets" / "templates"
+SCRIPT = PACKAGE_ROOT / "codex-skills" / "projipsa" / "scripts" / "validate_memory.py"
+TEMPLATES = PACKAGE_ROOT / "codex-skills" / "projipsa" / "assets" / "templates"
 SPEC = importlib.util.spec_from_file_location("validate_memory", SCRIPT)
 assert SPEC and SPEC.loader
 validate_memory = importlib.util.module_from_spec(SPEC)

@@ -55,16 +55,16 @@ Qualification itself needs no reference. Load a reference when the step it
 governs is the next thing you will do, not upfront:
 
 - Routed to the ordinary workflow: read nothing further and leave Outsource.
-- [delivery-protocol.md](../skills/outsource/references/delivery-protocol.md) — engagement modes,
+- [delivery-protocol.md](../codex-skills/outsource/references/delivery-protocol.md) — engagement modes,
   the outer lifecycle, durable state, feedback routing, and completion
   semantics. Read it once the engagement is Scoped or Project.
-- [deep-interview.md](../skills/outsource/references/deep-interview.md) — read before interviewing a
+- [deep-interview.md](../codex-skills/outsource/references/deep-interview.md) — read before interviewing a
   Maker or deciding that an interview is unnecessary.
-- [delivery-contract.md](../skills/outsource/references/delivery-contract.md) — read before
+- [delivery-contract.md](../codex-skills/outsource/references/delivery-contract.md) — read before
   proposing, confirming, or changing a Delivery Contract.
-- [execution-strategies.md](../skills/outsource/references/execution-strategies.md) — read before
+- [execution-strategies.md](../codex-skills/outsource/references/execution-strategies.md) — read before
   selecting agents, parallelism, loops, graphs, or verification roles.
-- [projipsa-integration.md](../skills/outsource/references/projipsa-integration.md) — read only when
+- [projipsa-integration.md](../codex-skills/outsource/references/projipsa-integration.md) — read only when
   Projipsa memory exists or a durable Project-mode handoff is relevant.
 
 Loading all five before knowing the engagement mode spends the Maker's context

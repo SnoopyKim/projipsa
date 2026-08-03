@@ -1,6 +1,6 @@
 {
   "name": "projipsa",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A project butler with separate skills for project memory, onboarding, and substantial delivery in Codex and Claude Code.",
   "author": {
     "name": "SnoopyDev",
@@ -17,7 +17,7 @@
     "delegation",
     "delivery"
   ],
-  "skills": "./skills/",
+  "skills": "./codex-skills/",
   "interface": {
     "displayName": "Projipsa",
     "shortDescription": "A project butler for memory and delivery.",

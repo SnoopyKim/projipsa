@@ -39,14 +39,14 @@ Initialization is idempotent. A second run audits and repairs the existing
 structure rather than starting over.
 
 Read
-[the initialization workflow](../skills/projipsa-init/references/initialization.md)
+[the initialization workflow](../codex-skills/projipsa-init/references/initialization.md)
 for the
 detailed inventory, mapping, and validation workflow. Read the sibling
 canonical resources before writing:
 
-- [memory contract](../skills/projipsa/references/memory-contract.md)
-- [page types](../skills/projipsa/references/page-types.md)
-- [templates](../skills/projipsa/assets/templates/)
+- [memory contract](../codex-skills/projipsa/references/memory-contract.md)
+- [page types](../codex-skills/projipsa/references/page-types.md)
+- [templates](../codex-skills/projipsa/assets/templates/)
 
 ## Create the minimum useful core
 
@@ -111,7 +111,7 @@ initialization maintains one marked pointer block in the project's root
 instruction files:
 
 1. Ensure the project root has `AGENTS.md` carrying the pointer block from
-   [the root pointer template](../skills/projipsa/assets/templates/root-pointer.md).
+   [the root pointer template](../codex-skills/projipsa/assets/templates/root-pointer.md).
 2. Ensure the project root has `CLAUDE.md`. When none exists, create it as an
    import of `AGENTS.md` so both hosts read one maintained file. When one
    already exists, add the same pointer block instead of injecting an import
@@ -130,7 +130,7 @@ outside the memory root the Maker asked you to create.
 ## Validate and hand off
 
 1. Run the sibling
-   [memory validator](../skills/projipsa/scripts/validate_memory.py) against
+   [memory validator](../codex-skills/projipsa/scripts/validate_memory.py) against
    the memory root.
 2. Check that maintained pages are reachable from the index or related pages.
 3. Inspect the diff for unintended non-documentation changes.

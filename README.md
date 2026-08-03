@@ -30,7 +30,7 @@ request and host approvals.
 Each host enforces that loading policy with its own thin adapter instead of
 sharing incompatible harness metadata. Codex uses
 `allow_implicit_invocation` in
-`plugins/projipsa/skills/<name>/agents/openai.yaml`; Claude Code uses
+`plugins/projipsa/codex-skills/<name>/agents/openai.yaml`; Claude Code uses
 `disable-model-invocation` in
 `plugins/projipsa/claude-skills/<name>/SKILL.md`. Both adapters load the same
 workflow under `plugins/projipsa/shared/`, and
@@ -169,7 +169,7 @@ Root `AGENTS.md` carries the block. Root `CLAUDE.md` is created as an
 already exists and should not be disturbed. A later initialization run replaces
 the block in place rather than appending a second copy.
 
-`plugins/projipsa/skills/projipsa/scripts/validate_memory.py` enforces all of
+`plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py` enforces all of
 that: it fails on a
 missing instruction file, a missing block, a second appended block, and a block
 that names a different root than the one being validated.
@@ -204,7 +204,7 @@ directory boundary:
 plugins/projipsa/                 shipped plugin root
   .codex-plugin/                  Codex manifest
   .claude-plugin/                 Claude Code manifest
-  skills/                         Codex adapters and shared resources
+  codex-skills/                   Codex adapters and shared resources
   claude-skills/                  Claude Code adapters
   shared/                         host-neutral workflow bodies
 docs/                 this project's own Projipsa memory

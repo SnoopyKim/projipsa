@@ -20,9 +20,17 @@ CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CLAUDE_MARKETPLACE = ROOT / ".claude-plugin" / "marketplace.json"
 CODEX_MANIFEST = PACKAGE_ROOT / ".codex-plugin" / "plugin.json"
 CLAUDE_MANIFEST = PACKAGE_ROOT / ".claude-plugin" / "plugin.json"
-CODEX_SKILL_ROOT = PACKAGE_ROOT / "skills"
+CODEX_SKILL_ROOT = PACKAGE_ROOT / "codex-skills"
 CLAUDE_SKILL_ROOT = PACKAGE_ROOT / "claude-skills"
 SHARED_WORKFLOW_ROOT = PACKAGE_ROOT / "shared"
+# Claude Code adds its manifest-declared Skill directory to the default
+# skills/ scan instead of replacing it, so a package that keeps adapters in
+# skills/ exposes every public Skill twice. Neither host may use that name.
+DEFAULT_SKILL_ROOT = PACKAGE_ROOT / "skills"
+HOST_SKILL_ROOTS = (CODEX_SKILL_ROOT, CLAUDE_SKILL_ROOT)
+# The Codex tree also hosts the canonical references, templates, and scripts
+# that both hosts' shared workflows link to. Keeping one copy is deliberate;
+# moving it to a host-neutral home is deferred, not forgotten.
 RESOURCE_SKILL_ROOT = CODEX_SKILL_ROOT
 TEMPLATE_ROOT = RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates"
 
@@ -198,10 +206,18 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
     ):
         errors.append("plugin version must use strict semantic versioning")
 
-    if codex.get("skills") != "./skills/":
-        errors.append("Codex manifest must use the standard skills/ entry point")
+    if codex.get("skills") != "./codex-skills/":
+        errors.append("Codex manifest must use the isolated codex-skills/ entry point")
     if claude.get("skills") != "./claude-skills/":
         errors.append("Claude manifest must use the isolated claude-skills/ entry point")
+    for host, manifest in (("Codex", codex), ("Claude", claude)):
+        if manifest.get("skills") == "./skills/":
+            errors.append(
+                f"{host} manifest must not declare the default skills/ path, "
+                "which Claude Code scans in addition to its own entry point"
+            )
+    if codex.get("skills") == claude.get("skills"):
+        errors.append("each host must load its own Skill adapter directory")
 
     codex_interface = codex.get("interface")
     codex_display = (
@@ -268,6 +284,17 @@ def validate_marketplaces(errors: list[str]) -> None:
 
 
 def validate_skill_surface(errors: list[str]) -> None:
+    # Claude Code reported six Skills, two per public name, while the package
+    # kept Codex adapters at the default skills/ path: its manifest skills
+    # entry is additive, not a replacement. The package therefore ships no
+    # directory by that name, for either host.
+    if DEFAULT_SKILL_ROOT.exists():
+        errors.append(
+            f"{relative(DEFAULT_SKILL_ROOT)} must not exist; Claude Code scans "
+            "it in addition to its manifest entry point and exposes every "
+            "public Skill twice"
+        )
+
     codex_skills = discovered_skills(CODEX_SKILL_ROOT)
     claude_skills = discovered_skills(CLAUDE_SKILL_ROOT)
     if codex_skills != EXPECTED_SKILLS:
@@ -286,8 +313,8 @@ def validate_skill_surface(errors: list[str]) -> None:
         path.relative_to(ROOT) for path in PACKAGE_ROOT.rglob("SKILL.md")
     }
     expected_skill_files = {
-        package_prefix / host_root / skill / "SKILL.md"
-        for host_root in ("skills", "claude-skills")
+        package_prefix / host_root.name / skill / "SKILL.md"
+        for host_root in HOST_SKILL_ROOTS
         for skill in EXPECTED_SKILLS
     }
     if all_skill_files != expected_skill_files:
