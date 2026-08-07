@@ -8,6 +8,9 @@ sources:
   - https://github.com/SnoopyKim/projipsa/pull/2
   - https://github.com/SnoopyKim/projipsa/pull/3
   - https://github.com/SnoopyKim/projipsa/pull/4
+  - https://github.com/SnoopyKim/projipsa/pull/5
+  - README.md
+  - CONTRIBUTING.md
   - plugins/projipsa/.claude-plugin/plugin.json
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/codex-skills/projipsa/references/page-types.md
@@ -27,11 +30,17 @@ related:
 
 ## Summary
 
-Version 0.3.1 is complete in the repository and has not been released. The
-three v0.3 Skills exist, the shipped surface has been separated from the
-repository at `plugins/projipsa/`, and this memory tree is the project's first
-use of Projipsa on itself. 0.3.1 is a packaging fix: it stops Claude Code from
+Version 0.3.1 is merged on `main` and has not been released. The three v0.3
+Skills exist, the shipped surface has been separated from the repository at
+`plugins/projipsa/`, and this memory tree is the project's first use of
+Projipsa on itself. 0.3.1 is a packaging fix: it stops Claude Code from
 exposing every public Skill twice.
+
+The project's stated purpose was corrected on 2026-08-03. Projipsa exists so
+that project understanding survives the session and substantial work can be
+delegated against it; the memory is the durable shared state that delegated
+work runs on. Cross-host support is a distribution constraint, not the goal.
+See [the overview](overview.md).
 
 ## Confirmed Current
 
@@ -57,7 +66,12 @@ exposing every public Skill twice.
   true` for Claude Code. A skill listing under `claude --plugin-dir` confirmed
   Claude Code hides it from the model.
 - Only `plugins/projipsa/` is shipped. `scripts/validate_package.py` scans that
-  tree and the repository README, nothing else.
+  tree and the repository README for prose, links, and Skill contracts, and
+  additionally reads the two root development marketplace manifests. Nothing
+  under `docs/` is in its scope.
+- User-facing documentation and contributor documentation are separated:
+  `README.md` covers purpose, install, and usage; `CONTRIBUTING.md` covers
+  repository layout, the `skills/` invariant, and the validators.
 - `validate_memory.py` owns everything under this memory root, including the
   host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`. Its
   pointer checks are incomplete: three gaps were reproduced on 2026-07-31 and
@@ -73,8 +87,10 @@ exposing every public Skill twice.
 
 ## In Progress
 
-- The 0.3.1 packaging fix that renames the Codex adapter directory to
-  `codex-skills/` is committed on a branch and not yet merged.
+- The 0.3.1 packaging fix merged as
+  [pull request 5](https://github.com/SnoopyKim/projipsa/pull/5). The
+  documentation restructure of 2026-08-03 is committed on
+  `agent/restate-purpose-and-split-docs` and is not yet merged.
 
 ## Explicitly Not Current
 
@@ -127,6 +143,10 @@ exposing every public Skill twice.
 - `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py docs`
   passes, and three of its gaps were reproduced in a scratch fixture built from
   this tree.
+- After the 2026-08-03 documentation restructure and the removal of the
+  banned-vocabulary check, the package validator and 35 tests still pass. The
+  rewritten README was checked against `validate_readme`'s whole-token rule for
+  all six host invocations.
 
 ## Next Work
 
