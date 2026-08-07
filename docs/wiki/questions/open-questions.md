@@ -72,11 +72,11 @@ there is no evidence either way.
 
 Resolution: use it, and record cases where it should have fired and did not.
 
-## When should 0.3.0 be released?
+## When should 0.3.1 be released?
 
-The version has never been listed in the marketplace, so nothing has shipped
-and no version bump is owed. It is unresolved whether adopting this memory tree
-should precede or follow a first listing.
+The plugin has never been listed in a marketplace, so nothing has shipped to
+anyone who did not install from source. It is unresolved whether adopting this
+memory tree should precede or follow a first listing.
 
 ## Should skill triggering be tested automatically?
 

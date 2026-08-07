@@ -3,10 +3,12 @@ id: decision.plugin-ship-boundary.2026-07-30
 type: decision
 status: active
 confidence: confirmed
-updated: 2026-07-31
+updated: 2026-08-03
 sources:
   - https://github.com/SnoopyKim/projipsa/pull/2
   - scripts/validate_package.py
+  - .agents/plugins/marketplace.json
+  - .claude-plugin/marketplace.json
 related:
   - project.overview
   - decision.projipsa-adoption.2026-07-31
@@ -55,3 +57,13 @@ documentation content could fail package validation.
 - A marketplace listing must point at the subdirectory, not the repository.
 - This memory tree can live at `docs/` without shipping and without gating
   package validation.
+
+## Amendment 2026-08-03
+
+The scan described above was accurate when this decision was written. The
+[host adapter separation](2026-08-02-host-adapter-separation.md) later added two
+development marketplace manifests at the repository root, and
+`scripts/validate_package.py` reads both. Its *prose and link* scan is still
+exactly the shipped tree plus the repository README, and nothing under `docs/`
+is in scope, so the boundary this decision established is unchanged. Only the
+literal phrase "nothing more" was outgrown.

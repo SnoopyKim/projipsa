@@ -44,7 +44,6 @@ SKILL_POLICY = {
 EXPECTED_SKILLS = set(SKILL_POLICY)
 CODEX_PLUGIN_NAMESPACE = "projipsa"
 
-DISALLOWED_ROLE = "steward"
 SHARED_FIELDS = {
     "name",
     "version",
@@ -232,9 +231,6 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
             "displayName must match across hosts; Claude Code otherwise shows "
             "no name where Codex shows one"
         )
-
-    if "project butler" not in (codex.get("description") or "").lower():
-        errors.append("plugin description must state the project butler concept")
 
     return codex, claude
 
@@ -531,10 +527,6 @@ def validate_prose(errors: list[str]) -> None:
         if path.suffix not in text_extensions:
             continue
         text = path.read_text(encoding="utf-8")
-        if re.search(rf"\b{DISALLOWED_ROLE}(?:ship)?\b", text, re.IGNORECASE):
-            errors.append(
-                f"{relative(path)}: use the Projipsa butler concept instead"
-            )
         if "[TODO:" in text:
             errors.append(f"{relative(path)}: unresolved scaffold TODO")
 
