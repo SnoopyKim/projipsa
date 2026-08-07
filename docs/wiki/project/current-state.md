@@ -87,10 +87,10 @@ See [the overview](overview.md).
 
 ## In Progress
 
-- The 0.3.1 packaging fix merged as
-  [pull request 5](https://github.com/SnoopyKim/projipsa/pull/5). The
-  documentation restructure of 2026-08-03 is committed on
-  `agent/restate-purpose-and-split-docs` and is not yet merged.
+- Nothing. The 0.3.1 packaging fix merged as
+  [pull request 5](https://github.com/SnoopyKim/projipsa/pull/5), and the
+  2026-08-03 documentation restructure is recorded in
+  [the monthly log](../../logs/2026-08.md).
 
 ## Explicitly Not Current
 
@@ -102,6 +102,10 @@ See [the overview](overview.md).
 ## Active Defaults
 
 - `docs/` is the memory root, and it is public.
+- The package validator checks structure, policy, and contract surface only.
+  Vocabulary and concept checks do not belong in it: a banned-word scan and a
+  required-phrase check on the plugin description were both removed on
+  2026-08-03. Documentation carries the concept instead.
 - Pages created from a template start below `confirmed`: `inferred` for most
   types, `assumed` for `assumption`, `question`, `risk`, and `delivery`. A page
   is raised to `confirmed` only in the edit that lists its evidence.

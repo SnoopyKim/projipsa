@@ -232,9 +232,6 @@ def validate_manifests(errors: list[str]) -> tuple[dict[str, Any], ...] | None:
             "no name where Codex shows one"
         )
 
-    if "project butler" not in (codex.get("description") or "").lower():
-        errors.append("plugin description must state the project butler concept")
-
     return codex, claude
 
 
