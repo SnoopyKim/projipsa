@@ -9,6 +9,8 @@ sources:
   - https://github.com/SnoopyKim/projipsa/pull/3
   - https://github.com/SnoopyKim/projipsa/pull/4
   - https://github.com/SnoopyKim/projipsa/pull/5
+  - https://github.com/SnoopyKim/projipsa/pull/7
+  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2
   - README.md
   - CONTRIBUTING.md
   - plugins/projipsa/.claude-plugin/plugin.json
@@ -35,11 +37,14 @@ related:
 
 ## Summary
 
-Version 0.3.2 is prepared and locally validated as a release candidate. It
-strengthens Outsource verification after real Project-mode use showed that a
-substantially correct contract could still be marked verified by
-implementation-authored helpers and partial execution paths. Version 0.3.1
-remains the latest merged version until the release candidate is published.
+Version 0.3.2 is released from [pull request
+7](https://github.com/SnoopyKim/projipsa/pull/7) at merge commit `66a42df` and
+tagged as [v0.3.2](https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2).
+It strengthens Outsource verification after real Project-mode use showed that
+a substantially correct contract could still be marked verified by
+implementation-authored helpers and partial execution paths. The user-scope
+Claude installation and the Codex installation are both synchronized to
+0.3.2.
 
 The project's stated purpose was corrected on 2026-08-03. Projipsa exists so
 that project understanding survives the session and substantial work can be
@@ -99,17 +104,18 @@ See [the overview](overview.md).
 - The ship boundary is confirmed by an actual Claude Code install: its cache
   holds the plugin root while repository `docs/`, `tests/`, and `scripts/`
   remain outside the installed copy.
+- The Codex and Claude Code 0.3.2 caches both contain the QA-oriented
+  `verification.md`, declare version 0.3.2, and contain no `skills/` directory.
+  Claude Code exposes exactly the three manifest-declared Skills.
 
 ## In Progress
 
-- The 0.3.2 verification release candidate is implemented and locally
-  validated. Publication and installed-plugin refresh remain.
+Nothing. Version 0.3.2 is released and synchronized to both supported hosts.
 
 ## Explicitly Not Current
 
-- No release. The marketplace lists `invee` and `outsource`, not `projipsa`.
-- Version 0.3.2 has not been published or installed into either host's
-  version-pinned cache.
+- No public marketplace listing. The SnoopyDev marketplace lists `invee` and
+  `outsource`, not `projipsa`; 0.3.2 is distributed from this source repository.
 - No `raw/` tree, because every current source has a stable versioned path.
 - No `wiki/deliveries/` tree, because no delegated engagement is active.
 - `outsource` is not in daily use yet.
@@ -169,6 +175,15 @@ See [the overview](overview.md).
 - For the 0.3.2 working tree, the package validator, 37 tests, and
   `git diff --check` pass. The memory validator accepts 7 maintained pages, and
   `claude plugin validate ./plugins/projipsa --strict` passes.
+- Pull request 7 passed all four GitHub Actions checks and merged as signed
+  commit `66a42df`; the annotated `v0.3.2` tag and GitHub Release point to that
+  shipped-plugin commit.
+- `claude plugin update projipsa@projipsa -s user` updated the installed plugin
+  from 0.3.1 to 0.3.2, and `claude plugin details projipsa` reports three
+  Skills.
+- `codex plugin add projipsa@projipsa` installed version 0.3.2 under
+  `~/.codex/plugins/cache/projipsa/projipsa/0.3.2`, and `codex plugin list`
+  reports it enabled at 0.3.2.
 
 ## Next Work
 
