@@ -24,7 +24,7 @@ throughout.
 
 ## Install
 
-Projipsa is version `0.3.1` and is **not listed in a public marketplace yet**.
+Projipsa is version `0.3.2` and is **not listed in a public marketplace yet**.
 Install it from a source checkout:
 
 ```bash
@@ -143,6 +143,11 @@ sessions and handoffs. It:
 - proposes and versions a Delivery Contract;
 - picks the simplest topology that still verifies — direct, sequential,
   parallel, graph, or human-gated;
+- verifies from the service user, artifact consumer, or QA perspective by
+  tracing the real user or data path and trying consequential regressions;
+- records `direct`, `proxy`, `reported`, and `not_run` evidence without
+  promoting a partial path or implementer self-check into a broader passing
+  claim;
 - separates *executed*, *verified*, and *Maker-accepted* outcomes;
 - manages feedback, change, pause, review, acceptance, and handoff;
 - writes durable outcomes into Projipsa memory when that is authorized.

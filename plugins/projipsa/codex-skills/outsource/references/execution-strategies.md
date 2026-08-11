@@ -31,12 +31,23 @@ Use roles dynamically:
 - **Delivery Orchestrator** — owns the contract, plan, state transitions, authority, integration, review package, and final claims.
 - **Investigator** — gathers facts, separates inference from evidence, and identifies uncertainty.
 - **Implementer** — changes only the assigned scope and returns inspectable artifacts and checks.
-- **Verifier** — judges criteria from raw artifacts and reproduced evidence, independent of the implementation narrative.
+- **Verifier** — approaches the final result as a service user, artifact
+  consumer, or QA reviewer; judges criteria from raw artifacts, real user or
+  data paths, and reproduced evidence independently of the implementation
+  narrative.
 - **Integrator** — resolves convergence points and runs aggregate checks.
 
 One agent may perform roles sequentially in single-agent or capacity-limited
 work, but it must make a fresh verification pass from the contract rather than
 self-approve from memory.
+
+Prefer a distinct verifier role when the work changes data, authorization,
+tenancy, security, historical records, operational commands, or several
+connected layers; contains a preservation invariant; or separates helpers from
+the final save or side-effect path. A separate agent is useful when the host
+supports it, but the invariant is independence of judgment rather than agent
+count. A single agent may set aside its implementation narrative, reopen the
+contract and final artifacts, and perform the same QA-oriented pass.
 
 ## Inner execution lifecycle
 
@@ -76,6 +87,13 @@ Prefer:
 4. reports that cite reproducible evidence.
 
 Unsupported completion claims do not pass.
+
+Classify observed evidence as `direct`, `proxy`, `reported`, or `not_run`.
+Proxy evidence may support a criterion, but it cannot pass a broader user,
+data, permission, or operational claim unless it exercises the relevant final
+boundary and the verifier records why it is sufficient. An early exit proves
+only the path before the exit. A test that mirrors an implementation branch is
+not evidence for adjacent branches it never entered.
 
 Classify failures before repair:
 

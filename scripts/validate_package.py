@@ -110,6 +110,22 @@ SKILL_GUARDRAILS = {
             "ordinary workflow",
             "leave outsource",
         ),
+        "verification uses the final user or QA path": (
+            "read the verification reference",
+            "service user",
+            "qa reviewer",
+            "real user or data path",
+            "implementer's helpers",
+        ),
+        "partial evidence cannot become a broad pass": (
+            "proxy",
+            "not_run",
+            "early exit",
+        ),
+        "Maker acceptance cannot rewrite verification": (
+            "maker acceptance",
+            "technical verdict",
+        ),
     },
 }
 
@@ -479,7 +495,13 @@ def validate_templates(errors: list[str]) -> None:
             "status: draft",
             "confidence: assumed",
             "Contract status: draft",
+            "Execution status: incomplete | complete",
+            "Verification status: not_run | partial | passed | failed | blocked",
             "Confirmed by: pending",
+            "## Verification Results",
+            "Plan status: planned | pending_decision | not_applicable",
+            "Evidence level: direct | proxy | reported | not_run",
+            "Technical verdict: passed | partial | failed | blocked | not_applicable",
         ):
             if marker not in delivery_text:
                 errors.append(f"delivery template must preserve {marker!r}")
@@ -494,6 +516,7 @@ def validate_resources(errors: list[str]) -> None:
         RESOURCE_SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
         RESOURCE_SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
         RESOURCE_SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
+        RESOURCE_SKILL_ROOT / "outsource" / "references" / "verification.md",
     )
     for path in required_files:
         if not path.is_file():

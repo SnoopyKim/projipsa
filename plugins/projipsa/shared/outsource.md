@@ -64,10 +64,12 @@ governs is the next thing you will do, not upfront:
   proposing, confirming, or changing a Delivery Contract.
 - [execution-strategies.md](../codex-skills/outsource/references/execution-strategies.md) — read before
   selecting agents, parallelism, loops, graphs, or verification roles.
+- [verification.md](../codex-skills/outsource/references/verification.md) — read before running
+  `VERIFY` or judging whether acceptance evidence is sufficient.
 - [projipsa-integration.md](../codex-skills/outsource/references/projipsa-integration.md) — read only when
   Projipsa memory exists or a durable Project-mode handoff is relevant.
 
-Loading all five before knowing the engagement mode spends the Maker's context
+Loading all six before knowing the engagement mode spends the Maker's context
 on paths this engagement will never take.
 
 ## Run the outer delivery lifecycle
@@ -110,6 +112,10 @@ For Scoped and Project work, create a shared contract that states:
 - constraints, authority boundaries, and human approval points;
 - deliverables and milestones;
 - acceptance criteria with planned evidence;
+- preservation invariants promoted from prohibitions such as "must not change"
+  or "must not overwrite";
+- a risk-shaped verification plan written from the service user, artifact
+  consumer, or QA perspective rather than the implementation structure;
 - recommended execution strategy;
 - assumptions, risks, open decisions, and change policy.
 
@@ -149,13 +155,27 @@ Use host-native worktrees, subagents, schedulers, goals, and permission controls
 
 ## Verify, review, and accept
 
-Verify every acceptance criterion using the strongest feasible direct evidence. Separate:
+Read the verification reference before entering `VERIFY`. Verify every
+acceptance criterion using the strongest feasible direct evidence. Approach the
+final result as a service user, artifact consumer, or QA reviewer trying to
+reproduce the promised outcome and expose regressions. Start from the contract
+and the real user or data path, not from the implementer's helpers, tests, or
+explanation.
+
+Record `direct`, `proxy`, `reported`, and `not_run` evidence honestly. A partial path,
+an early exit, or a helper test proves only the behavior it exercised; it does
+not pass a broader criterion. Separate:
 
 1. **Executed** — planned work exists.
 2. **Verified** — acceptance evidence passes.
 3. **Accepted** — the Maker reviews the result and accepts it.
 
-Present results for judgment: what changed, how it was verified, important decisions, limitations, residual risks, and requested Maker feedback. Classify feedback as a contract defect, misunderstanding, change request, preference, or next-phase idea before acting on it.
+`REVIEW` may present partial or failed verification so the Maker can judge the
+gaps, but neither Maker acceptance nor a terminal handoff may rewrite the
+technical verdict. Present results for judgment: what changed, how it was
+verified, important decisions, limitations, residual risks, and requested Maker
+feedback. Classify feedback as a contract defect, misunderstanding, change
+request, preference, or next-phase idea before acting on it.
 
 ## Finish transparently
 

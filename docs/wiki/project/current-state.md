@@ -3,7 +3,7 @@ id: project.current-state
 type: project
 status: active
 confidence: confirmed
-updated: 2026-08-03
+updated: 2026-08-11
 sources:
   - https://github.com/SnoopyKim/projipsa/pull/2
   - https://github.com/SnoopyKim/projipsa/pull/3
@@ -14,7 +14,11 @@ sources:
   - plugins/projipsa/.claude-plugin/plugin.json
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/codex-skills/projipsa/references/page-types.md
+  - plugins/projipsa/codex-skills/outsource/references/verification.md
+  - plugins/projipsa/codex-skills/projipsa/assets/templates/delivery.md
   - scripts/validate_package.py
+  - tests/test_package_contract.py
+  - wiki/decisions/2026-08-11-qa-oriented-verification-claims.md
   - wiki/decisions/2026-08-02-host-adapter-separation.md
   - .agents/plugins/marketplace.json
   - .claude-plugin/marketplace.json
@@ -23,6 +27,7 @@ related:
   - decision.projipsa-adoption.2026-07-31
   - decision.plugin-ship-boundary.2026-07-30
   - decision.host-adapter-separation.2026-08-02
+  - decision.qa-oriented-verification-claims.2026-08-11
   - question.open-questions
 ---
 
@@ -30,11 +35,11 @@ related:
 
 ## Summary
 
-Version 0.3.1 is merged on `main` and has not been released. The three v0.3
-Skills exist, the shipped surface has been separated from the repository at
-`plugins/projipsa/`, and this memory tree is the project's first use of
-Projipsa on itself. 0.3.1 is a packaging fix: it stops Claude Code from
-exposing every public Skill twice.
+Version 0.3.2 is prepared and locally validated as a release candidate. It
+strengthens Outsource verification after real Project-mode use showed that a
+substantially correct contract could still be marked verified by
+implementation-authored helpers and partial execution paths. Version 0.3.1
+remains the latest merged version until the release candidate is published.
 
 The project's stated purpose was corrected on 2026-08-03. Projipsa exists so
 that project understanding survives the session and substantial work can be
@@ -45,6 +50,16 @@ See [the overview](overview.md).
 ## Confirmed Current
 
 - Three public Skills ship: `projipsa`, `projipsa-init`, and `outsource`.
+- Outsource verification starts from the service user, artifact consumer,
+  operator, or QA perspective and traces the actual user or data path. It
+  records `direct`, `proxy`, `reported`, and `not_run` evidence separately and
+  does not promote a partial path or early exit into a broader passing claim.
+  See [the verification
+  decision](../decisions/2026-08-11-qa-oriented-verification-claims.md).
+- Preservation prohibitions are negative acceptance criteria when adjacent
+  delivery work could violate them. Execution status, verification status, and
+  Maker decision are independent fields; Maker acceptance cannot rewrite a
+  technical verdict.
 - The public workflows are shared, but their harnesses are isolated: Codex
   loads thin adapters from `codex-skills/`, while Claude Code loads thin
   adapters from `claude-skills/`. The package ships no `skills/` directory. See
@@ -76,7 +91,7 @@ See [the overview](overview.md).
   host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`. Its
   pointer checks are incomplete: three gaps were reproduced on 2026-07-31 and
   are recorded in [open questions](../questions/open-questions.md).
-- 35 tests pass on Python 3.12. The preceding 31-test suite also passed on
+- 37 tests pass on Python 3.12. The preceding 31-test suite also passed on
   Python 3.9.6, and CI runs the current suite on 3.9 and 3.13.
 - `projipsa` is not listed in the SnoopyDev marketplace. Development installs
   currently use this source checkout: Codex through `.agents/` and Claude Code
@@ -87,14 +102,14 @@ See [the overview](overview.md).
 
 ## In Progress
 
-- Nothing. The 0.3.1 packaging fix merged as
-  [pull request 5](https://github.com/SnoopyKim/projipsa/pull/5), and the
-  2026-08-03 documentation restructure is recorded in
-  [the monthly log](../../logs/2026-08.md).
+- The 0.3.2 verification release candidate is implemented and locally
+  validated. Publication and installed-plugin refresh remain.
 
 ## Explicitly Not Current
 
 - No release. The marketplace lists `invee` and `outsource`, not `projipsa`.
+- Version 0.3.2 has not been published or installed into either host's
+  version-pinned cache.
 - No `raw/` tree, because every current source has a stable versioned path.
 - No `wiki/deliveries/` tree, because no delegated engagement is active.
 - `outsource` is not in daily use yet.
@@ -118,9 +133,9 @@ See [the overview](overview.md).
 ## Validation
 
 - `python3 scripts/validate_package.py` passes.
-- `python3 -m unittest discover -s tests` passes, 35 tests, on Python 3.12.
-  Two of them fail if the package reintroduces a `skills/` directory or if the
-  two manifests name the same one.
+- `python3 -m unittest discover -s tests` passes, 37 tests, on Python 3.12.
+  The two new tests preserve the independent delivery statuses and the shipped
+  QA-oriented verification reference.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
 - The authoritative Codex plugin validator and all three Codex Skill validators
   passed against the 2026-08-02 layout, when Codex adapters were still at
@@ -151,6 +166,9 @@ See [the overview](overview.md).
   banned-vocabulary check, the package validator and 35 tests still pass. The
   rewritten README was checked against `validate_readme`'s whole-token rule for
   all six host invocations.
+- For the 0.3.2 working tree, the package validator, 37 tests, and
+  `git diff --check` pass. The memory validator accepts 7 maintained pages, and
+  `claude plugin validate ./plugins/projipsa --strict` passes.
 
 ## Next Work
 
@@ -162,4 +180,7 @@ See [the overview](overview.md).
 - Decide when to list `projipsa` in the marketplace, and at which commit,
   after re-running the authoritative Codex plugin validator against
   `codex-skills/`.
-- Consider a skill-triggering evaluation harness, which no validator covers.
+- Consider a Skill-triggering and workflow-behavior evaluation harness, which
+  no static validator covers. Include scenarios that reject helper-only or
+  early-exit evidence for broader claims, exercise preservation invariants, and
+  keep Maker acceptance separate from technical verdicts.

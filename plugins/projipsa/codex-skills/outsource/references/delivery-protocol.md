@@ -48,7 +48,7 @@ Reclassify when discovery changes the evidence. Record why the mode changed.
 | `PROPOSE` | Translate understanding into a responsible delivery offer | Draft Delivery Contract and alternatives | `CONFIRM` |
 | `CONFIRM` | Resolve material choices and establish authority | Confirmed or revised contract | `DELIVER` |
 | `DELIVER` | Produce the contracted deliverables | Inspectable artifacts, work log, implementation checks | `VERIFY` |
-| `VERIFY` | Test each acceptance criterion with direct evidence | Evidence matrix and verdicts | `REVIEW` or inner repair |
+| `VERIFY` | Test each acceptance criterion from the service user, artifact consumer, or QA perspective | Typed evidence matrix, technical verdicts, and aggregate verification status | `REVIEW` or inner repair |
 | `REVIEW` | Present results for Maker judgment | Review package and feedback classification | `ACCEPT`, `CHANGE`, or repair |
 | `CHANGE` | Evaluate a new desire or changed constraint | Impact analysis and contract revision | `CONFIRM` |
 | `ACCEPT` | Record the Maker's acceptance decision | Accepted scope, exclusions, residual risks | `HANDOFF` |
@@ -79,6 +79,9 @@ work_items:
 approvals:
 changes:
 evidence:
+execution_status:
+verification_status:
+maker_decision:
 risks:
 maker_feedback:
 next_action:
@@ -135,6 +138,26 @@ EXECUTED  = the planned artifact or action exists
 VERIFIED  = required evidence passes
 ACCEPTED  = the Maker has reviewed and accepted the result
 ```
+
+Represent them independently in durable state:
+
+```text
+execution_status: incomplete | complete
+verification_status: not_run | partial | passed | failed | blocked
+maker_decision: pending | accepted | accepted_with_exclusions | changes_requested
+```
+
+Verification is fail-closed at the claim boundary: it is `passed` only when
+every required criterion has a suitable passing technical verdict. Any required
+criterion that is partial, failed, blocked, or not run keeps the aggregate
+status from `passed`. Moving to `REVIEW` is still allowed so the Maker can see
+and classify the gaps.
+
+Maker acceptance never changes a technical verdict. A terminal `HANDOFF` may
+record accepted exclusions or explicitly accepted residual risk, but it must
+preserve the incomplete verification status and must not describe the excluded
+scope as verified. Every non-passing criterion must have a disposition: repair,
+contract change, accepted exclusion or risk, or a concrete blocked next action.
 
 Do not infer `ACCEPTED` from silence, a passing test, or an agent report. Scoped
 work may end with “verified and ready for your review” when an explicit
