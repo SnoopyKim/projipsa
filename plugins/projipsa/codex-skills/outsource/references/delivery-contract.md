@@ -17,6 +17,13 @@ Use this reference to translate interview evidence into a shared, versioned basi
 - Let Outsource propose deliverables, tests, and evidence; do not misrepresent them as Maker-authored requirements.
 - Keep non-goals explicit to prevent silent scope growth.
 - Give every acceptance criterion an evidence method or an explicit Maker-review method.
+- Separate untouched excluded scope from preservation invariants. Promote a
+  prohibition such as "must not change", "must not overwrite", or "must not
+  grant" into a negative acceptance criterion when the delivery could violate
+  it.
+- Plan evidence from the service user, artifact consumer, or QA perspective.
+  Name the real user or data path and risk-shaped normal, negative, regression,
+  boundary, or failure cases before implementation begins.
 - Record material changes as new versions.
 - Require confirmation for Project mode and for consequential scope, cost, external effect, or irreversible action.
 
@@ -47,6 +54,7 @@ Relevant current behavior, source artifacts, users, constraints, and baseline.
 - Included:
 - Excluded:
 - Explicit non-goals:
+- Preservation invariants:
 
 ## 4. Constraints and authority
 
@@ -70,8 +78,21 @@ Relevant current behavior, source artifacts, users, constraints, and baseline.
 
 ## 7. Acceptance and evidence
 
-| ID | Acceptance criterion | Evidence or test | Reviewer | Status |
-|---|---|---|---|---|
+| ID | Criterion or invariant | Claim type and actual user/data path | Risk | Planned cases | Planned evidence | Reviewer | Plan status |
+|---|---|---|---|---|---|---|---|
+
+- Verification perspective: service user | artifact consumer | QA reviewer
+- Proxy-only evidence that cannot pass a criterion:
+- Plan status: planned | pending_decision | not_applicable
+
+### Verification results
+
+| ID | Cases executed | Observed evidence | Evidence level | Verifier mode and perspective | Technical verdict | Residual risk |
+|---|---|---|---|---|---|---|
+
+- Evidence level: direct | proxy | reported | not_run
+- Technical verdict: passed | partial | failed | blocked | not_applicable
+- Aggregate verification status: not_run | partial | passed | failed | blocked
 
 ## 8. Milestones
 
@@ -104,7 +125,9 @@ How new desires, misunderstandings, contract defects, and next-phase ideas will 
 - Review package:
 - Known limitations:
 - Residual risks:
-- Maker decision: pending | accepted | accepted with exclusions | changes requested
+- Execution status: incomplete | complete
+- Verification status: not_run | partial | passed | failed | blocked
+- Maker decision: pending | accepted | accepted_with_exclusions | changes_requested
 
 ## 14. Change log
 
@@ -120,9 +143,10 @@ Scoped work may use:
 ## Compact Delivery Contract
 
 - Outcome:
-- Scope / non-goals:
+- Scope / non-goals / preservation invariants:
 - Deliverables:
-- Acceptance criteria and evidence:
+- Acceptance criteria, actual paths, risk-shaped cases, and planned evidence:
+- Observed evidence, technical verdicts, and aggregate verification status:
 - Constraints / approvals:
 - Assumptions / risks:
 - Strategy:
@@ -133,6 +157,10 @@ Scoped work whose outcome and boundaries are already clear may skip a separate
 interview and move from qualification to a compact proposal. Keep the contract
 weight proportional, but do not make material authority, risk, or acceptance
 boundaries implicit.
+
+Do not require an exhaustive Cartesian product of cases. Select cases in
+proportion to consequence and uncertainty, but make the critical path and any
+preservation invariant explicit before delivery begins.
 
 When a contract needs durable Project-mode state, maintain its current form in
 the Projipsa Memory `delivery` page rather than copying it into current state or

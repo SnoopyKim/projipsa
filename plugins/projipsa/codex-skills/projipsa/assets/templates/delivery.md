@@ -18,6 +18,9 @@ related:
   REVIEW | CHANGE | ACCEPT | HANDOFF
 - Contract version:
 - Contract status: draft | confirmed | changed | accepted | superseded
+- Execution status: incomplete | complete
+- Verification status: not_run | partial | passed | failed | blocked
+- Maker decision: pending | accepted | accepted_with_exclusions | changes_requested
 - Confirmed by: pending
 - Confirmed at: pending
 - Current milestone:
@@ -32,6 +35,7 @@ State the observable change, audience, and why it matters.
 - Included:
 - Excluded:
 - Explicit non-goals:
+- Preservation invariants:
 
 ## Authority And Approvals
 
@@ -53,8 +57,21 @@ State the observable change, audience, and why it matters.
 
 ## Acceptance And Evidence
 
-| ID | Criterion | Evidence or review method | Status |
-| --- | --- | --- | --- |
+| ID | Criterion or invariant | Claim type and actual user/data path | Risk | Planned cases | Planned evidence | Reviewer | Plan status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+- Verification perspective: service user | artifact consumer | QA reviewer
+- Proxy-only evidence that cannot pass a criterion:
+- Plan status: planned | pending_decision | not_applicable
+
+## Verification Results
+
+| ID | Cases executed | Observed evidence | Evidence level | Verifier mode and perspective | Technical verdict | Residual risk |
+| --- | --- | --- | --- | --- | --- | --- |
+
+Evidence level: direct | proxy | reported | not_run
+
+Technical verdict: passed | partial | failed | blocked | not_applicable
 
 ## Decisions And Changes
 
@@ -67,7 +84,8 @@ State the observable change, audience, and why it matters.
 ## Maker Review
 
 - Latest feedback:
-- Acceptance: pending | accepted | accepted with exclusions | changes requested
+- Decision rationale and accepted scope or exclusions:
+- Disposition of every non-passing criterion:
 - Residual risks:
 
 ## Change Log

@@ -3,10 +3,12 @@ id: question.open-questions
 type: question
 status: active
 confidence: assumed
-updated: 2026-08-03
+updated: 2026-08-11
 sources:
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
+  - plugins/projipsa/codex-skills/outsource/references/verification.md
   - plugins/projipsa/.codex-plugin/plugin.json
+  - tests/test_package_contract.py
 related:
   - project.current-state
   - decision.host-adapter-separation.2026-08-02
@@ -78,14 +80,20 @@ The plugin has never been listed in a marketplace, so nothing has shipped to
 anyone who did not install from source. It is unresolved whether adopting this
 memory tree should precede or follow a first listing.
 
-## Should skill triggering be tested automatically?
+## Should Skill triggering and workflow behavior be tested automatically?
 
-No validator checks whether a Skill fires at the right moment. The only
-evidence so far is a manual skill listing under `claude --plugin-dir`. Official
-guidance recommends evaluation scenarios but provides no runner.
+No validator checks whether a Skill fires at the right moment or whether a
+model follows its semantic workflow. The package tests preserve the 0.3.2
+verification reference and delivery-state surface, but they cannot determine
+whether a verifier rejects helper-only or early-exit evidence for a broader
+claim. Triggering evidence remains a manual skill listing under
+`claude --plugin-dir`. Official guidance recommends evaluation scenarios but
+provides no runner.
 
 Resolution: decide whether an evaluation harness belongs in this repository,
-and whether it can run in CI given that it requires model calls.
+and whether it can run in CI given that it requires model calls. Include both
+triggering cases and verification-behavior regressions covering actual paths,
+preservation invariants, proxy evidence, and Maker-versus-technical verdicts.
 
 ## Should the memory contract know about public roots?
 
