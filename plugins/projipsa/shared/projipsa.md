@@ -54,9 +54,10 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
 
 A request to wrap up, close out, or finish names no operation. Resolve it
 instead of asking: run Update for a writer finishing its own work, and Integrate
-for a branch holding merged work that no shared page has absorbed yet. The
-memory validator reports that second condition as an outstanding-integration
-warning.
+only on a branch holding merged writer logs that no shared page or later
+`integrate` chronology entry has absorbed yet. The memory validator reports
+newer per-writer chronology, but that signal does not prove the current branch
+contains the merge; check the branch position before selecting Integrate.
 
 Read [operations](../codex-skills/projipsa/references/operations.md) for the selected
 operation. Read
@@ -72,10 +73,11 @@ provenance merely to keep the operation label singular.
 
 ## Separate reading from writing
 
-Implicit loading, Query, and diagnostic lint are read-only. Ingest, update,
-repair, and snapshot change project files and require either an explicit user
-request or a task whose approved scope already includes project-memory
-maintenance. Installation alone never authorizes automatic writes.
+Implicit loading, Query, and diagnostic lint are read-only. Ingest, Update,
+Integrate, repair, and Snapshot change project files and require either an
+explicit user request or a task whose approved scope already includes
+project-memory maintenance. Installation alone never authorizes automatic
+writes.
 
 When writing:
 

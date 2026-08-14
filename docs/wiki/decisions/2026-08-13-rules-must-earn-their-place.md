@@ -91,8 +91,9 @@ accretion that continues because adding feels safe and removing feels risky.
   rejects a second one. Because it stays required, a tree still ends up with
   one decision page, so dropping the general requirement is a change in what
   the contract means rather than in what a valid tree contains.
-- Nothing in the reduction touches what the outstanding-integration warning
-  needs: `updated`, `sources`, `current-state.md`, and the chronology logs all
-  stay required.
+- Nothing in the reduction touches what the pending-integration warning needs:
+  `updated`, `current-state.md`, and the chronology logs all stay required. An
+  append-only `integrate` entry advances the watermark when shared state has no
+  meaningful content change, so no new frontmatter field is required.
 - Prose deduplication remains separate work. A single meaning restated in five
   files is a writing failure that no rule cut removes.

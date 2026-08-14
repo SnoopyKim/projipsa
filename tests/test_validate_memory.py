@@ -255,6 +255,56 @@ class ValidateMemoryTests(unittest.TestCase):
 
             self.assertEqual([], validate_memory.validate(docs))
 
+    def test_index_must_link_a_directory_that_contains_chronology(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            docs = self.make_valid_tree(Path(temporary))
+            (docs / "logs" / "2026-07.md").unlink()
+            actual = docs / "logs" / "actual"
+            actual.mkdir()
+            (actual / "2026-07-28-writer.md").write_text(
+                "# Writer log\n", encoding="utf-8"
+            )
+            unrelated = docs / "logs" / "archive"
+            unrelated.mkdir()
+            (unrelated / "README.md").write_text(
+                "# Not the chronology entry point\n", encoding="utf-8"
+            )
+            index = docs / "index.md"
+            index.write_text(
+                index.read_text(encoding="utf-8").replace(
+                    "logs/2026-07.md", "logs/archive/"
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_memory.validate(docs)
+            self.assertTrue(
+                any("index.md must link the chronology" in error for error in errors)
+            )
+
+    def test_chronology_day_must_be_a_real_calendar_date(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            docs = self.make_valid_tree(Path(temporary))
+            (docs / "logs" / "2026-07.md").unlink()
+            impossible = docs / "logs" / "2026-02-31.md"
+            impossible.write_text("# Impossible day\n", encoding="utf-8")
+            index = docs / "index.md"
+            index.write_text(
+                index.read_text(encoding="utf-8").replace(
+                    "logs/2026-07.md", "logs/2026-02-31.md"
+                ),
+                encoding="utf-8",
+            )
+
+            errors = validate_memory.validate(docs)
+            self.assertTrue(
+                any("real calendar date" in error for error in errors), errors
+            )
+            self.assertTrue(
+                any("missing required chronology log" in error for error in errors),
+                errors,
+            )
+
     def test_nested_chronology_is_content_checked(self) -> None:
         """A non-recursive walk used to make nested logs invisible, which
         exempted them from link and placeholder checking entirely."""
@@ -324,11 +374,11 @@ class ValidateMemoryTests(unittest.TestCase):
             "# Adapter split\n\n- changed: the host adapter\n", encoding="utf-8"
         )
 
-    def test_chronology_after_current_state_warns_integration_outstanding(
+    def test_per_writer_chronology_warns_that_integration_will_be_needed(
         self,
     ) -> None:
-        """A merged writer's log is dated later than the shared page that should
-        have absorbed it, which is exactly the post-merge condition."""
+        """A writer log newer than shared state needs Integrate after merge,
+        but the warning must not claim that this checkout is already merged."""
         with tempfile.TemporaryDirectory() as temporary:
             docs = self.make_valid_tree(Path(temporary))
             self.add_writer_log(docs, "2026-08-03-adapter-split.md")
@@ -338,6 +388,8 @@ class ValidateMemoryTests(unittest.TestCase):
             self.assertEqual(1, len(warnings), warnings)
             self.assertIn("Integrate", warnings[0])
             self.assertIn("2026-08-03", warnings[0])
+            self.assertIn("after those writer logs merge", warnings[0])
+            self.assertIn("writer branch", warnings[0])
 
     def test_integration_warning_clears_when_current_state_catches_up(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -348,6 +400,28 @@ class ValidateMemoryTests(unittest.TestCase):
                 current_state.read_text(encoding="utf-8").replace(
                     "updated: 2026-07-28", "updated: 2026-08-03"
                 ),
+                encoding="utf-8",
+            )
+
+            self.assertEqual([], validate_memory.collect_warnings(docs))
+
+    def test_integrate_entry_clears_without_rewriting_current_state(self) -> None:
+        """The merged work may have no project-level consequence, so an
+        append-only Integrate entry must clear the signal without falsifying the
+        current-state page's last meaningful update date."""
+        with tempfile.TemporaryDirectory() as temporary:
+            docs = self.make_valid_tree(Path(temporary))
+            self.add_writer_log(docs, "2026-08-03-adapter-split.md")
+            (docs / "logs" / "README.md").write_text(
+                "## [2099-01-01] integrate | Documentation example\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(1, len(validate_memory.collect_warnings(docs)))
+            log = docs / "logs" / "2026-07.md"
+            log.write_text(
+                log.read_text(encoding="utf-8")
+                + "\n## [2026-08-04] integrate | Writer memory absorbed\n"
+                + "\n- unchanged: current state had no project-level consequence.\n",
                 encoding="utf-8",
             )
 
@@ -370,9 +444,9 @@ class ValidateMemoryTests(unittest.TestCase):
             self.assertIn("warning: ", stderr.getvalue())
             self.assertNotIn("error: ", stderr.getvalue())
 
-    def test_a_dated_entry_in_a_monthly_log_drives_the_comparison(self) -> None:
-        """A monthly filename names no day, so the entry heading is the signal
-        that keeps this check working for a single-writer project."""
+    def test_single_writer_log_does_not_imply_parallel_integration(self) -> None:
+        """A review-only Update may append chronology without changing current
+        state; monthly and day units therefore cannot imply a merged writer."""
         with tempfile.TemporaryDirectory() as temporary:
             docs = self.make_valid_tree(Path(temporary))
             log = docs / "logs" / "2026-07.md"
@@ -381,10 +455,12 @@ class ValidateMemoryTests(unittest.TestCase):
                 + "\n## [2026-07-30] update | Later work\n\n- changed: a page.\n",
                 encoding="utf-8",
             )
+            (docs / "logs" / "2026-08-03.md").write_text(
+                "# Daily review\n\n## [2026-08-03] update | Review only\n",
+                encoding="utf-8",
+            )
 
-            warnings = validate_memory.collect_warnings(docs)
-            self.assertEqual(1, len(warnings), warnings)
-            self.assertIn("2026-07-30", warnings[0])
+            self.assertEqual([], validate_memory.collect_warnings(docs))
 
     def test_confirmed_page_requires_a_source(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

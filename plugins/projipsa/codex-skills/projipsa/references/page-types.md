@@ -108,6 +108,12 @@ Keep one unit per project rather than mixing them, and link the chronology from
 many to list. The memory validator accepts every form above, and checks nested
 chronology files exactly like flat ones.
 
+Per-writer chronology is also the input to the post-merge
+[Integrate operation](operations.md). Its warning means the writer logs are
+newer than the last shared-state or `integrate` watermark; it does not prove the
+current branch contains their merge. Integrate appends a dated `integrate`
+entry even when the merged result correctly leaves current state unchanged.
+
 A project that already kept chronology under `logs/<subdirectory>/` was not
 being checked there before: the validator walked only the top level, so those
 files were invisible to its link, placeholder, and empty-file checks. They are

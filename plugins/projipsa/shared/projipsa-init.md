@@ -29,14 +29,23 @@ policy. Keep the Codex and Claude Code adapter policies aligned.
 
 - **New memory**: the project has little or no durable documentation. Create
   the minimum useful core from verified repository context.
-- **Migration**: the project has useful but flat or mixed documentation.
-  Reclassify it as maintained synthesis, raw source, decision, question, or
-  chronology and preserve its meaning.
-- **Repair**: Projipsa is partly initialized. Reconcile missing files,
-  navigation, frontmatter, IDs, and logs without duplicating the tree.
+- **Adoption migration**: the project has useful but flat or mixed
+  documentation. Reclassify it as maintained synthesis, raw source, decision,
+  question, or chronology and preserve its meaning.
+- **Upgrade or repair**: Projipsa already exists. Reconcile its installed
+  contract, project-specific rules, navigation, frontmatter, IDs, and logs
+  without duplicating or normalizing the tree.
 
 Initialization is idempotent. A second run audits and repairs the existing
 structure rather than starting over.
+
+An installed plugin update never rewrites an adopting project's memory. An
+explicit Init upgrade audits the existing tree against the current contract.
+For the 0.3.x to 0.4.0 transition, preserve the old overview, open-questions
+page, and optional frontmatter; they remain valid even though new projects no
+longer require them. Keep monthly chronology unless current parallel work
+justifies a deliberate cutover to per-writer logs. The detailed initialization
+workflow owns the preservation and cutover rules.
 
 Read
 [the initialization workflow](../codex-skills/projipsa-init/references/initialization.md)
@@ -151,5 +160,5 @@ outside the memory root the Maker asked you to create.
    useful Projipsa operation.
 
 After successful initialization, use `$projipsa:projipsa` in Codex or
-`/projipsa:projipsa` in Claude Code for ongoing Query, Ingest, Update, Lint,
-and Snapshot work.
+`/projipsa:projipsa` in Claude Code for ongoing Query, Ingest, Update,
+Integrate, Lint, and Snapshot work.

@@ -88,6 +88,22 @@ Initialization is docs-only by default: it changes no implementation file. It is
 also idempotent, so running it again audits and repairs the existing setup
 instead of creating a second tree.
 
+### Upgrading an existing project
+
+Updating the Plugin does not rewrite project memory. Run
+`$projipsa:projipsa-init` in Codex or `/projipsa:projipsa-init` in Claude Code
+explicitly when you want an existing Projipsa project audited or migrated to
+the current contract.
+
+The 0.3.x to 0.4.0 upgrade is preservation-first: existing overview and open
+questions pages remain valid, as do stated `type`, `status`, `confidence`, and
+`related` fields. Monthly logs remain in place unless real concurrent writers
+justify a dated cutover to per-writer files. Init merges the new ownership,
+eviction, and Integrate guidance into project-specific rules rather than
+replacing customized documentation from a template. The first 0.4.0 validation
+may report pre-existing findings in nested `logs/**`, which older validators did
+not inspect.
+
 From then on, `/projipsa:projipsa` is the everyday call. Ask it to brief you,
 and it reads current state before history. Ask it to record a session, and it
 updates the affected pages and appends the log.
@@ -117,13 +133,15 @@ The everyday Skill once a project has adopted Projipsa. It can:
 - answer questions from current memory without writing anything;
 - ingest new source material with its provenance;
 - update current state, decisions, risks, questions, and next work;
+- integrate shared memory once parallel writer branches have merged;
 - lint structure, freshness, links, and evidence;
 - capture a milestone, pause, handoff, or restart snapshot;
 - persist delivery state for an authorized engagement.
 
 It may load implicitly when you ask for a project briefing, but implicit use
-stays read-only. Ingest, update, repair, and snapshot need either an explicit
-request or a task whose approved scope already covers memory maintenance.
+stays read-only. Ingest, Update, Integrate, repair, and Snapshot need either an
+explicit request or a task whose approved scope already covers memory
+maintenance.
 
 If no coherent memory exists, it says so and may suggest onboarding. It never
 initializes a project on its own.
@@ -196,18 +214,20 @@ Chronology defaults to one file per month. A project whose work runs in
 parallel branches or worktrees switches to one file per writer
 (`logs/2026-08/2026-08-12-<slug>.md`), because a shared append target is a
 merge-conflict target. Those branches leave the shared pages alone; asking
-Projipsa to finish after the merge writes them once from the merged result, and
-the memory validator warns while that write is outstanding.
+Projipsa to finish after the merge writes them once from the merged result. The
+memory validator reports newer per-writer chronology, while Projipsa checks that
+the current branch actually holds the merge before running Integrate.
 
 Optional page families get added only when a project actually needs them —
 `wiki/areas/`, `assumptions/`, `risks/`, `procedures/`, `external/`,
 `milestones/`, `deliveries/`. Empty folders for symmetry are a smell.
 
-Every maintained page carries frontmatter with a stable `id`, a `status`, a
-`confidence` (`confirmed`, `assumed`, `inferred`, or `disputed`), and a
-`sources` list. A page is raised to `confirmed` only in the same edit that lists
-its evidence. Six months later you can still ask whether a claim was verified or
-guessed — and get an answer.
+Every maintained page carries frontmatter with a stable `id`, an `updated` date,
+and a `sources` list. `status` defaults to `active` and `confidence` defaults to
+`inferred`; state either when the page departs from that default. A page is
+raised to `confirmed` only in the same edit that lists its evidence. Six months
+later you can still ask whether a claim was verified or guessed — and get an
+answer.
 
 ## Delegating substantial work
 

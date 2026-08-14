@@ -6,6 +6,7 @@ confidence: confirmed
 updated: 2026-08-14
 sources:
   - https://github.com/SnoopyKim/projipsa/pull/7
+  - https://github.com/SnoopyKim/projipsa/pull/12
   - https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2
   - https://github.com/SnoopyKim/projipsa/issues/9
   - https://github.com/SnoopyKim/projipsa/issues/10
@@ -16,6 +17,7 @@ sources:
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/codex-skills/projipsa/references/page-types.md
   - plugins/projipsa/codex-skills/projipsa/references/operations.md
+  - plugins/projipsa/codex-skills/projipsa-init/references/initialization.md
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
   - plugins/projipsa/shared/projipsa.md
   - plugins/projipsa/shared/outsource.md
@@ -94,6 +96,8 @@ See [the overview](overview.md).
 - `projipsa-init` is explicit-only on both hosts, enforced by
   `allow_implicit_invocation: false` for Codex and `disable-model-invocation:
   true` for Claude Code.
+- Existing projects upgrade only through explicit `projipsa-init`; 0.3.x pages
+  and frontmatter stay valid, and chronology changes require a dated cutover.
 - Only `plugins/projipsa/` is shipped. `scripts/validate_package.py` scans that
   tree and the repository README for prose, links, and Skill contracts, and
   additionally reads the two root development marketplace manifests. Nothing
@@ -117,18 +121,22 @@ See [the overview](overview.md).
   rules on purpose, because an adopting project reads it without these
   references.
 - Integrate is the fifth operation of the `projipsa` Skill, not a fourth Skill.
-  It writes the single-owner shared pages once from a merged result, a request
-  to finish routes to Update or Integrate without asking, and the validator
-  warns while chronology is dated later than current state. The comparison is
-  day-granular, so a same-day merge after an integration is not detected.
+  It requires the same authorized write scope as Update and writes the
+  single-owner shared pages once from a merged result. The validator compares
+  per-writer chronology with the later of current state's meaningful update and
+  an append-only `integrate` entry; the workflow checks that writer logs have
+  actually merged before running Integrate. The comparison is day-granular, so
+  a writer update landing after integration on the same day is not detected.
 - The contract requires three files and three frontmatter keys: `AGENTS.md`,
   `index.md`, `current-state.md`, and `id`, `updated`, `sources`. `type` is
   read from a page's directory when absent, `status` and `confidence` default
   to `active` and `inferred`, and each dropped field is still validated when a
   page states it. The Projipsa adoption decision stays required as the
   initialization idempotency marker.
-- 48 tests pass on Python 3.12 and on the 3.9.6 floor. CI runs them on 3.9 and
-  3.13.
+- 51 tests pass on Python 3.12. The three new regressions cover chronology
+  navigation, real calendar dates, and an append-only Integrate watermark. The
+  current unpushed repair has not run on the 3.9.6 floor; CI remains configured
+  for 3.9 and 3.13.
 - `projipsa` is not listed in the SnoopyDev marketplace. Development installs
   currently use this source checkout: Codex through `.agents/` and Claude Code
   through `.claude-plugin/` at the repository root.
@@ -175,22 +183,17 @@ Latest evidence for the current working tree. Earlier runs stay in the
 chronology: [August](../../logs/2026-08.md) and [July](../../logs/2026-07.md).
 
 - `python3 scripts/validate_package.py` passes.
-- `python3 -m unittest discover -s tests` passes, 48 tests, on Python 3.12 and
-  on the 3.9.6 floor CI also gates. Nine tests cover the memory changes:
-  per-session chronology names, an `index.md` link to the logs directory,
-  content checking of nested logs, the current-state warnings including the
-  short-page case that must stay silent, and the outstanding-integration
-  warning from both a per-writer filename and a dated entry heading.
+- `python3 -m unittest discover -s tests` passes, 51 tests, on Python 3.12.
+  The focused cases cover chronology granularity and navigation, recursive
+  checking, drift warnings, pending integration, both watermarks, and
+  single-writer silence; details are in the August chronology.
 - `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py .`
   accepts this memory root and prints no warning.
-- A scratch copy of this tree with the chronology moved to
-  `logs/2026-08/2026-08-12-<slug>.md` validated as chronology, reported the
-  relative links that the deeper path broke — which the previous non-recursive
-  walk never saw — and warned once current state passed the size budget.
-- Adding `logs/2026-08/2026-08-14-<slug>.md` to this tree produced the
-  outstanding-integration warning naming both dates, kept the structure valid,
-  and exited 0; removing the file cleared the warning.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
+- The current repair has not run on Python 3.9 because no 3.9 runtime is
+  available locally. Parsing the validator with Python 3.9's grammar is proxy
+  evidence only; the runtime floor remains `not_run` until the PR is pushed and
+  CI executes it.
 - The authoritative Codex plugin validator and all three Codex Skill validators
   passed against the 2026-08-02 layout, when Codex adapters were still at
   `skills/`. They have not been re-run against `codex-skills/`; see [open
@@ -200,9 +203,9 @@ chronology: [August](../../logs/2026-08.md) and [July](../../logs/2026-07.md).
 
 ## Next Work
 
-- Decide whether the parallel-safe memory changes ship as their own release,
-  including the version bump both host manifests need before any installed
-  plugin can see them.
+- Commit and push the PR 12 repair only when authorized, let the Python 3.9 and
+  3.13 gates run, then decide merge, tag, GitHub Release, and host refresh as
+  separate operations.
 - Fix the three reproduced `validate_memory.py` gaps: an unparsed root
   declaration, Markdown code regions counted as real imports, and unresolved
   `related` IDs.

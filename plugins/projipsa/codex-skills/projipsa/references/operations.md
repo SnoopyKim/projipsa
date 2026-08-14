@@ -124,7 +124,7 @@ two branches rewriting current state do, and ownership reaches that case only
 when it is assigned rather than inferred.
 
 A parallel writer records its work in the pages it owns, and reports that the
-integration pages still need the post-merge Update. The integrator then writes
+integration pages will need the post-merge Integrate. The integrator then writes
 current state once, from the merged result, which is also the only point where
 that page can be accurate.
 
@@ -144,8 +144,10 @@ differs: it reads the chronology that landed since current state was last
 written, not the session that just ended.
 
 Run it when a merge brings in work from writers that owned only their own
-pages, and whenever the memory validator warns that chronology reaches a later
-date than `wiki/project/current-state.md`.
+pages. The memory validator warns when per-writer chronology is newer than the
+last shared-state or `integrate` watermark, but the warning may also appear on
+the writer branch before merge. Confirm that the current branch holds the
+merged result; otherwise report Integrate as pending instead of running it.
 
 1. Read `wiki/project/current-state.md`, then every chronology entry dated
    after it.
@@ -162,6 +164,10 @@ date than `wiki/project/current-state.md`.
    raised.
 7. Update `index.md` only when the merged work changed the reading path.
 8. Append one chronology entry for the integration, naming the work it absorbed.
+   Its heading uses the operation token `integrate`, as in
+   `## [2026-08-14] integrate | Writer memory absorbed`. This append-only entry
+   is the integration watermark when the merged work correctly leaves current
+   state unchanged.
 9. Run the memory validator and report its errors and warnings.
 
 Do not run Integrate on a feature branch. Its output is exactly the single-owner
@@ -189,8 +195,9 @@ Check:
 - resolved questions still presented as open;
 - current state carrying lines that no longer steer the next session, or
   `sources` entries no longer supporting any claim on the page;
-- chronology recorded after current state was last written, which means a
-  post-merge Integrate never ran;
+- per-writer chronology newer than the last shared-state or `integrate`
+  watermark, which means post-merge Integrate may still be pending; confirm the
+  writer logs have merged before treating it as outstanding;
 - duplicate claims likely to drift;
 - raw sources edited instead of appended;
 - optional page families without a real project need;

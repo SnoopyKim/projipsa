@@ -51,17 +51,24 @@ ADOPTION_FILE_PATTERN = re.compile(
 )
 # Chronology defaults to one file per month. Finer units are first-class so
 # that parallel writers stop appending to one shared file: `2026-08-12.md` for
-# a day, and a `-<slug>` suffix for one branch, session, or engagement. Any of
-# them may sit directly under `logs/` or nested one level deeper, as in
+# a day, and a day plus `-<slug>` for one branch, session, or engagement. Any
+# of them may sit directly under `logs/` or in a subdirectory, as in
 # `logs/2026-08/2026-08-12-adapter-split.md`.
 CHRONOLOGY_LOG_PATTERN = re.compile(
     r"^(?P<year>\d{4})-(?P<month>0[1-9]|1[0-2])"
-    r"(?:-(?P<day>0[1-9]|[12]\d|3[01]))?"
-    r"(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?"
+    r"(?:-(?P<day>0[1-9]|[12]\d|3[01])"
+    r"(?:-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*))?"
+    r")?"
     r"\.md$"
 )
-# A dated entry heading, bracketed as the log template writes it or bare.
-ENTRY_DATE_PATTERN = re.compile(r"^#{1,6}\s*\[?(\d{4}-\d{2}-\d{2})\]?", re.MULTILINE)
+# A dated entry heading, bracketed as the log template writes it or bare. The
+# optional operation makes an append-only `integrate` entry an integration
+# watermark without adding mutable frontmatter to a shared page.
+ENTRY_HEADING_PATTERN = re.compile(
+    r"^#{1,6}\s*\[?(?P<date>\d{4}-\d{2}-\d{2})\]?"
+    r"(?:\s+(?P<operation>[a-z][a-z0-9-]*))?",
+    re.IGNORECASE | re.MULTILINE,
+)
 # Current state is read at the start of every session, so its length is a
 # recurring context cost. Past this much text a briefing page has normally
 # absorbed completed history that belongs in chronology. A warning, never an
@@ -375,13 +382,28 @@ def validate(root: Path) -> list[str]:
     # Walk the whole tree: a nested chronology file used to be invisible here,
     # which silently exempted it from every content check below.
     log_files = sorted(logs_root.rglob("*.md")) if logs_root.is_dir() else []
-    chronology_logs = [
-        path for path in log_files if CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
-    ]
+    chronology_logs: list[Path] = []
+    for path in log_files:
+        matched = CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
+        if not matched:
+            continue
+        if matched.group("day"):
+            try:
+                date(
+                    int(matched.group("year")),
+                    int(matched.group("month")),
+                    int(matched.group("day")),
+                )
+            except ValueError:
+                errors.append(
+                    f"{path}: chronology filename must contain a real calendar date"
+                )
+                continue
+        chronology_logs.append(path)
     if not chronology_logs:
         errors.append(
             "missing required chronology log matching logs/YYYY-MM.md; a finer "
-            "unit may add -DD and a -slug suffix and may sit in a subdirectory"
+            "unit may add -DD or -DD-<slug> and may sit in a subdirectory"
         )
 
     seen_ids: dict[str, Path] = {}
@@ -531,11 +553,14 @@ def validate(root: Path) -> list[str]:
         # A per-session chronology has too many files to list, so linking the
         # directory that holds them is an equally good reading entry point.
         chronology_targets = {path.resolve() for path in chronology_logs}
-        if logs_root.is_dir():
-            chronology_targets.add(logs_root.resolve())
-            chronology_targets.update(
-                path.resolve() for path in logs_root.rglob("*") if path.is_dir()
-            )
+        resolved_logs_root = logs_root.resolve()
+        for chronology_log in chronology_logs:
+            for parent in chronology_log.resolve().parents:
+                if parent == resolved_logs_root:
+                    chronology_targets.add(parent)
+                    break
+                if resolved_logs_root in parent.parents:
+                    chronology_targets.add(parent)
         if chronology_logs and not (index_targets & chronology_targets):
             errors.append(
                 "index.md must link the chronology: a log file or the "
@@ -575,20 +600,39 @@ def chronology_dates(path: Path) -> list[date]:
         text = path.read_text(encoding="utf-8")
     except OSError:
         return dates
-    for raw in ENTRY_DATE_PATTERN.findall(text):
+    for matched_heading in ENTRY_HEADING_PATTERN.finditer(text):
         try:
-            dates.append(date.fromisoformat(raw))
+            dates.append(date.fromisoformat(matched_heading.group("date")))
         except ValueError:
             continue
     return dates
 
 
-def outstanding_integration(root: Path, current_state: Path) -> list[str]:
-    """Chronology recorded after current state was last written. Under parallel
-    work this is the normal post-merge condition: every writer appended to the
-    log file it owns, and nobody has yet written the shared pages from the
-    merged result. Dates are day-granular, so same-day merges after an
-    integration go unseen; the reporting rule in Update covers those."""
+def integration_dates(path: Path) -> list[date]:
+    """Dates of append-only Integrate entries. This is a watermark rather than
+    a claim that current state changed: Integrate may correctly conclude that
+    merged writer work has no project-level consequence for that page."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    dates: list[date] = []
+    for matched_heading in ENTRY_HEADING_PATTERN.finditer(text):
+        if (matched_heading.group("operation") or "").lower() != "integrate":
+            continue
+        try:
+            dates.append(date.fromisoformat(matched_heading.group("date")))
+        except ValueError:
+            continue
+    return dates
+
+
+def pending_integration(root: Path, current_state: Path) -> list[str]:
+    """Per-writer chronology newer than the last shared-state or Integrate
+    watermark. This proves work still needs integration after it merges, not
+    that the current checkout already contains the merged result. Monthly and
+    day logs are single-writer units and never trigger this signal."""
     parsed = parse_frontmatter(current_state)
     if parsed is None:
         return []
@@ -604,18 +648,42 @@ def outstanding_integration(root: Path, current_state: Path) -> list[str]:
     logs_root = root / "logs"
     if not logs_root.is_dir():
         return []
-    recorded = [
+    log_files = sorted(logs_root.rglob("*.md"))
+    chronology_files: list[tuple[Path, re.Match[str]]] = []
+    for path in log_files:
+        matched = CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
+        if not matched:
+            continue
+        if matched.group("day"):
+            try:
+                date(
+                    int(matched.group("year")),
+                    int(matched.group("month")),
+                    int(matched.group("day")),
+                )
+            except ValueError:
+                continue
+        chronology_files.append((path, matched))
+
+    writer_dates = [
         entry
-        for path in sorted(logs_root.rglob("*.md"))
+        for path, matched in chronology_files
+        if matched.group("slug")
         for entry in chronology_dates(path)
     ]
-    latest = max(recorded, default=None)
-    if latest is None or latest <= written:
+    latest_writer = max(writer_dates, default=None)
+    integration_watermarks = [written]
+    for path, _ in chronology_files:
+        integration_watermarks.extend(integration_dates(path))
+    integrated_through = max(integration_watermarks)
+    if latest_writer is None or latest_writer <= integrated_through:
         return []
     return [
-        f"{current_state}: chronology reaches {latest.isoformat()} but this "
-        f"page is dated {written.isoformat()}; the post-merge Integrate that "
-        "writes the shared pages once from the merged result is outstanding"
+        f"{current_state}: per-writer chronology reaches "
+        f"{latest_writer.isoformat()} but shared state is integrated only "
+        f"through {integrated_through.isoformat()}; after those writer logs "
+        "merge, run Integrate on the branch holding the merged result; on a "
+        "writer branch report the integration as pending instead"
     ]
 
 
@@ -671,7 +739,7 @@ def collect_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
     current_state = root / "wiki" / "project" / "current-state.md"
     if current_state.is_file():
-        warnings.extend(outstanding_integration(root, current_state))
+        warnings.extend(pending_integration(root, current_state))
         text = current_state.read_text(encoding="utf-8")
         if len(text) > CURRENT_STATE_WARN_CHARS:
             warnings.append(

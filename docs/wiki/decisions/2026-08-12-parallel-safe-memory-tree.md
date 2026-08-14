@@ -12,6 +12,8 @@ sources:
   - plugins/projipsa/codex-skills/projipsa/references/operations.md
   - plugins/projipsa/codex-skills/projipsa/references/page-types.md
   - plugins/projipsa/codex-skills/projipsa/references/memory-contract.md
+  - plugins/projipsa/shared/projipsa-init.md
+  - plugins/projipsa/codex-skills/projipsa-init/references/initialization.md
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
   - tests/test_validate_memory.py
 related:
@@ -48,10 +50,11 @@ chronology is split, and that current state is replaced rather than appended.
   leaves with its claim. The validator prints non-blocking `warning:` lines
   when current state grows past a readable briefing or loses its sections.
 - **The post-merge write is an operation.** Integrate is the fifth operation of
-  the `projipsa` Skill, not a fourth Skill. It reads the chronology dated after
-  current state and writes the single-owner pages once from the merged result. A
-  request to finish routes to Update or Integrate without asking, and the
-  validator warns while chronology is dated later than current state.
+  the `projipsa` Skill, not a fourth Skill. It reads the per-writer chronology
+  not yet covered by shared state or a later `integrate` chronology entry, then
+  writes the single-owner pages once from the merged result. A request to finish
+  routes to Update or Integrate without asking, but a warning does not prove the
+  writer logs have merged; the workflow checks the branch position first.
 
 ## Context
 
@@ -86,7 +89,8 @@ frontmatter, link, and placeholder checking.
   on the page.
 - Ship a fourth Skill for the wrap-up step, invocable on its own.
 - Write the shared pages automatically from a merge hook or a CI job.
-- Have each parallel writer leave a `pending` marker that the integrator clears.
+- Have each parallel writer leave a mutable `pending` marker that the integrator
+  clears.
 
 ## Reasoning
 
@@ -116,30 +120,45 @@ frontmatter, link, and placeholder checking.
   when a pull request merges. So detection belongs in the validator and the
   write stays an authorized operation; a hook or CI job that wrote current state
   would perform the one judgment the memory contract reserves for the Maker.
-- A `pending` marker would have to be cleared, and clearing it means editing a
-  log entry, which chronology's append-only rule forbids. Comparing the latest
-  chronology date against `updated:` needs no new convention, edits nothing, and
-  clears itself when Integrate writes the page.
+- A mutable `pending` marker would have to be cleared, and clearing it means
+  editing a log entry, which chronology's append-only rule forbids. The writer
+  log already records the pending work; Integrate appends its own dated
+  `integrate` entry as a completion watermark. This preserves chronology and
+  clears the signal even when merged work correctly has no project-level
+  consequence and therefore should not falsify current state's `updated` date.
+- A later per-writer log proves only that Integrate will be needed after merge.
+  It appears on the writer branch too, so the workflow must confirm that the
+  current branch holds the merged result before running the write operation.
+  Monthly and day units are single-writer chronology and do not emit this
+  parallel-work signal.
 
 ## Consequences
 
 - `validate_memory.py` accepts month, day, and per-writer chronology names,
   walks `logs/**` recursively, content-checks every log file, accepts an
-  `index.md` link to either a log file or the directory holding it, and prints
-  warnings that never change the exit code.
+  `index.md` link to either a log file or one of its containing directories, and
+  prints warnings that never change the exit code. A sibling directory no
+  longer satisfies navigation, and a day-qualified filename must name a real
+  calendar date.
 - The Update operation carries an ownership table and an eviction table; Lint
   gains current-state accumulation and stale `sources` entries as findings.
 - The generated `docs/AGENTS.md` template tells every adopting project both
   rules, so a project inherits them without reading the reference.
 - Existing monthly trees keep validating unchanged, so the change reaches
   adopters without migration.
+- Plugin installation never rewrites an adopting project's memory. An explicit
+  `projipsa-init` Upgrade/Repair audits 0.3.x trees preservation-first: retained
+  pages and optional frontmatter remain valid, monthly logs stay until a
+  deliberate per-writer cutover, and project-specific rules are merged rather
+  than replaced from a template.
 - The `projipsa` Skill gains an Integrate operation and wrap-up routing, and
   Outsource reports the outstanding integration at engagement close rather than
   writing shared pages from a delivery branch. No new Skill, manifest entry, or
   package surface.
-- The outstanding-integration warning is day-granular, so a merge landing the
-  same day as an integration is invisible to it. Parsing entry headings for a
-  finer signal is possible later; until then the reporting rule in Update
+- The pending-integration warning compares day-granular per-writer entries with
+  the later of current state's meaningful update and an append-only `integrate`
+  entry. A writer update landing after integration on the same day is invisible
+  to it; until a finer identity is justified, the reporting rule in Update
   carries that case.
 - The first eviction rule keyed on an item being current, which never reached a
   fact that stays true and simply stops steering the work. That is most of what
