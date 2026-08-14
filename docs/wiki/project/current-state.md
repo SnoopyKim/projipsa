@@ -8,6 +8,7 @@ sources:
   - https://github.com/SnoopyKim/projipsa/pull/7
   - https://github.com/SnoopyKim/projipsa/pull/12
   - https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2
+  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.4.0
   - https://github.com/SnoopyKim/projipsa/issues/9
   - https://github.com/SnoopyKim/projipsa/issues/10
   - https://github.com/SnoopyKim/projipsa/issues/11
@@ -48,9 +49,9 @@ related:
 
 ## Summary
 
-Both host manifests declare 0.4.0, which is prepared but not tagged, released,
-or installed anywhere. 0.3.2 remains the last published version and is what both
-host caches hold. 0.4.0 answers adopter feedback issues
+0.4.0 was merged through PR 12, tagged, published as a GitHub Release, and
+installed in both the Codex and Claude Code user caches on 2026-08-14. It
+answers adopter feedback issues
 [9](https://github.com/SnoopyKim/projipsa/issues/9),
 [10](https://github.com/SnoopyKim/projipsa/issues/10), and
 [11](https://github.com/SnoopyKim/projipsa/issues/11) with a memory tree that
@@ -133,21 +134,22 @@ See [the overview](overview.md).
   to `active` and `inferred`, and each dropped field is still validated when a
   page states it. The Projipsa adoption decision stays required as the
   initialization idempotency marker.
-- 51 tests pass on Python 3.12. The three new regressions cover chronology
+- 51 tests pass locally on Python 3.12 and in CI on Python 3.9 and 3.13. The
+  three new regressions cover chronology
   navigation, real calendar dates, and an append-only Integrate watermark. The
-  current unpushed repair has not run on the 3.9.6 floor; CI remains configured
-  for 3.9 and 3.13.
+  release merge commit is `7a420f3`.
 - `projipsa` is not listed in the SnoopyDev marketplace. Development installs
   currently use this source checkout: Codex through `.agents/` and Claude Code
   through `.claude-plugin/` at the repository root.
-- The Codex and Claude Code 0.3.2 caches both contain the QA-oriented
-  `verification.md`, declare version 0.3.2, and contain no `skills/` directory.
-  Claude Code exposes exactly the three manifest-declared Skills.
+- The Codex and Claude Code caches both hold 0.4.0, contain no legacy `skills/`
+  directory, and expose the three manifest-declared Skills. Claude Code reports
+  that a restart is required before an already-running session applies the
+  update.
 
 ## In Progress
 
-- 0.4.0 is prepared but unpublished: no tag, no GitHub Release, no marketplace
-  listing, and neither installed host has it until its install is refreshed.
+- No 0.4.0 release operation remains in progress. Public marketplace listing is
+  separate future work.
 
 ## Explicitly Not Current
 
@@ -187,25 +189,25 @@ chronology: [August](../../logs/2026-08.md) and [July](../../logs/2026-07.md).
   The focused cases cover chronology granularity and navigation, recursive
   checking, drift warnings, pending integration, both watermarks, and
   single-writer silence; details are in the August chronology.
+- GitHub CI passes the full suite on Python 3.9 and 3.13 for both the pushed
+  branch and PR 12.
 - `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py .`
   accepts this memory root and prints no warning.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
-- The current repair has not run on Python 3.9 because no 3.9 runtime is
-  available locally. Parsing the validator with Python 3.9's grammar is proxy
-  evidence only; the runtime floor remains `not_run` until the PR is pushed and
-  CI executes it.
+- No Python 3.9 runtime is available locally; GitHub CI supplies the direct
+  runtime evidence for that supported floor.
 - The authoritative Codex plugin validator and all three Codex Skill validators
   passed against the 2026-08-02 layout, when Codex adapters were still at
   `skills/`. They have not been re-run against `codex-skills/`; see [open
   questions](../questions/open-questions.md).
-- The 0.3.2 release and both host installations were verified on 2026-08-11 and
-  are recorded in [that release entry](../../logs/2026-08.md).
+- The 0.4.0 tag, GitHub Release, and both host installations were verified on
+  2026-08-14 and are recorded in [the August chronology](../../logs/2026-08.md).
 
 ## Next Work
 
-- Commit and push the PR 12 repair only when authorized, let the Python 3.9 and
-  3.13 gates run, then decide merge, tag, GitHub Release, and host refresh as
-  separate operations.
+- Run explicit `projipsa-init` Upgrade or Repair in an adopting repository only
+  when its owner asks for that repository to migrate; Plugin installation alone
+  never authorizes memory rewrites.
 - Fix the three reproduced `validate_memory.py` gaps: an unparsed root
   declaration, Markdown code regions counted as real imports, and unresolved
   `related` IDs.
