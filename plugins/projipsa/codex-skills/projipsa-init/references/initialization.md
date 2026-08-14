@@ -8,7 +8,7 @@
 4. Mapping
 5. Core creation
 6. Migration
-7. Repair and idempotency
+7. Upgrade, repair, and idempotency
 8. Validation
 
 ## 1. Preflight
@@ -80,7 +80,7 @@ Map to the universal core first:
 - unresolved unknowns -> `wiki/questions/`;
 - meetings, research, interviews, imported docs, and conversation outputs ->
   `raw/YYYY-MM/` plus affected maintained pages;
-- chronology -> `logs/YYYY-MM.md`.
+- chronology -> `logs/YYYY-MM.md`, or the finer unit this project needs.
 
 Add optional families only when the inventory justifies them:
 
@@ -101,11 +101,15 @@ At minimum:
 
 1. Make `index.md` the reading entry point.
 2. Add project-specific memory rules in `<memory-root>/AGENTS.md`.
-3. Create verified project overview and current state pages.
+3. Create a verified current state page.
 4. Record the Projipsa adoption decision.
-5. Capture real unknowns in open questions.
-6. Start the current monthly log.
-7. Maintain the pointer block from `root-pointer.md` in the project root's
+5. Start the current chronology log.
+
+Add an overview page when the project's purpose and scope are worth stating
+apart from its current state, and an open-questions page when real unknowns
+exist. Neither is required, because a page created before the project has
+anything to put in it fills up with template text instead.
+6. Maintain the pointer block from `root-pointer.md` in the project root's
    `AGENTS.md` and `CLAUDE.md`. These are the project root's instruction files,
    not the memory root's, and they are how Codex and Claude Code respectively
    discover the memory root at all.
@@ -133,7 +137,7 @@ When existing docs need reorganization:
 
 Avoid two full copies of the same maintained truth.
 
-## 7. Repair and idempotency
+## 7. Upgrade, repair, and idempotency
 
 When a memory root already exists:
 
@@ -149,6 +153,45 @@ When a memory root already exists:
   see the memory root;
 - treat user customizations as intentional unless evidence shows otherwise;
 - report divergence from the default instead of normalizing it automatically.
+
+### Upgrade an existing Projipsa root
+
+Treat an upgrade as a capability audit, not as a schema rewrite. Project memory
+does not carry a reliable installed-plugin version, and its shape may include
+intentional customizations, so compare the existing behavior with the current
+contract instead of inferring a version from file or field presence.
+
+For the 0.3.x to 0.4.0 transition:
+
+1. Preserve `wiki/project/overview.md`,
+   `wiki/questions/open-questions.md`, and stated `type`, `status`,
+   `confidence`, or `related` fields. They became optional, not deprecated.
+2. Never bulk-remove fields or pages merely to match the smaller minimum. A
+   no-op is a successful upgrade when the existing tree already validates and
+   its operating rules are current.
+3. Merge the ownership, current-state eviction, and post-merge Integrate rules
+   into the project's existing `<memory-root>/AGENTS.md`; do not replace that
+   project-specific file wholesale from the latest template.
+4. Preserve monthly chronology by default. Switch only when concurrent writers
+   make one append target unsafe: choose a cutover date, leave old logs in
+   place, start day-and-slug per-writer files, update `index.md`, and record the
+   choice in the existing adoption decision or a new focused decision.
+5. Do not rename or split historical logs. The 0.4.0 validator now checks every
+   Markdown file under `logs/**`; report newly visible broken links,
+   placeholders, and empty files as pre-existing migration findings before
+   repairing them.
+6. Apply current-state eviction claim by claim. Move history only to an
+   existing or justified destination, prune a source only with the claim it
+   supported, and preserve stable IDs and links.
+7. Replace the marked root pointer block only when its discovery path or layer
+   rules changed, and preserve every surrounding instruction.
+8. Append one upgrade chronology entry only when the run actually changes the
+   project memory. Do not add duplicate adoption or initialization entries.
+
+The upgrade does not run when the plugin is installed or refreshed. It requires
+an explicit `$projipsa:projipsa-init` or `/projipsa:projipsa-init` migration,
+audit, or repair request, preserving the Skill's docs-only and explicit-only
+authority boundary.
 
 ## 8. Validation
 

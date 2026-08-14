@@ -12,22 +12,26 @@ from typing import Union
 from urllib.parse import unquote, urlparse
 
 
+# Without these a tree cannot be read at all: no stated rules, no entry point,
+# no briefing. Overview and open questions are not here, because forcing them
+# onto a project with nothing yet to say produces template filler, which is the
+# unresolved placeholder this script rejects elsewhere.
 REQUIRED_FILES = (
     "AGENTS.md",
     "index.md",
-    "wiki/project/overview.md",
     "wiki/project/current-state.md",
-    "wiki/questions/open-questions.md",
 )
+# A page needs an identity to be linked and a date to be judged stale, and a
+# claim needs its evidence. `type` is read from the page's directory when the
+# page does not state it; `status` and `confidence` carry defaults; `related`
+# was satisfied by an empty list, so requiring it changed nothing.
 REQUIRED_FRONTMATTER = (
     "id",
-    "type",
-    "status",
-    "confidence",
     "updated",
     "sources",
-    "related",
 )
+DEFAULT_STATUS = "active"
+DEFAULT_CONFIDENCE = "inferred"
 ALLOWED_STATUSES = {"active", "draft", "stale", "superseded", "archived"}
 ALLOWED_CONFIDENCE = {"confirmed", "assumed", "inferred", "disputed"}
 LIST_FIELDS = {
@@ -45,7 +49,39 @@ ADOPTION_ID_PATTERN = re.compile(
 ADOPTION_FILE_PATTERN = re.compile(
     r"^\d{4}-\d{2}-\d{2}-projipsa-adoption\.md$"
 )
-MONTHLY_LOG_PATTERN = re.compile(r"^\d{4}-(?:0[1-9]|1[0-2])\.md$")
+# Chronology defaults to one file per month. Finer units are first-class so
+# that parallel writers stop appending to one shared file: `2026-08-12.md` for
+# a day, and a day plus `-<slug>` for one branch, session, or engagement. Any
+# of them may sit directly under `logs/` or in a subdirectory, as in
+# `logs/2026-08/2026-08-12-adapter-split.md`.
+CHRONOLOGY_LOG_PATTERN = re.compile(
+    r"^(?P<year>\d{4})-(?P<month>0[1-9]|1[0-2])"
+    r"(?:-(?P<day>0[1-9]|[12]\d|3[01])"
+    r"(?:-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*))?"
+    r")?"
+    r"\.md$"
+)
+# A dated entry heading, bracketed as the log template writes it or bare. The
+# optional operation makes an append-only `integrate` entry an integration
+# watermark without adding mutable frontmatter to a shared page.
+ENTRY_HEADING_PATTERN = re.compile(
+    r"^#{1,6}\s*\[?(?P<date>\d{4}-\d{2}-\d{2})\]?"
+    r"(?:\s+(?P<operation>[a-z][a-z0-9-]*))?",
+    re.IGNORECASE | re.MULTILINE,
+)
+# Current state is read at the start of every session, so its length is a
+# recurring context cost. Past this much text a briefing page has normally
+# absorbed completed history that belongs in chronology. A warning, never an
+# error: only the project can say which of its content is still current.
+CURRENT_STATE_WARN_CHARS = 12000
+CURRENT_STATE_SECTIONS = (
+    "Confirmed Current",
+    "In Progress",
+    "Explicitly Not Current",
+    "Active Defaults",
+    "Validation",
+    "Next Work",
+)
 POINTER_OPEN = "<!-- projipsa:memory-pointer -->"
 POINTER_CLOSE = "<!-- /projipsa:memory-pointer -->"
 # Codex reads AGENTS.md; Claude Code reads CLAUDE.md and never reads AGENTS.md.
@@ -341,31 +377,41 @@ def validate(root: Path) -> list[str]:
     decision_files = (
         sorted(decision_root.rglob("*.md")) if decision_root.is_dir() else []
     )
-    if not decision_files:
-        errors.append("missing required decision page under wiki/decisions/")
 
     logs_root = root / "logs"
-    monthly_logs = (
-        sorted(
-            path
-            for path in logs_root.glob("*.md")
-            if MONTHLY_LOG_PATTERN.fullmatch(path.name)
+    # Walk the whole tree: a nested chronology file used to be invisible here,
+    # which silently exempted it from every content check below.
+    log_files = sorted(logs_root.rglob("*.md")) if logs_root.is_dir() else []
+    chronology_logs: list[Path] = []
+    for path in log_files:
+        matched = CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
+        if not matched:
+            continue
+        if matched.group("day"):
+            try:
+                date(
+                    int(matched.group("year")),
+                    int(matched.group("month")),
+                    int(matched.group("day")),
+                )
+            except ValueError:
+                errors.append(
+                    f"{path}: chronology filename must contain a real calendar date"
+                )
+                continue
+        chronology_logs.append(path)
+    if not chronology_logs:
+        errors.append(
+            "missing required chronology log matching logs/YYYY-MM.md; a finer "
+            "unit may add -DD or -DD-<slug> and may sit in a subdirectory"
         )
-        if logs_root.is_dir()
-        else []
-    )
-    if not monthly_logs:
-        errors.append("missing required monthly log matching logs/YYYY-MM.md")
 
     seen_ids: dict[str, Path] = {}
     valid_decision_pages = 0
     adoption_decision_pages: list[Path] = []
-    confirmed_pages: set[Path] = set()
-    direct_evidence_pages: set[Path] = set()
-    maintained_source_edges: dict[Path, set[Path]] = {}
     files_to_check = [
         path
-        for path in (root / "index.md", *wiki_files, *monthly_logs)
+        for path in (root / "index.md", *wiki_files, *log_files)
         if path.is_file()
     ]
 
@@ -401,7 +447,13 @@ def validate(root: Path) -> list[str]:
             not isinstance(page_type, str) or not page_type.strip()
         ):
             errors.append(f"{path}: type must be a non-empty scalar value")
-        is_decision_page = decision_root in path.parents and page_type == "decision"
+            page_type = None
+        # The directory answers this when the page does not. A page filed under
+        # wiki/decisions/ is a decision unless it names itself something else.
+        is_decision_page = decision_root in path.parents and page_type in (
+            None,
+            "decision",
+        )
         adoption_marker = values.get("projipsa_adoption")
         if adoption_marker is not None and adoption_marker not in {
             "true",
@@ -426,7 +478,10 @@ def validate(root: Path) -> list[str]:
             elif adoption_marker == "true" or is_canonical_adoption:
                 adoption_decision_pages.append(path)
 
-        status = values.get("status")
+        # Absent means the default. A page states status or confidence when it
+        # departs from `active` and `inferred`, and stating either wrongly is
+        # still an error, because a reader acts on both.
+        status = values.get("status", DEFAULT_STATUS)
         if "status" in values and (
             not isinstance(status, str) or not status.strip()
         ):
@@ -434,7 +489,7 @@ def validate(root: Path) -> list[str]:
         elif isinstance(status, str) and status not in ALLOWED_STATUSES:
             errors.append(f"{path}: unsupported status {status!r}")
 
-        confidence = values.get("confidence")
+        confidence = values.get("confidence", DEFAULT_CONFIDENCE)
         if "confidence" in values and (
             not isinstance(confidence, str) or not confidence.strip()
         ):
@@ -464,8 +519,6 @@ def validate(root: Path) -> list[str]:
             errors.append(f"{path}: related must be a YAML list")
         if confidence == "confirmed" and isinstance(sources, list) and not sources:
             errors.append(f"{path}: confirmed pages require at least one source")
-        if confidence == "confirmed":
-            confirmed_pages.add(path.resolve())
         if isinstance(sources, list):
             for source in sources:
                 resolved_source = resolve_source_target(
@@ -476,16 +529,8 @@ def validate(root: Path) -> list[str]:
                 )
                 if resolved_source is None:
                     errors.append(f"{path}: source target not found: {source!r}")
-                elif isinstance(resolved_source, str):
-                    direct_evidence_pages.add(path.resolve())
                 elif resolved_source == path.resolve():
                     errors.append(f"{path}: a page cannot cite itself as a source")
-                elif wiki_root.resolve() in resolved_source.parents:
-                    maintained_source_edges.setdefault(path.resolve(), set()).add(
-                        resolved_source
-                    )
-                else:
-                    direct_evidence_pages.add(path.resolve())
 
     if decision_files and not valid_decision_pages:
         errors.append("wiki/decisions/ must contain at least one decision page")
@@ -498,52 +543,235 @@ def validate(root: Path) -> list[str]:
             "multiple Projipsa adoption decisions found; initialization must be idempotent"
         )
 
-    evidence_anchored_pages = set(direct_evidence_pages)
-    changed = True
-    while changed:
-        changed = False
-        for page, targets in maintained_source_edges.items():
-            if page not in evidence_anchored_pages and (
-                targets & evidence_anchored_pages
-            ):
-                evidence_anchored_pages.add(page)
-                changed = True
-
-    for page in sorted(confirmed_pages):
-        if page not in evidence_anchored_pages:
-            errors.append(
-                f"{page}: confirmed sources do not reach primary project evidence"
-            )
-
     index_path = root / "index.md"
     if index_path.is_file():
         index_text = index_path.read_text(encoding="utf-8")
         index_targets = local_markdown_targets(index_path, index_text)
-        for relative in (
-            "wiki/project/overview.md",
-            "wiki/project/current-state.md",
-            "wiki/questions/open-questions.md",
-        ):
-            if (root / relative).resolve() not in index_targets:
-                errors.append(f"index.md must link required page: {relative}")
-        if decision_files and not any(
-            path.resolve() in index_targets for path in decision_files
-        ):
-            errors.append("index.md must link at least one decision page")
-        if monthly_logs and not any(
-            path.resolve() in index_targets for path in monthly_logs
-        ):
-            errors.append("index.md must link at least one monthly log")
+        relative = "wiki/project/current-state.md"
+        if (root / relative).resolve() not in index_targets:
+            errors.append(f"index.md must link required page: {relative}")
+        # A per-session chronology has too many files to list, so linking the
+        # directory that holds them is an equally good reading entry point.
+        chronology_targets = {path.resolve() for path in chronology_logs}
+        resolved_logs_root = logs_root.resolve()
+        for chronology_log in chronology_logs:
+            for parent in chronology_log.resolve().parents:
+                if parent == resolved_logs_root:
+                    chronology_targets.add(parent)
+                    break
+                if resolved_logs_root in parent.parents:
+                    chronology_targets.add(parent)
+        if chronology_logs and not (index_targets & chronology_targets):
+            errors.append(
+                "index.md must link the chronology: a log file or the "
+                "directory holding it"
+            )
 
     for path in files_to_check:
         text = path.read_text(encoding="utf-8")
         errors.extend(local_markdown_links(path, text, root))
         if PLACEHOLDER_PATTERN.search(prose_only(text)):
             errors.append(f"{path}: unresolved template placeholder")
-        if path in monthly_logs and not text.strip():
-            errors.append(f"{path}: monthly log must not be empty")
+        if path in log_files and not text.strip():
+            errors.append(f"{path}: chronology log must not be empty")
 
     return errors
+
+
+def chronology_dates(path: Path) -> list[date]:
+    """Dates a chronology file claims: the day its own name carries, when it
+    has one, plus every dated entry heading inside it. A monthly file names no
+    day, so its headings are the only precise signal it offers."""
+    dates: list[date] = []
+    named = CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
+    if named and named.group("day"):
+        try:
+            dates.append(
+                date(
+                    int(named.group("year")),
+                    int(named.group("month")),
+                    int(named.group("day")),
+                )
+            )
+        except ValueError:
+            # A name like 2026-02-31 is well formed but not a real day.
+            pass
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return dates
+    for matched_heading in ENTRY_HEADING_PATTERN.finditer(text):
+        try:
+            dates.append(date.fromisoformat(matched_heading.group("date")))
+        except ValueError:
+            continue
+    return dates
+
+
+def integration_dates(path: Path) -> list[date]:
+    """Dates of append-only Integrate entries. This is a watermark rather than
+    a claim that current state changed: Integrate may correctly conclude that
+    merged writer work has no project-level consequence for that page."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    dates: list[date] = []
+    for matched_heading in ENTRY_HEADING_PATTERN.finditer(text):
+        if (matched_heading.group("operation") or "").lower() != "integrate":
+            continue
+        try:
+            dates.append(date.fromisoformat(matched_heading.group("date")))
+        except ValueError:
+            continue
+    return dates
+
+
+def pending_integration(root: Path, current_state: Path) -> list[str]:
+    """Per-writer chronology newer than the last shared-state or Integrate
+    watermark. This proves work still needs integration after it merges, not
+    that the current checkout already contains the merged result. Monthly and
+    day logs are single-writer units and never trigger this signal."""
+    parsed = parse_frontmatter(current_state)
+    if parsed is None:
+        return []
+    values, _ = parsed
+    updated = values.get("updated")
+    if not isinstance(updated, str):
+        return []
+    try:
+        written = date.fromisoformat(updated.strip())
+    except ValueError:
+        return []
+
+    logs_root = root / "logs"
+    if not logs_root.is_dir():
+        return []
+    log_files = sorted(logs_root.rglob("*.md"))
+    chronology_files: list[tuple[Path, re.Match[str]]] = []
+    for path in log_files:
+        matched = CHRONOLOGY_LOG_PATTERN.fullmatch(path.name)
+        if not matched:
+            continue
+        if matched.group("day"):
+            try:
+                date(
+                    int(matched.group("year")),
+                    int(matched.group("month")),
+                    int(matched.group("day")),
+                )
+            except ValueError:
+                continue
+        chronology_files.append((path, matched))
+
+    writer_dates = [
+        entry
+        for path, matched in chronology_files
+        if matched.group("slug")
+        for entry in chronology_dates(path)
+    ]
+    latest_writer = max(writer_dates, default=None)
+    integration_watermarks = [written]
+    for path, _ in chronology_files:
+        integration_watermarks.extend(integration_dates(path))
+    integrated_through = max(integration_watermarks)
+    if latest_writer is None or latest_writer <= integrated_through:
+        return []
+    return [
+        f"{current_state}: per-writer chronology reaches "
+        f"{latest_writer.isoformat()} but shared state is integrated only "
+        f"through {integrated_through.isoformat()}; after those writer logs "
+        "merge, run Integrate on the branch holding the merged result; on a "
+        "writer branch report the integration as pending instead"
+    ]
+
+
+def unanchored_confirmed_pages(root: Path) -> list[Path]:
+    """Pages claiming `confirmed` whose source chain never reaches primary
+    evidence, because it only ever cites other maintained pages. The claim may
+    well be true, and only the project can either produce the evidence or lower
+    the claim, so this reports instead of failing."""
+    wiki_root = root / "wiki"
+    if not wiki_root.is_dir():
+        return []
+    project_boundary = find_project_boundary(root)
+    wiki_resolved = wiki_root.resolve()
+
+    confirmed: set[Path] = set()
+    anchored: set[Path] = set()
+    edges: dict[Path, set[Path]] = {}
+    for path in sorted(wiki_root.rglob("*.md")):
+        parsed = parse_frontmatter(path)
+        if parsed is None:
+            continue
+        values, _ = parsed
+        resolved_page = path.resolve()
+        if values.get("confidence", DEFAULT_CONFIDENCE) == "confirmed":
+            confirmed.add(resolved_page)
+        sources = values.get("sources")
+        if not isinstance(sources, list):
+            continue
+        for source in sources:
+            target = resolve_source_target(source, path, root, project_boundary)
+            if target is None or target == resolved_page:
+                continue
+            if isinstance(target, Path) and wiki_resolved in target.parents:
+                edges.setdefault(resolved_page, set()).add(target)
+            else:
+                anchored.add(resolved_page)
+
+    changed = True
+    while changed:
+        changed = False
+        for page, targets in edges.items():
+            if page not in anchored and (targets & anchored):
+                anchored.add(page)
+                changed = True
+
+    return [page for page in sorted(confirmed) if page not in anchored]
+
+
+def collect_warnings(root: Path) -> list[str]:
+    """Drift signals that never fail validation. A tree can satisfy every
+    structural rule while a page has quietly stopped doing its job, and only
+    the project can decide which of its content is still current."""
+    warnings: list[str] = []
+    current_state = root / "wiki" / "project" / "current-state.md"
+    if current_state.is_file():
+        warnings.extend(pending_integration(root, current_state))
+        text = current_state.read_text(encoding="utf-8")
+        if len(text) > CURRENT_STATE_WARN_CHARS:
+            warnings.append(
+                f"{current_state}: {len(text)} characters for a page every "
+                "session reads; move work that is no longer current into "
+                "chronology, delivery, decision, or milestone pages and link it"
+            )
+            headings = {
+                line.lstrip("#").strip()
+                for line in text.splitlines()
+                if line.startswith("#")
+            }
+            # A page within budget may name its sections however it likes.
+            missing_sections = [
+                section
+                for section in CURRENT_STATE_SECTIONS
+                if section not in headings
+            ]
+            if missing_sections:
+                warnings.append(
+                    f"{current_state}: this long page has no section for "
+                    f"{', '.join(missing_sections)}; check whether that content "
+                    "was absorbed into a summary or a list of completed work"
+                )
+
+    warnings.extend(
+        f"{page}: confirmed sources do not reach primary project evidence; "
+        "add the evidence, or lower the claim to assumed or inferred"
+        for page in unanchored_confirmed_pages(root)
+    )
+
+    return warnings
 
 
 def main() -> int:
@@ -561,6 +789,8 @@ def main() -> int:
 
     root = resolve_memory_root(args.path)
     errors = validate(root)
+    for warning in collect_warnings(root):
+        print(f"warning: {warning}", file=sys.stderr)
     if errors:
         for error in errors:
             print(f"error: {error}", file=sys.stderr)

@@ -29,14 +29,23 @@ policy. Keep the Codex and Claude Code adapter policies aligned.
 
 - **New memory**: the project has little or no durable documentation. Create
   the minimum useful core from verified repository context.
-- **Migration**: the project has useful but flat or mixed documentation.
-  Reclassify it as maintained synthesis, raw source, decision, question, or
-  chronology and preserve its meaning.
-- **Repair**: Projipsa is partly initialized. Reconcile missing files,
-  navigation, frontmatter, IDs, and logs without duplicating the tree.
+- **Adoption migration**: the project has useful but flat or mixed
+  documentation. Reclassify it as maintained synthesis, raw source, decision,
+  question, or chronology and preserve its meaning.
+- **Upgrade or repair**: Projipsa already exists. Reconcile its installed
+  contract, project-specific rules, navigation, frontmatter, IDs, and logs
+  without duplicating or normalizing the tree.
 
 Initialization is idempotent. A second run audits and repairs the existing
 structure rather than starting over.
+
+An installed plugin update never rewrites an adopting project's memory. An
+explicit Init upgrade audits the existing tree against the current contract.
+For the 0.3.x to 0.4.0 transition, preserve the old overview, open-questions
+page, and optional frontmatter; they remain valid even though new projects no
+longer require them. Keep monthly chronology unless current parallel work
+justifies a deliberate cutover to per-writer logs. The detailed initialization
+workflow owns the preservation and cutover rules.
 
 Read
 [the initialization workflow](../codex-skills/projipsa-init/references/initialization.md)
@@ -56,17 +65,24 @@ Make the initialized project immediately readable:
 docs/
   AGENTS.md
   index.md
-  wiki/project/overview.md
   wiki/project/current-state.md
   wiki/decisions/YYYY-MM-DD-projipsa-adoption.md
-  wiki/questions/open-questions.md
   logs/YYYY-MM.md
 ```
+
+Add `wiki/project/overview.md` and `wiki/questions/open-questions.md` when the
+project has something verified to put in them.
 
 Create `raw/YYYY-MM/` content when real source material exists. Add optional
 page families only when the inventory justifies them. In particular, do not
 create `wiki/deliveries/` until a substantial delegated engagement needs
 durable state. Do not create empty folders merely to match an example.
+
+Monthly chronology is the default. When the inventory shows work already
+running in parallel branches or worktrees, choose a per-writer log unit at
+initialization instead, and record the choice in the adoption decision. The
+[page types](../codex-skills/projipsa/references/page-types.md) reference lists
+the supported units.
 
 Replace all template placeholders with verified project facts. When something
 is unknown, record it as an explicit open question rather than a TODO or an
@@ -81,7 +97,7 @@ invented answer.
   milestones, and chronology as applicable.
 - Leave a short moved stub only for an old path that people or agents are
   likely to open.
-- Keep current state about what is true now; keep chronology in monthly logs.
+- Keep current state about what is true now; keep chronology in the logs.
 - Do not rewrite project reality to fit the template.
 
 ## Record adoption
@@ -100,7 +116,7 @@ For a new decision, use the canonical ID
 equivalent decision already exists, preserve its stable ID and path, add the
 explicit adoption marker, and do not create a second decision.
 
-Append the monthly log and make `index.md` the clear reading entry point.
+Append the chronology log and make `index.md` the clear reading entry point.
 
 ## Make the memory root discoverable by every host
 
@@ -144,5 +160,5 @@ outside the memory root the Maker asked you to create.
    useful Projipsa operation.
 
 After successful initialization, use `$projipsa:projipsa` in Codex or
-`/projipsa:projipsa` in Claude Code for ongoing Query, Ingest, Update, Lint,
-and Snapshot work.
+`/projipsa:projipsa` in Claude Code for ongoing Query, Ingest, Update,
+Integrate, Lint, and Snapshot work.

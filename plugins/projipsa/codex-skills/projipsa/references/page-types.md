@@ -26,18 +26,30 @@ superseded_by: []
 ---
 ```
 
-Required fields:
+Required, because a page without them cannot be linked, judged stale, or
+believed:
 
 - `id`: stable unique ID, lower-case and dot-delimited.
-- `type`: a page type selected for this project.
-- `status`: `active`, `draft`, `stale`, `superseded`, or `archived`.
-- `confidence`: `confirmed`, `assumed`, `inferred`, or `disputed`.
 - `updated`: ISO date of the last meaningful content update.
 - `sources`: project-local regular-file paths, HTTP(S) sources, or maintained
-  pages supporting the page. A confirmed page's source chain must eventually
-  reach primary project evidence; self-reference or a maintained-page-only
-  cycle is not evidence.
-- `related`: related page IDs.
+  pages supporting the page. A confirmed page's source chain should eventually
+  reach primary project evidence; self-reference is a validation error, and a
+  maintained-page-only cycle draws a warning. On a page that is rewritten over
+  time, this lists the evidence for the claims the page makes now, so an entry
+  leaves with the claim it supported; it is not an append-only ledger of
+  everything the page once said.
+
+Stated when it departs from the default, and checked whenever present:
+
+- `type`: a page type selected for this project. Read from the page's directory
+  when the page does not state it, so a page under `wiki/decisions/` is a
+  decision unless it names itself something else.
+- `status`: `active`, `draft`, `stale`, `superseded`, or `archived`. Defaults to
+  `active`.
+- `confidence`: `confirmed`, `assumed`, `inferred`, or `disputed`. Defaults to
+  `inferred`, so a page claims more than that only by saying so.
+- `related`: related page IDs. Write it when a link helps a reader; an empty
+  list says nothing and is better left out.
 
 Most templates ship `confidence: inferred` because a template cannot know the
 project's evidence. Templates for assumptions, questions, risks, and deliveries
@@ -58,7 +70,9 @@ equivalent decision's stable ID and path.
 
 - `wiki/project/overview.md`: purpose, audience, scope, goals, and non-goals.
 - `wiki/project/current-state.md`: current status, active defaults, latest
-  validation, and next work.
+  validation, and next work. A replaced page, not an appended one; [the Update
+  operation](operations.md) states when a line leaves and where it goes. Keep it
+  short enough to stay worth reading at the start of every session.
 - `wiki/project/glossary.md`: optional canonical local vocabulary.
 
 ### Decision
@@ -77,10 +91,45 @@ multiple decisions.
 Use `logs/YYYY-MM.md` for append-only chronology. Logs never replace current
 state.
 
+Monthly is the default, not the only unit. Choose a finer one when a month's
+file grows past a comfortable read, or when several branches, worktrees, or
+sessions append at the same time: a shared append target is a conflict target,
+and day granularity does not help when two writers finish on the same day. The
+unit that removes the collision is one file per writer.
+
+| Unit | Path | Use when |
+|---|---|---|
+| month | `logs/2026-08.md` | one writer at a time; the default |
+| day | `logs/2026-08-12.md` | a month's chronology outgrows one read |
+| session | `logs/2026-08/2026-08-12-<slug>.md` | parallel writers append concurrently |
+
+Keep one unit per project rather than mixing them, and link the chronology from
+`index.md` — the current file, or the directory holding it when there are too
+many to list. The memory validator accepts every form above, and checks nested
+chronology files exactly like flat ones.
+
+Per-writer chronology is also the input to the post-merge
+[Integrate operation](operations.md). Its warning means the writer logs are
+newer than the last shared-state or `integrate` watermark; it does not prove the
+current branch contains their merge. Integrate appends a dated `integrate`
+entry even when the merged result correctly leaves current state unchanged.
+
+A project that already kept chronology under `logs/<subdirectory>/` was not
+being checked there before: the validator walked only the top level, so those
+files were invisible to its link, placeholder, and empty-file checks. They are
+checked now, so the first run after upgrading can report findings in files that
+have been sitting in the tree unchanged. Relative links are the usual one,
+because a path that resolved from `logs/` does not resolve from one level
+deeper.
+
 ## Optional page families
 
 - **Area**: a major workstream, domain, responsibility, initiative, audience,
-  component, research theme, or project surface.
+  component, research theme, or project surface. Current state names the
+  trigger: when one of its sections swells past the rest, the workstream that
+  section describes has outgrown a line on a briefing page and wants a page of
+  its own. Standing facts about that workstream move there, current state keeps
+  the link, and the branch that owns the workstream owns the page.
 - **Assumption**: an unverified claim that current planning relies on.
 - **Risk**: an active threat with impact, likelihood, mitigation, and signals.
 - **Procedure**: repeatable operating steps with validation and recovery.
