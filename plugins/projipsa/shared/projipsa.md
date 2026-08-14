@@ -15,8 +15,9 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
 - Keep raw source, maintained synthesis, and append-only chronology separate.
 - Never rewrite a raw source. Correct it with a new source or a linked note.
 - Keep current-state and active-delivery pages concise and current; keep logs
-  append-only.
+  append-only. Current state is replaced, not appended.
 - Split large documents into atomic pages with one responsibility.
+- Give every shared synthesis page one writer when work runs in parallel.
 - Mark important claims as confirmed, assumed, inferred, disputed, stale,
   superseded, or archived.
 - Prefer stable page IDs and links over duplicated claims.
@@ -45,16 +46,25 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
 - **Ingest**: preserve a new source and update affected maintained pages.
 - **Update after work**: record what changed, what did not, validation, risks,
   questions, and next work.
+- **Integrate**: after parallel work merges, write the single-owner shared pages
+  once from the merged result.
 - **Lint**: report structural, provenance, freshness, and consistency findings
   before making repairs.
 - **Snapshot**: preserve a milestone, handoff, pause, launch, or restart state.
+
+A request to wrap up, close out, or finish names no operation. Resolve it
+instead of asking: run Update for a writer finishing its own work, and Integrate
+for a branch holding merged work that no shared page has absorbed yet. The
+memory validator reports that second condition as an outstanding-integration
+warning.
 
 Read [operations](../codex-skills/projipsa/references/operations.md) for the selected
 operation. Read
 [page types](../codex-skills/projipsa/references/page-types.md) before creating or materially changing
 maintained pages. Read the
 [memory contract](../codex-skills/projipsa/references/memory-contract.md) when authority,
-source-of-truth, or host-integration boundaries are unclear.
+source-of-truth, or host-integration boundaries are unclear, or when weighing
+whether a new rule or convention earns its place.
 
 Compose Ingest with Update or Snapshot when a new evidence artifact must be
 preserved before its claims can be reflected in maintained memory. Do not drop
@@ -71,14 +81,20 @@ When writing:
 
 1. Preserve unrelated user work.
 2. Preserve or link the evidence supporting new confirmed claims.
-3. Update affected `sources` frontmatter.
+3. Update affected `sources` frontmatter, and prune entries whose claims left
+   the page.
 4. Make the smallest coherent memory update.
 5. Update navigation only when the reading path changed.
-6. Append the current monthly log.
+6. Append the current chronology log, in the unit this project uses.
 7. Run [the memory validator](../codex-skills/projipsa/scripts/validate_memory.py) against the memory
-   root when available.
+   root when available, and report its warnings alongside its errors.
 8. Inspect the documentation diff and keep implementation files untouched
    unless the user separately requested implementation work.
+
+Before writing, establish who owns the page. When several branches, worktrees,
+sessions, or agents work at once, the shared synthesis pages have a single
+writer and every other page belongs to whoever created it. Update carries the
+ownership table, and Integrate is the post-merge write.
 
 For an Outsource handoff, update the active `delivery` page when one exists and
 memory maintenance is authorized. Promote only durable project decisions,

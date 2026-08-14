@@ -24,7 +24,7 @@ throughout.
 
 ## Install
 
-Projipsa is version `0.3.2` and is **not listed in a public marketplace yet**.
+Projipsa is version `0.4.0` and is **not listed in a public marketplace yet**.
 Install it from a source checkout:
 
 ```bash
@@ -73,12 +73,13 @@ useful core:
 docs/
   AGENTS.md                              how this project's memory works
   index.md                               the reading entry point
-  wiki/project/overview.md               purpose, scope, non-goals
   wiki/project/current-state.md          what is true right now
   wiki/decisions/YYYY-MM-DD-projipsa-adoption.md
-  wiki/questions/open-questions.md
   logs/YYYY-MM.md
 ```
+
+An overview page and an open-questions page get added when the project has
+something verified to put in them, rather than on day one.
 
 It also adds a short pointer block to your root `AGENTS.md` and `CLAUDE.md` so
 the next agent — on either host — finds the memory without being told.
@@ -182,12 +183,21 @@ The universal core:
 docs/
   AGENTS.md
   index.md
-  raw/YYYY-MM/
-  wiki/project/
+  wiki/project/current-state.md
   wiki/decisions/
-  wiki/questions/
   logs/YYYY-MM.md
 ```
+
+`raw/YYYY-MM/`, `wiki/project/overview.md`, and `wiki/questions/` join it when
+the project has real source material, a purpose worth stating apart from its
+current state, or genuine unknowns.
+
+Chronology defaults to one file per month. A project whose work runs in
+parallel branches or worktrees switches to one file per writer
+(`logs/2026-08/2026-08-12-<slug>.md`), because a shared append target is a
+merge-conflict target. Those branches leave the shared pages alone; asking
+Projipsa to finish after the merge writes them once from the merged result, and
+the memory validator warns while that write is outstanding.
 
 Optional page families get added only when a project actually needs them —
 `wiki/areas/`, `assumptions/`, `risks/`, `procedures/`, `external/`,

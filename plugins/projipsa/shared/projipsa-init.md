@@ -56,17 +56,24 @@ Make the initialized project immediately readable:
 docs/
   AGENTS.md
   index.md
-  wiki/project/overview.md
   wiki/project/current-state.md
   wiki/decisions/YYYY-MM-DD-projipsa-adoption.md
-  wiki/questions/open-questions.md
   logs/YYYY-MM.md
 ```
+
+Add `wiki/project/overview.md` and `wiki/questions/open-questions.md` when the
+project has something verified to put in them.
 
 Create `raw/YYYY-MM/` content when real source material exists. Add optional
 page families only when the inventory justifies them. In particular, do not
 create `wiki/deliveries/` until a substantial delegated engagement needs
 durable state. Do not create empty folders merely to match an example.
+
+Monthly chronology is the default. When the inventory shows work already
+running in parallel branches or worktrees, choose a per-writer log unit at
+initialization instead, and record the choice in the adoption decision. The
+[page types](../codex-skills/projipsa/references/page-types.md) reference lists
+the supported units.
 
 Replace all template placeholders with verified project facts. When something
 is unknown, record it as an explicit open question rather than a TODO or an
@@ -81,7 +88,7 @@ invented answer.
   milestones, and chronology as applicable.
 - Leave a short moved stub only for an old path that people or agents are
   likely to open.
-- Keep current state about what is true now; keep chronology in monthly logs.
+- Keep current state about what is true now; keep chronology in the logs.
 - Do not rewrite project reality to fit the template.
 
 ## Record adoption
@@ -100,7 +107,7 @@ For a new decision, use the canonical ID
 equivalent decision already exists, preserve its stable ID and path, add the
 explicit adoption marker, and do not create a second decision.
 
-Append the monthly log and make `index.md` the clear reading entry point.
+Append the chronology log and make `index.md` the clear reading entry point.
 
 ## Make the memory root discoverable by every host
 

@@ -132,7 +132,11 @@ When project-memory maintenance is authorized:
 - link durable project decisions, questions, assumptions, risks, evidence, and
   milestones instead of duplicating their full contents;
 - update current state only with the project-level consequence;
-- append factual chronology to the monthly log.
+- append factual chronology to the log, in the unit this project uses.
+
+When the engagement ran on its own branch or worktree, closing it updates only
+the pages that engagement owned. Report that the shared pages still need the
+post-merge Integrate rather than writing them from the delivery branch.
 
 Scoped work may use a compact delivery page when it must survive a pause or
 handoff. Work routed out to the ordinary workflow normally needs only its

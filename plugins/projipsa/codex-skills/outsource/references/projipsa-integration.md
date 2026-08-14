@@ -27,7 +27,9 @@ When project-memory maintenance is within scope:
 - link durable decisions, questions, assumptions, risks, evidence, and
   milestones instead of duplicating them;
 - keep current state about present project consequences and append chronology
-  to the monthly log;
+  to the log;
+- when the engagement ran on its own branch or worktree, update only the pages
+  it owned and report that the shared pages still need the post-merge Integrate;
 - never store the interview transcript as project truth.
 
 If memory writes are not authorized, return a compact proposed handoff instead

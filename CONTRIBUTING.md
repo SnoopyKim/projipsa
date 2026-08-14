@@ -144,7 +144,7 @@ request, a commit, a file under `plugins/` — over copying content into `raw/`.
 - Run all three commands under [Validation](#validation).
 - Validate each public Skill with the host Skill validators, and the package
   with the Codex plugin validator.
-- Update `docs/wiki/project/current-state.md` and append the monthly log.
+- Update `docs/wiki/project/current-state.md` and append the chronology log.
 
 ## Provenance
 

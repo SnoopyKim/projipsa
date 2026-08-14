@@ -3,23 +3,30 @@ id: project.current-state
 type: project
 status: active
 confidence: confirmed
-updated: 2026-08-11
+updated: 2026-08-14
 sources:
-  - https://github.com/SnoopyKim/projipsa/pull/2
-  - https://github.com/SnoopyKim/projipsa/pull/3
-  - https://github.com/SnoopyKim/projipsa/pull/4
-  - https://github.com/SnoopyKim/projipsa/pull/5
   - https://github.com/SnoopyKim/projipsa/pull/7
   - https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2
+  - https://github.com/SnoopyKim/projipsa/issues/9
+  - https://github.com/SnoopyKim/projipsa/issues/10
+  - https://github.com/SnoopyKim/projipsa/issues/11
   - README.md
   - CONTRIBUTING.md
   - plugins/projipsa/.claude-plugin/plugin.json
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/codex-skills/projipsa/references/page-types.md
+  - plugins/projipsa/codex-skills/projipsa/references/operations.md
+  - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
+  - plugins/projipsa/shared/projipsa.md
+  - plugins/projipsa/shared/outsource.md
   - plugins/projipsa/codex-skills/outsource/references/verification.md
   - plugins/projipsa/codex-skills/projipsa/assets/templates/delivery.md
   - scripts/validate_package.py
   - tests/test_package_contract.py
+  - tests/test_validate_memory.py
+  - https://github.com/mattpocock/skills
+  - wiki/decisions/2026-08-13-rules-must-earn-their-place.md
+  - wiki/decisions/2026-08-12-parallel-safe-memory-tree.md
   - wiki/decisions/2026-08-11-qa-oriented-verification-claims.md
   - wiki/decisions/2026-08-02-host-adapter-separation.md
   - .agents/plugins/marketplace.json
@@ -30,6 +37,8 @@ related:
   - decision.plugin-ship-boundary.2026-07-30
   - decision.host-adapter-separation.2026-08-02
   - decision.qa-oriented-verification-claims.2026-08-11
+  - decision.parallel-safe-memory-tree.2026-08-12
+  - decision.rules-must-earn-their-place.2026-08-13
   - question.open-questions
 ---
 
@@ -37,14 +46,21 @@ related:
 
 ## Summary
 
-Version 0.3.2 is released from [pull request
-7](https://github.com/SnoopyKim/projipsa/pull/7) at merge commit `66a42df` and
-tagged as [v0.3.2](https://github.com/SnoopyKim/projipsa/releases/tag/v0.3.2).
-It strengthens Outsource verification after real Project-mode use showed that
-a substantially correct contract could still be marked verified by
-implementation-authored helpers and partial execution paths. The user-scope
-Claude installation and the Codex installation are both synchronized to
-0.3.2.
+Both host manifests declare 0.4.0, which is prepared but not tagged, released,
+or installed anywhere. 0.3.2 remains the last published version and is what both
+host caches hold. 0.4.0 answers adopter feedback issues
+[9](https://github.com/SnoopyKim/projipsa/issues/9),
+[10](https://github.com/SnoopyKim/projipsa/issues/10), and
+[11](https://github.com/SnoopyKim/projipsa/issues/11) with a memory tree that
+survives parallel worktrees, and then shrinks the memory contract itself: a rule
+is kept only when a future reader would otherwise reach a wrong conclusion. See
+[the parallel-safe memory
+decision](../decisions/2026-08-12-parallel-safe-memory-tree.md) and [the rule
+criterion](../decisions/2026-08-13-rules-must-earn-their-place.md).
+
+It is a minor rather than a patch release because the required surface shrank
+and a project that already kept nested chronology sees findings in files it
+never touched.
 
 The project's stated purpose was corrected on 2026-08-03. Projipsa exists so
 that project understanding survives the session and substantial work can be
@@ -70,21 +86,14 @@ See [the overview](overview.md).
   adapters from `claude-skills/`. The package ships no `skills/` directory. See
   [the host-adapter
   decision](../decisions/2026-08-02-host-adapter-separation.md).
-- Claude Code adds its manifest-declared Skill directory to the default
-  `skills/` scan rather than replacing it. While Codex adapters sat in
-  `skills/`, `claude plugin details projipsa` reported six Skills, two per
-  public name. Codex does the opposite: it loads only the declared directory
-  and ignores a sibling `skills/`.
 - Local installation is separated at the repository boundary too: Codex uses
   `.agents/plugins/marketplace.json`; Claude Code uses
   `.claude-plugin/marketplace.json`.
-- Codex plugin invocations are namespace-qualified. In particular,
-  `$projipsa:projipsa-init` loaded the correct explicit-only Skill in a fresh
-  process; the shorter `$projipsa-init` did not.
+- Codex plugin invocations are namespace-qualified: `$projipsa:projipsa-init`
+  resolves and the shorter `$projipsa-init` does not.
 - `projipsa-init` is explicit-only on both hosts, enforced by
   `allow_implicit_invocation: false` for Codex and `disable-model-invocation:
-  true` for Claude Code. A skill listing under `claude --plugin-dir` confirmed
-  Claude Code hides it from the model.
+  true` for Claude Code.
 - Only `plugins/projipsa/` is shipped. `scripts/validate_package.py` scans that
   tree and the repository README for prose, links, and Skill contracts, and
   additionally reads the two root development marketplace manifests. Nothing
@@ -96,21 +105,41 @@ See [the overview](overview.md).
   host pointer blocks in the repository's root `AGENTS.md` and `CLAUDE.md`. Its
   pointer checks are incomplete: three gaps were reproduced on 2026-07-31 and
   are recorded in [open questions](../questions/open-questions.md).
-- 37 tests pass on Python 3.12. The preceding 31-test suite also passed on
-  Python 3.9.6, and CI runs the current suite on 3.9 and 3.13.
+- The memory contract states write ownership for parallel work, treats monthly
+  chronology as a default rather than the only unit, and defines current state
+  as a replaced page whose `sources` are pruned with their claims. The memory
+  validator accepts month, day, and per-writer log names, checks every file
+  under `logs/**`, and prints non-blocking `warning:` lines for current-state
+  drift.
+- Each memory rule is stated in one place and reached by a link. The Update
+  operation owns the eviction rule and the ownership table; `page-types.md` and
+  the shared workflow name them and point. The generated `AGENTS.md` restates
+  rules on purpose, because an adopting project reads it without these
+  references.
+- Integrate is the fifth operation of the `projipsa` Skill, not a fourth Skill.
+  It writes the single-owner shared pages once from a merged result, a request
+  to finish routes to Update or Integrate without asking, and the validator
+  warns while chronology is dated later than current state. The comparison is
+  day-granular, so a same-day merge after an integration is not detected.
+- The contract requires three files and three frontmatter keys: `AGENTS.md`,
+  `index.md`, `current-state.md`, and `id`, `updated`, `sources`. `type` is
+  read from a page's directory when absent, `status` and `confidence` default
+  to `active` and `inferred`, and each dropped field is still validated when a
+  page states it. The Projipsa adoption decision stays required as the
+  initialization idempotency marker.
+- 48 tests pass on Python 3.12 and on the 3.9.6 floor. CI runs them on 3.9 and
+  3.13.
 - `projipsa` is not listed in the SnoopyDev marketplace. Development installs
   currently use this source checkout: Codex through `.agents/` and Claude Code
   through `.claude-plugin/` at the repository root.
-- The ship boundary is confirmed by an actual Claude Code install: its cache
-  holds the plugin root while repository `docs/`, `tests/`, and `scripts/`
-  remain outside the installed copy.
 - The Codex and Claude Code 0.3.2 caches both contain the QA-oriented
   `verification.md`, declare version 0.3.2, and contain no `skills/` directory.
   Claude Code exposes exactly the three manifest-declared Skills.
 
 ## In Progress
 
-Nothing. Version 0.3.2 is released and synchronized to both supported hosts.
+- 0.4.0 is prepared but unpublished: no tag, no GitHub Release, no marketplace
+  listing, and neither installed host has it until its install is refreshed.
 
 ## Explicitly Not Current
 
@@ -122,6 +151,10 @@ Nothing. Version 0.3.2 is released and synchronized to both supported hosts.
 
 ## Active Defaults
 
+- A rule enters the memory contract only after it is graded by what a future
+  reader loses when it breaks: wrong conclusion is an error, slowed but
+  recovering is a warning, unaffected is not a rule. See [the rule
+  criterion](../decisions/2026-08-13-rules-must-earn-their-place.md).
 - `docs/` is the memory root, and it is public.
 - The package validator checks structure, policy, and contract surface only.
   Vocabulary and concept checks do not belong in it: a banned-word scan and a
@@ -138,55 +171,38 @@ Nothing. Version 0.3.2 is released and synchronized to both supported hosts.
 
 ## Validation
 
+Latest evidence for the current working tree. Earlier runs stay in the
+chronology: [August](../../logs/2026-08.md) and [July](../../logs/2026-07.md).
+
 - `python3 scripts/validate_package.py` passes.
-- `python3 -m unittest discover -s tests` passes, 37 tests, on Python 3.12.
-  The two new tests preserve the independent delivery statuses and the shipped
-  QA-oriented verification reference.
+- `python3 -m unittest discover -s tests` passes, 48 tests, on Python 3.12 and
+  on the 3.9.6 floor CI also gates. Nine tests cover the memory changes:
+  per-session chronology names, an `index.md` link to the logs directory,
+  content checking of nested logs, the current-state warnings including the
+  short-page case that must stay silent, and the outstanding-integration
+  warning from both a per-writer filename and a dated entry heading.
+- `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py .`
+  accepts this memory root and prints no warning.
+- A scratch copy of this tree with the chronology moved to
+  `logs/2026-08/2026-08-12-<slug>.md` validated as chronology, reported the
+  relative links that the deeper path broke — which the previous non-recursive
+  walk never saw — and warned once current state passed the size budget.
+- Adding `logs/2026-08/2026-08-14-<slug>.md` to this tree produced the
+  outstanding-integration warning naming both dates, kept the structure valid,
+  and exited 0; removing the file cleared the warning.
 - `claude plugin validate ./plugins/projipsa --strict` passes.
 - The authoritative Codex plugin validator and all three Codex Skill validators
   passed against the 2026-08-02 layout, when Codex adapters were still at
   `skills/`. They have not been re-run against `codex-skills/`; see [open
   questions](../questions/open-questions.md).
-- codex-cli 0.146.0 installed a probe plugin declaring
-  `"skills": "./codex-skills/"` into an isolated `CODEX_HOME` and listed its
-  Skill from that path in `codex debug prompt-input`. With that manifest, a
-  sibling `skills/` directory was ignored.
-- A fresh Codex process invoked `$projipsa:projipsa-init`, created only the
-  minimum memory core in a temporary repository, and passed the shipped memory
-  validator with 4 maintained pages.
-- A Claude Code 2.1.220 process loaded the working-tree plugin through
-  `--plugin-dir`, exposed exactly the three Projipsa commands, and resolved
-  `/projipsa:projipsa-init` without tools or writes. Counting commands that way
-  hid the duplicate Skills; `claude plugin details projipsa` counts loaded
-  Skills and is the check that found it.
-- After `claude plugin update projipsa@projipsa`, the user-scope cache holds
-  `0.3.1/claude-skills/` and `0.3.1/codex-skills/` and no `skills/`, and a
-  fresh Claude Code session listed `projipsa:projipsa` and `projipsa:outsource`
-  once each, with `projipsa-init` hidden as designed.
-- Each pointer-validation fix was reverted individually and failed exactly one
-  test each time.
-- `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py docs`
-  passes, and three of its gaps were reproduced in a scratch fixture built from
-  this tree.
-- After the 2026-08-03 documentation restructure and the removal of the
-  banned-vocabulary check, the package validator and 35 tests still pass. The
-  rewritten README was checked against `validate_readme`'s whole-token rule for
-  all six host invocations.
-- For the 0.3.2 working tree, the package validator, 37 tests, and
-  `git diff --check` pass. The memory validator accepts 7 maintained pages, and
-  `claude plugin validate ./plugins/projipsa --strict` passes.
-- Pull request 7 passed all four GitHub Actions checks and merged as signed
-  commit `66a42df`; the annotated `v0.3.2` tag and GitHub Release point to that
-  shipped-plugin commit.
-- `claude plugin update projipsa@projipsa -s user` updated the installed plugin
-  from 0.3.1 to 0.3.2, and `claude plugin details projipsa` reports three
-  Skills.
-- `codex plugin add projipsa@projipsa` installed version 0.3.2 under
-  `~/.codex/plugins/cache/projipsa/projipsa/0.3.2`, and `codex plugin list`
-  reports it enabled at 0.3.2.
+- The 0.3.2 release and both host installations were verified on 2026-08-11 and
+  are recorded in [that release entry](../../logs/2026-08.md).
 
 ## Next Work
 
+- Decide whether the parallel-safe memory changes ship as their own release,
+  including the version bump both host manifests need before any installed
+  plugin can see them.
 - Fix the three reproduced `validate_memory.py` gaps: an unparsed root
   declaration, Markdown code regions counted as real imports, and unresolved
   `related` IDs.

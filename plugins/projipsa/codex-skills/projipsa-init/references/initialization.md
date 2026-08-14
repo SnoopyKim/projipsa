@@ -80,7 +80,7 @@ Map to the universal core first:
 - unresolved unknowns -> `wiki/questions/`;
 - meetings, research, interviews, imported docs, and conversation outputs ->
   `raw/YYYY-MM/` plus affected maintained pages;
-- chronology -> `logs/YYYY-MM.md`.
+- chronology -> `logs/YYYY-MM.md`, or the finer unit this project needs.
 
 Add optional families only when the inventory justifies them:
 
@@ -101,10 +101,14 @@ At minimum:
 
 1. Make `index.md` the reading entry point.
 2. Add project-specific memory rules in `<memory-root>/AGENTS.md`.
-3. Create verified project overview and current state pages.
+3. Create a verified current state page.
 4. Record the Projipsa adoption decision.
-5. Capture real unknowns in open questions.
-6. Start the current monthly log.
+5. Start the current chronology log.
+
+Add an overview page when the project's purpose and scope are worth stating
+apart from its current state, and an open-questions page when real unknowns
+exist. Neither is required, because a page created before the project has
+anything to put in it fills up with template text instead.
 7. Maintain the pointer block from `root-pointer.md` in the project root's
    `AGENTS.md` and `CLAUDE.md`. These are the project root's instruction files,
    not the memory root's, and they are how Codex and Claude Code respectively
