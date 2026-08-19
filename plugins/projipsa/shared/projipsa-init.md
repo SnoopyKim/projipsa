@@ -7,12 +7,12 @@ scope.
 
 This is an explicit, infrequent workflow. Do not load or run it merely because
 project memory would be useful. Start only when the user invokes
-`$projipsa:projipsa-init` in Codex, `/projipsa:projipsa-init` in Claude Code,
-or clearly asks to initialize, adopt, migrate, audit, or repair Projipsa
-memory.
+`$projipsa:projipsa-init` in Codex, `/projipsa:projipsa-init` in Claude Code or
+Grok Build, or clearly asks to initialize Projipsa or adopt existing general
+documentation into it.
 
 Each host adapter enforces that boundary mechanically using its own invocation
-policy. Keep the Codex and Claude Code adapter policies aligned.
+policy. Keep the Codex and Claude-compatible adapter policies aligned.
 
 ## Establish the boundary
 
@@ -32,20 +32,15 @@ policy. Keep the Codex and Claude Code adapter policies aligned.
 - **Adoption migration**: the project has useful but flat or mixed
   documentation. Reclassify it as maintained synthesis, raw source, decision,
   question, or chronology and preserve its meaning.
-- **Upgrade or repair**: Projipsa already exists. Reconcile its installed
-  contract, project-specific rules, navigation, frontmatter, IDs, and logs
-  without duplicating or normalizing the tree.
 
-Initialization is idempotent. A second run audits and repairs the existing
-structure rather than starting over.
+Initialization is idempotent while first adoption is incomplete: resume the
+inventory and fill only the missing adoption pieces. Once an adoption decision
+with `projipsa_adoption: true` exists, do not modify the adopted memory in Init.
+Route structural repair or contract upgrade to `$projipsa:projipsa` in Codex or
+`/projipsa:projipsa` in Claude Code, and route size or binary cleanup to the
+explicit Compact workflow.
 
-An installed plugin update never rewrites an adopting project's memory. An
-explicit Init upgrade audits the existing tree against the current contract.
-For the 0.3.x to 0.4.0 transition, preserve the old overview, open-questions
-page, and optional frontmatter; they remain valid even though new projects no
-longer require them. Keep monthly chronology unless current parallel work
-justifies a deliberate cutover to per-writer logs. The detailed initialization
-workflow owns the preservation and cutover rules.
+An installed plugin update never rewrites an adopting project's memory.
 
 Read
 [the initialization workflow](../codex-skills/projipsa-init/references/initialization.md)
@@ -122,14 +117,15 @@ Append the chronology log and make `index.md` the clear reading entry point.
 
 An initialized memory root is worthless if the next agent never opens it, and
 each host discovers project instructions differently. Codex reads `AGENTS.md`.
-Claude Code reads `CLAUDE.md` and does not read `AGENTS.md` at all. So
+Claude Code reads `CLAUDE.md` and does not read `AGENTS.md` at all. Grok Build
+reads `AGENTS.md` and also supports Claude Code instruction compatibility. So
 initialization maintains one marked pointer block in the project's root
 instruction files:
 
 1. Ensure the project root has `AGENTS.md` carrying the pointer block from
    [the root pointer template](../codex-skills/projipsa/assets/templates/root-pointer.md).
 2. Ensure the project root has `CLAUDE.md`. When none exists, create it as an
-   import of `AGENTS.md` so both hosts read one maintained file. When one
+   import of `AGENTS.md` so every host reads one maintained file. When one
    already exists, add the same pointer block instead of injecting an import
    that would duplicate curated instructions.
 3. Delimit the block with `<!-- projipsa:memory-pointer -->` and
@@ -160,5 +156,5 @@ outside the memory root the Maker asked you to create.
    useful Projipsa operation.
 
 After successful initialization, use `$projipsa:projipsa` in Codex or
-`/projipsa:projipsa` in Claude Code for ongoing Query, Ingest, Update,
-Integrate, Lint, and Snapshot work.
+`/projipsa:projipsa` in Claude Code or Grok Build for ongoing Query, Ingest,
+Update, Integrate, Lint, Repair, and Snapshot work.

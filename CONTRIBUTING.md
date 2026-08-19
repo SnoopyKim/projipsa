@@ -14,8 +14,8 @@ plugins/projipsa/            the shipped plugin root — everything users get
   .codex-plugin/             Codex manifest
   .claude-plugin/            Claude Code manifest
   codex-skills/              Codex adapters, plus the canonical references,
-                             templates, and scripts both hosts link to
-  claude-skills/             Claude Code adapters
+                             templates, and scripts every host links to
+  claude-skills/             Claude Code adapters, reused by Grok compatibility
   shared/                    host-neutral workflow body, one per Skill
 
 .agents/plugins/             Codex development marketplace manifest
@@ -39,7 +39,7 @@ different schemas.
 ## The `skills/` invariant
 
 **The package must never contain a directory named `plugins/projipsa/skills/`,
-for either host.** This is the single most important layout rule here, and it is
+for any host.** This is the single most important layout rule here, and it is
 not obvious.
 
 Claude Code *adds* its manifest-declared Skill directory to the default `skills/`
@@ -61,19 +61,23 @@ tests cover those cases. See
 
 ## Adapters and shared workflows
 
-Each public Skill has one thin adapter per host plus one shared workflow body:
+Each public Skill has two thin adapter dialects across three hosts plus one
+shared workflow body:
 
 ```text
 codex-skills/<name>/SKILL.md          Codex adapter
 codex-skills/<name>/agents/openai.yaml  Codex loading policy + interface
-claude-skills/<name>/SKILL.md         Claude Code adapter
-shared/<name>.md                      the workflow both adapters load
+claude-skills/<name>/SKILL.md         Claude Code adapter, reused by Grok Build
+shared/<name>.md                      the workflow every host loads
 ```
 
-Adapters exist because the two hosts express loading policy incompatibly. Codex
-uses `allow_implicit_invocation` in `agents/openai.yaml`; Claude Code uses
+Adapters exist because Codex and the Claude-compatible hosts express loading
+policy incompatibly. Codex uses `allow_implicit_invocation` in
+`agents/openai.yaml`; Claude Code and Grok Build use
 `disable-model-invocation` in the adapter's frontmatter. Neither key belongs in
-the other host's tree, and the validator enforces that separation.
+the other adapter tree, and the validator enforces that separation. Grok's
+official Claude Code compatibility is why a third adapter tree or manifest is
+intentionally absent.
 
 Keep adapters thin. Workflow content belongs in `shared/`. Adding a Skill means
 declaring its loading policy once in `SKILL_POLICY` in
@@ -84,6 +88,10 @@ Canonical references, templates, and `validate_memory.py` currently live under
 links to reach them. Keeping one copy is deliberate; moving them to a
 host-neutral home is deferred, not decided against.
 
+The Compact Skill's read-only analyzer lives at
+`codex-skills/compact/scripts/audit_compaction.py`. It inventories candidates;
+it does not implement Apply or accept deletion approval on the user's behalf.
+
 ## Validation
 
 The validators require Python 3.9 or newer and otherwise use only the standard
@@ -93,6 +101,7 @@ library.
 python3 scripts/validate_package.py
 python3 -m unittest discover -s tests
 claude plugin validate ./plugins/projipsa --strict
+grok plugin validate ./plugins/projipsa
 ```
 
 `scripts/validate_package.py` checks cross-host alignment. It scans the shipped
@@ -104,7 +113,7 @@ validation. Specifically it checks:
 - shared manifest fields, semantic versioning, and matching display names;
 - the `skills/` invariant and one isolated adapter per host per Skill;
 - loading policy agreement between `agents/openai.yaml` and adapter frontmatter;
-- both host invocations documented in every adapter description, every shared
+- both adapter-dialect invocations documented in every adapter description, every shared
   workflow, and the README;
 - the load-bearing guardrail phrases each Skill contract must keep;
 - the two development marketplace manifests;

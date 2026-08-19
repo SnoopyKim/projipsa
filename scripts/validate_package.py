@@ -22,6 +22,10 @@ CODEX_MANIFEST = PACKAGE_ROOT / ".codex-plugin" / "plugin.json"
 CLAUDE_MANIFEST = PACKAGE_ROOT / ".claude-plugin" / "plugin.json"
 CODEX_SKILL_ROOT = PACKAGE_ROOT / "codex-skills"
 CLAUDE_SKILL_ROOT = PACKAGE_ROOT / "claude-skills"
+# Grok Build officially supports Claude Code plugin compatibility and reads the
+# same manifest-selected adapter surface. A third adapter tree would duplicate
+# Skills without adding a distinct host contract.
+GROK_SKILL_ROOT = CLAUDE_SKILL_ROOT
 SHARED_WORKFLOW_ROOT = PACKAGE_ROOT / "shared"
 # Claude Code adds its manifest-declared Skill directory to the default
 # skills/ scan instead of replacing it, so a package that keeps adapters in
@@ -29,7 +33,7 @@ SHARED_WORKFLOW_ROOT = PACKAGE_ROOT / "shared"
 DEFAULT_SKILL_ROOT = PACKAGE_ROOT / "skills"
 HOST_SKILL_ROOTS = (CODEX_SKILL_ROOT, CLAUDE_SKILL_ROOT)
 # The Codex tree also hosts the canonical references, templates, and scripts
-# that both hosts' shared workflows link to. Keeping one copy is deliberate;
+# that every host's shared workflows link to. Keeping one copy is deliberate;
 # moving it to a host-neutral home is deferred, not forgotten.
 RESOURCE_SKILL_ROOT = CODEX_SKILL_ROOT
 TEMPLATE_ROOT = RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates"
@@ -39,6 +43,7 @@ TEMPLATE_ROOT = RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates"
 SKILL_POLICY = {
     "projipsa": {"implicit": True},
     "projipsa-init": {"implicit": False},
+    "compact": {"implicit": False},
     "outsource": {"implicit": True},
 }
 EXPECTED_SKILLS = set(SKILL_POLICY)
@@ -94,6 +99,30 @@ SKILL_GUARDRAILS = {
             "projipsa:memory-pointer",
             "claude.md",
             "agents.md",
+        ),
+    },
+    "compact": {
+        "compaction is explicit": (
+            "explicit, infrequent workflow",
+        ),
+        "audit is the read-only default": (
+            "audit is read-only",
+        ),
+        "apply needs path-level approval": (
+            "exact plan",
+            "explicit approval",
+        ),
+        "active evidence is protected": (
+            "only evidence",
+        ),
+        "untracked deletion needs recovery handling": (
+            "untracked artifacts",
+        ),
+        "semantic duplicates need judgment": (
+            "semantic review",
+        ),
+        "compaction cannot decide for the Maker": (
+            "does not create or approve project decisions",
         ),
     },
     "outsource": {
@@ -514,6 +543,8 @@ def validate_resources(errors: list[str]) -> None:
         RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates" / "root-pointer.md",
         RESOURCE_SKILL_ROOT / "projipsa" / "scripts" / "validate_memory.py",
         RESOURCE_SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
+        RESOURCE_SKILL_ROOT / "compact" / "references" / "compaction.md",
+        RESOURCE_SKILL_ROOT / "compact" / "scripts" / "audit_compaction.py",
         RESOURCE_SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
         RESOURCE_SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
         RESOURCE_SKILL_ROOT / "outsource" / "references" / "verification.md",
@@ -586,7 +617,7 @@ def main() -> int:
         print(f"Package validation failed with {len(errors)} error(s).", file=sys.stderr)
         return 1
 
-    print("Projipsa package is aligned for Codex and Claude Code.")
+    print("Projipsa package is aligned for Codex, Claude Code, and Grok Build.")
     return 0
 
 

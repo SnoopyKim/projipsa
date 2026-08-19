@@ -3,7 +3,7 @@ id: decision.parallel-safe-memory-tree.2026-08-12
 type: decision
 status: active
 confidence: confirmed
-updated: 2026-08-13
+updated: 2026-08-17
 sources:
   - https://github.com/SnoopyKim/projipsa/issues/9
   - https://github.com/SnoopyKim/projipsa/issues/10
@@ -14,12 +14,14 @@ sources:
   - plugins/projipsa/codex-skills/projipsa/references/memory-contract.md
   - plugins/projipsa/shared/projipsa-init.md
   - plugins/projipsa/codex-skills/projipsa-init/references/initialization.md
+  - wiki/decisions/2026-08-17-explicit-memory-compaction.md
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
   - tests/test_validate_memory.py
 related:
   - project.current-state
   - project.overview
   - decision.projipsa-adoption.2026-07-31
+  - decision.explicit-memory-compaction.2026-08-17
 supersedes: []
 superseded_by: []
 ---
@@ -168,3 +170,12 @@ frontmatter, link, and placeholder checking.
 - Static checks still cannot tell whether an agent actually honored ownership
   during parallel work; that remains a behavior question for the evaluation
   harness in [open questions](../questions/open-questions.md).
+
+## Amendment 2026-08-17: Repair moved out of Init
+
+The 0.5.0 [compaction decision](2026-08-17-explicit-memory-compaction.md)
+supersedes only the earlier consequence that routed existing-project Upgrade
+and Repair through `projipsa-init`. Init now stops after first adoption;
+preservation-first Upgrade and Repair use the ongoing `projipsa` Skill. The
+preservation rules in this decision remain current, and one-off size or binary
+cleanup uses the separately approved Compact workflow.

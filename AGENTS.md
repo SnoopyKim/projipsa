@@ -11,8 +11,8 @@ decision](docs/wiki/decisions/2026-07-30-plugin-ship-boundary.md).
 This project keeps operating memory under `docs/`, maintained with Projipsa.
 
 - Read `docs/index.md` first, then `docs/wiki/project/current-state.md`.
-- Treat `docs/wiki/**` as maintained synthesis, `docs/raw/**` as preserved
-  source material that is never rewritten, and `docs/logs/**` as append-only
-  chronology rather than current truth.
+- Treat `docs/wiki/**` as maintained synthesis, `docs/raw/**` as retained
+  evidence that normal maintenance never rewrites, and `docs/logs/**` as
+  append-only chronology rather than current truth.
 - This memory root is public. Full memory rules: `docs/AGENTS.md`.
 <!-- /projipsa:memory-pointer -->

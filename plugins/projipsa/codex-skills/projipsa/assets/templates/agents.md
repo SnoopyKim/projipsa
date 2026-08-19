@@ -10,9 +10,15 @@
 
 ## Maintenance rules
 
-- Treat `wiki/**` as maintained synthesis.
-- Treat `raw/**` as preserved source material; never rewrite it.
-- Treat `logs/**` as append-only chronology, not current truth.
+- Map project paths by role: Evidence, Events, Synthesis, and rebuildable Views.
+  By default, `raw/**` is retained Evidence, `logs/**` is append-only Events,
+  and `wiki/**` is maintained Synthesis.
+- During normal maintenance, never overwrite or delete retained raw Evidence.
+  Explicit Compact may remove a whole artifact only after an active-evidence
+  check, exact path plan, recoverability review, and approval.
+- When the project keeps replaceable current visuals, name their asset location
+  and retention rule here. Keep temporary or reproducible captures out of
+  project memory.
 - Keep current state concise and link to detailed pages. Replace it rather than
   appending: a line that no longer changes what the next session does moves to
   chronology, a delivery, a decision, a milestone, or an area page.

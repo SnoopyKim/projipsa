@@ -18,7 +18,7 @@ class PackageContractTests(unittest.TestCase):
         self.assertEqual([], validate_package.validate())
 
     def test_codex_plugin_invocations_are_namespace_qualified(self) -> None:
-        for skill in ("projipsa", "projipsa-init", "outsource"):
+        for skill in sorted(validate_package.EXPECTED_SKILLS):
             with self.subTest(skill=skill):
                 self.assertEqual(
                     f"$projipsa:{skill}",
@@ -37,6 +37,14 @@ class PackageContractTests(unittest.TestCase):
         for host, manifest in (("Codex", codex), ("Claude", claude)):
             with self.subTest(host=host):
                 self.assertNotEqual("./skills/", manifest["skills"])
+
+    def test_grok_reuses_the_claude_compatibility_adapter(self) -> None:
+        claude = validate_package.load_json(validate_package.CLAUDE_MANIFEST)
+        self.assertEqual(
+            validate_package.CLAUDE_SKILL_ROOT,
+            validate_package.GROK_SKILL_ROOT,
+        )
+        self.assertEqual("./claude-skills/", claude["skills"])
 
     def test_a_default_skill_directory_fails_validation(self) -> None:
         self.assertFalse(validate_package.DEFAULT_SKILL_ROOT.exists())

@@ -22,18 +22,26 @@ conventions the same way. A tree that enforces its shape harder than its
 substance fills up with pages that match the shape and say nothing, which is
 the failure this contract exists to prevent.
 
-## Canonical layers
+## Canonical roles
 
-Projipsa uses four layers with distinct authority:
+Projipsa uses four roles with distinct authority:
 
-1. **Raw sources** preserve imported or captured evidence.
-2. **Maintained wiki pages** hold current synthesized understanding.
-3. **Append-only logs** preserve chronology without becoming current truth.
-4. **Derived layers** provide search, graph, dashboard, or summary views and
-   must be rebuildable from the first three layers.
+1. **Evidence** preserves or links the sources needed to verify claims.
+2. **Events** preserve append-only chronology without becoming current truth.
+3. **Synthesis** holds maintained current understanding, decisions, risks, and
+   questions.
+4. **Views** provide search, graph, dashboard, index, or generated summaries and
+   must be rebuildable from the first three roles.
 
-Do not make a derived layer the only place where a project fact or decision
-exists.
+The default `raw/`, `logs/`, and `wiki/` layout implements the first three
+roles, but role is more important than folder name. Record project-specific
+mapping and visual-asset policy in `<memory-root>/AGENTS.md`. Do not make a View
+the only place where a project fact or decision exists.
+
+Normal Ingest, Update, and Repair never overwrite or delete retained raw
+evidence. The explicit Compact workflow may remove a whole artifact only after
+an active-evidence check, an exact path plan, recoverability review, and user
+approval. This is a lifecycle exception, not permission to rewrite history.
 
 ## Default memory root
 

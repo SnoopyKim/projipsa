@@ -1,9 +1,9 @@
 # Root Instruction Pointer
 
 Maintain this block in the project's root `AGENTS.md` and root `CLAUDE.md` so
-every host finds the memory root without being told. Replace `docs` with the
-selected memory root. On a later run, replace the existing block in place and
-never append a second copy.
+Codex, Claude Code, and Grok Build find the memory root without being told.
+Replace `docs` with the selected memory root. On a later run, replace the
+existing block in place and never append a second copy.
 
 ## Pointer block
 
@@ -14,9 +14,9 @@ never append a second copy.
 This project keeps operating memory under `docs/`, maintained with Projipsa.
 
 - Read `docs/index.md` first, then `docs/wiki/project/current-state.md`.
-- Treat `docs/wiki/**` as maintained synthesis, `docs/raw/**` as preserved
-  source material that is never rewritten, and `docs/logs/**` as append-only
-  chronology rather than current truth.
+- Treat `docs/wiki/**` as maintained synthesis, `docs/raw/**` as retained
+  evidence that normal maintenance never rewrites, and `docs/logs/**` as
+  append-only chronology rather than current truth.
 - Full memory rules: `docs/AGENTS.md`.
 <!-- /projipsa:memory-pointer -->
 ```
@@ -24,7 +24,7 @@ This project keeps operating memory under `docs/`, maintained with Projipsa.
 ## New root CLAUDE.md
 
 Claude Code does not read `AGENTS.md`. When the project has no `CLAUDE.md`,
-create one that imports the file both hosts should share:
+create one that imports the file every host should share:
 
 ```markdown
 # Project Instructions

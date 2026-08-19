@@ -1,6 +1,6 @@
 ---
 name: projipsa
-description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes /projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, post-merge memory integration, memory lint or repair, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, integration, repair, and snapshot require authorized write scope.
+description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes /projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, post-merge memory integration, memory lint, repair or contract upgrade, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, integration, repair, and snapshot require authorized write scope. One-off size and asset cleanup belongs to the separate explicit Compact Skill.
 ---
 
 # Projipsa for Claude Code

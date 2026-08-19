@@ -9,9 +9,13 @@
 
 ## Maintenance rules
 
-- Treat `wiki/**` as maintained synthesis.
-- Treat `raw/**` as preserved source material; never rewrite it.
-- Treat `logs/**` as append-only chronology, not current truth.
+- Map paths by role: stable repository links are Evidence, `logs/**` is
+  append-only Events, `wiki/**` is maintained Synthesis, and generated indexes
+  or reports are rebuildable Views.
+- This public project has no raw or replaceable visual asset tree. Prefer stable
+  repository paths. During normal maintenance, never overwrite or delete
+  retained raw Evidence; explicit Compact still requires an exact plan,
+  recoverability review, and approval.
 - Keep current state concise and link to detailed pages. Replace it rather than
   appending: a line that no longer changes what the next session does moves to
   chronology, a delivery, a decision, a milestone, or an area page, and

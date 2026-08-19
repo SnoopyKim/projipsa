@@ -22,9 +22,16 @@ supersedes it.
 Use Ingest for a new research artifact, meeting note, user feedback,
 conversation output, external article, source document, or field observation.
 
-1. Save the source under `raw/YYYY-MM/` or the established equivalent.
-2. Preserve the original as closely as practical. Add provenance metadata only
-   when it helps identify origin, date, or scope.
+1. Classify the artifact before copying it:
+   - link a stable repository path, URL, commit, or durable external record;
+   - retain unique, durable evidence under `raw/YYYY-MM/` or the established
+     equivalent;
+   - place a replaceable current visual in the project's maintained asset area
+     when its `docs/AGENTS.md` defines one;
+   - do not add temporary, intermediate, or reproducible captures to project
+     memory.
+2. Preserve retained evidence as closely as practical. Add provenance metadata
+   only when it helps identify origin, date, or scope.
 3. Identify affected maintained pages.
 4. Update existing pages or create focused new pages.
 5. Link new or changed claims to the source.
@@ -41,9 +48,9 @@ meeting, review, or handoff.
 
 1. Establish what actually changed and what explicitly did not.
 2. Identify the evidence supporting every new confirmed claim.
-3. Preserve an ephemeral, imported, or conversation-only artifact under
-   `raw/YYYY-MM/`. When evidence already has a stable versioned project path,
-   link that path instead of copying it.
+3. Retain only durable, unique evidence that future work may need to verify a
+   live claim. Link a stable versioned project path instead of copying it, and
+   leave temporary, intermediate, or reproducible captures out of memory.
 4. Update `sources` frontmatter on affected maintained pages.
 5. Replace the affected parts of `wiki/project/current-state.md`, and move out
    what no longer steers the next session.
@@ -216,6 +223,27 @@ script also prints `warning:` lines for drift it can measure but not decide,
 such as a current-state page that has grown past a readable briefing, or
 chronology dated after that page was last written. A warning never fails
 validation; treat it as a lint finding to report.
+
+## Repair
+
+Use Repair after Lint identifies contract drift in a project that has already
+adopted Projipsa, or when the user explicitly asks to upgrade its memory rules.
+
+1. Read the project's `docs/AGENTS.md` or equivalent profile before the plugin
+   defaults. Preserve intentional local paths, roles, and conventions.
+2. Inventory the exact findings and separate required repairs from optional
+   normalization. A valid customized tree is not damage.
+3. Preserve stable IDs, links, chronology, retained evidence, and unrelated
+   user work.
+4. Apply the smallest authorized fixes. Do not recreate the adoption decision
+   or rerun Init.
+5. Run the memory validator, inspect the diff, and append one repair or upgrade
+   chronology entry only when files actually changed.
+
+Read [repair and upgrade](repair-and-upgrade.md) for version-specific
+preservation rules. Repair does not authorize binary cleanup. When the finding
+is mainly size, repeated captures, or obsolete assets, route to the explicit
+Compact workflow instead.
 
 ## Snapshot
 
