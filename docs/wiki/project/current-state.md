@@ -7,6 +7,8 @@ updated: 2026-08-19
 sources:
   - AGENTS.md
   - https://github.com/SnoopyKim/projipsa/releases/tag/v0.4.0
+  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.5.0
+  - https://github.com/SnoopyKim/projipsa/pull/14
   - https://docs.x.ai/build/features/skills-plugins-marketplaces
   - README.md
   - CONTRIBUTING.md
@@ -47,19 +49,17 @@ related:
 
 ## Summary
 
-0.5.0 is implemented in the local working tree but is not committed or
-released. It separates first adoption, routine repair, and explicit compaction;
+0.5.0 is the latest published release. PR #14 merged as `c8cfb53`; annotated
+tag `v0.5.0` and the matching GitHub Release are public. Claude Code and Codex
+report 0.5.0 with four Skills, and Grok Build discovers the same four-Skill
+surface through its official Claude Code compatibility layer.
+
+The release separates first adoption, routine repair, and explicit compaction;
 adds a fourth `compact` Skill whose default is read-only Audit; changes future
 ingestion so temporary or reproducible captures do not automatically
-accumulate under `raw/`; and supports Codex, Claude Code, and Grok Build through
-two adapter dialects. See [the compaction
+accumulate under `raw/`; and supports three hosts through two adapter dialects.
+See [the compaction
 decision](../decisions/2026-08-17-explicit-memory-compaction.md).
-
-0.4.0 remains the latest published release. Claude Code reports its installed
-copy as 0.4.0; the Codex development marketplace exposes the local 0.5.0
-working tree, and Grok Build's Claude compatibility discovers the same local
-four-Skill surface. Its release history and validation evidence are in [the
-August chronology](../../logs/2026-08.md).
 
 Projipsa exists so project understanding survives session boundaries and
 substantial work can be delegated against that durable state. Cross-host
@@ -124,9 +124,7 @@ overview](overview.md).
 
 ## In Progress
 
-- 0.5.0 changes are present only in the local working tree. Commit,
-  push, tag, release, installed-host refresh, and public marketplace listing
-  are separate operations and have not been performed.
+- No 0.5.0 release or installed-host refresh step remains in progress.
 
 ## Explicitly Not Current
 
@@ -137,9 +135,6 @@ overview](overview.md).
 - This repository has no `raw/` or replaceable visual asset tree because its
   evidence already has stable versioned paths.
 - No `wiki/deliveries/` tree exists because no delegated engagement is active.
-- Claude Code still reports its installed copy as 0.4.0. Codex and Grok Build
-  can see the 0.5.0 development tree, but that is not release publication or a
-  pinned 0.5.0 install.
 
 ## Active Defaults
 
@@ -151,13 +146,15 @@ overview](overview.md).
   neither write authority, delegation, acceptance, nor deletion approval.
 - Pages created from a template start below `confirmed`. Raise one to
   `confirmed` only in the edit that lists its primary evidence.
-- The installed copy is version-pinned. Working-tree changes reach a host only
-  after a version bump and a separately authorized install refresh.
+- Installed copies are version-pinned. Working-tree changes reach a host only
+  after a version bump and a separately authorized install refresh. An
+  already-running Claude Code, Codex, or Grok session still needs a restart or
+  new task to apply the refreshed Skill surface.
 
 ## Validation
 
-Latest local working-tree evidence; released 0.4.0 evidence stays in [the
-chronology](../../logs/2026-08.md).
+Latest release and installed-host evidence; earlier release evidence stays in
+[the chronology](../../logs/2026-08.md).
 
 - `python3 scripts/validate_package.py` passes.
 - `python3 -m unittest discover -s tests` passes: 58 tests on the local Python
@@ -169,17 +166,22 @@ chronology](../../logs/2026-08.md).
 - `grok plugin validate ./plugins/projipsa` passes, and filtered runtime
   inspection exposes all four Skills from the Claude-compatible adapter.
 - `git diff --check` passes.
+- PR #14's push and pull-request workflows pass on Python 3.9 and 3.13. The PR
+  had no review comments, remained mergeable at head `0ef0d1c`, and merged to
+  main as `c8cfb53`.
+- Annotated tag `v0.5.0` resolves to `c8cfb53`, and its GitHub Release is
+  published.
+- `claude plugin details projipsa@projipsa` reports 0.5.0 and four Skills after
+  a user-scope update from 0.4.0. `codex plugin list` reports 0.5.0 installed
+  and enabled. Filtered `grok inspect --json` output reports the enabled plugin
+  and four Skills from `claude-skills/`.
 - The skill-creator quick validator was attempted but could not run because its
   separate runtime dependency `PyYAML` is absent. The repository package
   validator independently checks both Compact adapters, loading policies,
   metadata, links, resources, and contract guardrails.
-- Python 3.9 and 3.13 CI have not run against 0.5.0 because nothing has been
-  committed or pushed.
 
 ## Next Work
 
-- Publish the authorized 0.5.0 release, run supported-version CI, and refresh
-  the three host surfaces without creating a duplicate native Grok install.
 - Fix the three reproduced `validate_memory.py` gaps recorded in [open
   questions](../questions/open-questions.md).
 - Decide whether the narrowed Outsource trigger fires appropriately and whether
