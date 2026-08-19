@@ -11,6 +11,7 @@ then follow links to deeper pages.
 
 ## Decisions
 
+- [Explicit memory compaction](wiki/decisions/2026-08-17-explicit-memory-compaction.md)
 - [Rules must earn their place](wiki/decisions/2026-08-13-rules-must-earn-their-place.md)
 - [Parallel-safe memory tree](wiki/decisions/2026-08-12-parallel-safe-memory-tree.md)
 - [QA-oriented verification claims](wiki/decisions/2026-08-11-qa-oriented-verification-claims.md)

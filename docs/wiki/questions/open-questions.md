@@ -3,7 +3,7 @@ id: question.open-questions
 type: question
 status: active
 confidence: assumed
-updated: 2026-08-11
+updated: 2026-08-17
 sources:
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
   - plugins/projipsa/codex-skills/outsource/references/verification.md
@@ -74,12 +74,6 @@ there is no evidence either way.
 
 Resolution: use it, and record cases where it should have fired and did not.
 
-## When should 0.3.1 be released?
-
-The plugin has never been listed in a marketplace, so nothing has shipped to
-anyone who did not install from source. It is unresolved whether adopting this
-memory tree should precede or follow a first listing.
-
 ## Should Skill triggering and workflow behavior be tested automatically?
 
 No validator checks whether a Skill fires at the right moment or whether a
@@ -94,13 +88,3 @@ Resolution: decide whether an evaluation harness belongs in this repository,
 and whether it can run in CI given that it requires model calls. Include both
 triggering cases and verification-behavior regressions covering actual paths,
 preservation invariants, proxy evidence, and Maker-versus-technical verdicts.
-
-## Should the memory contract know about public roots?
-
-`operations.md` instructs preserving conversation-only artifacts under `raw/`,
-and the contract has no notion of a publicly visible memory root. This project
-handles that locally in `AGENTS.md`, which leaves the default pointed the wrong
-way for every other public repository that adopts Projipsa.
-
-Resolution: decide whether initialization should ask whether the memory root is
-public and record the answer in the adoption decision.

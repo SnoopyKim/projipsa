@@ -1,7 +1,7 @@
 {
   "name": "projipsa",
-  "version": "0.4.0",
-  "description": "A project butler with separate skills for project memory, onboarding, and substantial delivery in Codex and Claude Code.",
+  "version": "0.5.0",
+  "description": "A project butler with separate skills for project memory, onboarding, compaction, and substantial delivery in Codex, Claude Code, and Grok Build.",
   "author": {
     "name": "SnoopyDev",
     "url": "https://github.com/SnoopyKim"
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "Projipsa",
     "shortDescription": "A project butler for memory and delivery.",
-    "longDescription": "Projipsa is a project butler for Codex and Claude Code. Separate skills keep source-backed memory current, explicitly onboard existing projects, and qualify or manage substantial work from discovery through verified review and handoff.",
+    "longDescription": "Projipsa is a project butler for Codex, Claude Code, and Grok Build. Separate skills keep source-backed memory current, explicitly onboard existing projects, safely audit or compact accumulated artifacts, and qualify or manage substantial work from discovery through verified review and handoff.",
     "developerName": "SnoopyDev",
     "category": "Productivity",
     "capabilities": [
@@ -31,6 +31,7 @@
     "defaultPrompt": [
       "Use $projipsa:projipsa to brief me from this project's maintained memory.",
       "Use $projipsa:projipsa-init to onboard this existing project.",
+      "Use $projipsa:compact to audit this project's memory for safe compaction without deleting anything.",
       "Use $projipsa:outsource to qualify this substantial project and manage it after I opt in."
     ]
   }

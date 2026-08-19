@@ -1,8 +1,8 @@
 {
   "name": "projipsa",
   "displayName": "Projipsa",
-  "version": "0.4.0",
-  "description": "A project butler with separate skills for project memory, onboarding, and substantial delivery in Codex and Claude Code.",
+  "version": "0.5.0",
+  "description": "A project butler with separate skills for project memory, onboarding, compaction, and substantial delivery in Codex, Claude Code, and Grok Build.",
   "author": {
     "name": "SnoopyDev",
     "url": "https://github.com/SnoopyKim"

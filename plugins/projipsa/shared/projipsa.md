@@ -11,9 +11,12 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
 
 ## Protect the memory contract
 
-- Treat maintained Markdown plus preserved raw sources as canonical memory.
-- Keep raw source, maintained synthesis, and append-only chronology separate.
-- Never rewrite a raw source. Correct it with a new source or a linked note.
+- Treat maintained Markdown plus retained evidence as canonical memory.
+- Keep **Evidence**, **Events**, **Synthesis**, and rebuildable **Views** distinct
+  by role. A project may choose its own folder names in `docs/AGENTS.md`.
+- In normal memory maintenance, never overwrite or delete a retained raw
+  source. Correct it with a new source or a linked note. Whole-artifact removal
+  belongs only to the explicit Compact workflow.
 - Keep current-state and active-delivery pages concise and current; keep logs
   append-only. Current state is replaced, not appended.
 - Split large documents into atomic pages with one responsibility.
@@ -35,8 +38,8 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
    root it names as authoritative over the `docs/` default.
 3. If no coherent memory root exists, do not improvise a parallel tree or
    initialize it automatically. Suggest `$projipsa:projipsa-init` in Codex or
-   `/projipsa:projipsa-init` in Claude Code when adoption, migration, or repair
-   would be useful.
+   `/projipsa:projipsa-init` in Claude Code for first adoption. If an adopted
+   root exists but has drifted, use Lint and an authorized Repair here.
 4. Read current state before logs. Open raw sources only when provenance or
    verification requires them.
 
@@ -50,6 +53,8 @@ The explicit host invocations are `$projipsa:projipsa` in Codex and
   once from the merged result.
 - **Lint**: report structural, provenance, freshness, and consistency findings
   before making repairs.
+- **Repair**: reconcile an adopted memory root with the current contract while
+  preserving project-specific paths, IDs, history, and custom rules.
 - **Snapshot**: preserve a milestone, handoff, pause, launch, or restart state.
 
 A request to wrap up, close out, or finish names no operation. Resolve it
@@ -66,6 +71,9 @@ maintained pages. Read the
 [memory contract](../codex-skills/projipsa/references/memory-contract.md) when authority,
 source-of-truth, or host-integration boundaries are unclear, or when weighing
 whether a new rule or convention earns its place.
+Read
+[repair and upgrade](../codex-skills/projipsa/references/repair-and-upgrade.md)
+before changing an already adopted memory root's contract or structure.
 
 Compose Ingest with Update or Snapshot when a new evidence artifact must be
 preserved before its claims can be reflected in maintained memory. Do not drop
@@ -74,7 +82,7 @@ provenance merely to keep the operation label singular.
 ## Separate reading from writing
 
 Implicit loading, Query, and diagnostic lint are read-only. Ingest, Update,
-Integrate, repair, and Snapshot change project files and require either an
+Integrate, Repair, and Snapshot change project files and require either an
 explicit user request or a task whose approved scope already includes
 project-memory maintenance. Installation alone never authorizes automatic
 writes.
@@ -92,6 +100,11 @@ When writing:
    root when available, and report its warnings alongside its errors.
 8. Inspect the documentation diff and keep implementation files untouched
    unless the user separately requested implementation work.
+
+When size, repeated captures, or obsolete binary evidence needs a one-off
+cleanup, recommend `$projipsa:compact` in Codex or `/projipsa:compact` in
+Claude Code. Never invoke Compact automatically or treat routine Update as
+permission to delete artifacts.
 
 Before writing, establish who owns the page. When several branches, worktrees,
 sessions, or agents work at once, the shared synthesis pages have a single

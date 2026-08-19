@@ -24,7 +24,7 @@ throughout.
 
 ## Install
 
-Projipsa is version `0.4.0` and is **not listed in a public marketplace yet**.
+Projipsa is version `0.5.0` and is **not listed in a public marketplace yet**.
 Install it from a source checkout:
 
 ```bash
@@ -45,7 +45,16 @@ codex plugin marketplace add /path/to/projipsa
 codex plugin add projipsa@projipsa
 ```
 
-Restart Claude Code, or start a new Codex task, after installing.
+Grok Build automatically discovers an enabled Claude Code installation through
+its official compatibility layer, so do not install a second copy when you use
+both hosts. For a Grok-only local installation instead:
+
+```bash
+grok plugin install /path/to/projipsa/plugins/projipsa --trust
+grok plugin enable projipsa
+```
+
+Restart Claude Code, or start a new Codex or Grok task, after installing.
 
 The installed copy is version-pinned rather than a live reference, so a later
 edit under `plugins/projipsa/` reaches it only after a version bump plus the
@@ -63,7 +72,7 @@ capabilities you already have.
 ## Your first five minutes
 
 Open an existing project and run onboarding explicitly — `/projipsa:projipsa-init`
-in Claude Code, or `$projipsa:projipsa-init` in Codex.
+in Claude Code or Grok Build, or `$projipsa:projipsa-init` in Codex.
 
 It inventories what documentation you already have, picks `docs/` (or an
 established durable equivalent) as the memory root, and writes the minimum
@@ -82,41 +91,41 @@ An overview page and an open-questions page get added when the project has
 something verified to put in them, rather than on day one.
 
 It also adds a short pointer block to your root `AGENTS.md` and `CLAUDE.md` so
-the next agent — on either host — finds the memory without being told.
+the next agent — on any supported host — finds the memory without being told.
 
-Initialization is docs-only by default: it changes no implementation file. It is
-also idempotent, so running it again audits and repairs the existing setup
-instead of creating a second tree.
+Initialization is docs-only by default: it changes no implementation file. It
+can resume an interrupted first adoption without creating a second tree. Once
+the adoption marker exists, Init stops; ongoing repair belongs to the everyday
+Project memory Skill.
 
 ### Upgrading an existing project
 
 Updating the Plugin does not rewrite project memory. Run
-`$projipsa:projipsa-init` in Codex or `/projipsa:projipsa-init` in Claude Code
-explicitly when you want an existing Projipsa project audited or migrated to
-the current contract.
+`$projipsa:projipsa` in Codex or `/projipsa:projipsa` in Claude Code or Grok
+Build when you want an already adopted project linted, repaired, or upgraded to
+the current contract. Init is reserved for first adoption, including migration
+of general project documentation into Projipsa.
 
-The 0.3.x to 0.4.0 upgrade is preservation-first: existing overview and open
-questions pages remain valid, as do stated `type`, `status`, `confidence`, and
-`related` fields. Monthly logs remain in place unless real concurrent writers
-justify a dated cutover to per-writer files. Init merges the new ownership,
-eviction, and Integrate guidance into project-specific rules rather than
-replacing customized documentation from a template. The first 0.4.0 validation
-may report pre-existing findings in nested `logs/**`, which older validators did
-not inspect.
+Upgrades remain preservation-first: optional pages and frontmatter stay valid,
+stable IDs and working paths remain in place, and monthly logs remain unless
+real concurrent writers justify a dated cutover. Repair merges earned contract
+changes into project-specific `docs/AGENTS.md` rules rather than replacing
+customized documentation from a template.
 
 From then on, `/projipsa:projipsa` is the everyday call. Ask it to brief you,
 and it reads current state before history. Ask it to record a session, and it
 updates the affected pages and appends the log.
 
-## The three Skills
+## The four Skills
 
-One Plugin, three Skills with deliberately different trigger boundaries:
+One Plugin, four Skills with deliberately different trigger boundaries:
 
-| Skill | Codex | Claude Code | Loads automatically |
-| --- | --- | --- | --- |
-| Project memory | `$projipsa:projipsa` | `/projipsa:projipsa` | Yes — read-only context work |
-| Onboarding and repair | `$projipsa:projipsa-init` | `/projipsa:projipsa-init` | No |
-| Substantial delivery | `$projipsa:outsource` | `/projipsa:outsource` | Yes — qualification only |
+| Skill | Codex | Claude Code | Grok Build | Loads automatically |
+| --- | --- | --- | --- | --- |
+| Project memory | `$projipsa:projipsa` | `/projipsa:projipsa` | `/projipsa:projipsa` | Yes — read-only context work |
+| First adoption | `$projipsa:projipsa-init` | `/projipsa:projipsa-init` | `/projipsa:projipsa-init` | No |
+| Memory compaction | `$projipsa:compact` | `/projipsa:compact` | `/projipsa:compact` | No |
+| Substantial delivery | `$projipsa:outsource` | `/projipsa:outsource` | `/projipsa:outsource` | Yes — qualification only |
 
 **Automatic loading is not authority.** It helps the host notice the right
 workflow. It does not authorize writes, external effects, costs, deployment,
@@ -134,23 +143,37 @@ The everyday Skill once a project has adopted Projipsa. It can:
 - ingest new source material with its provenance;
 - update current state, decisions, risks, questions, and next work;
 - integrate shared memory once parallel writer branches have merged;
-- lint structure, freshness, links, and evidence;
+- lint and repair structure, freshness, links, evidence, and contract drift;
 - capture a milestone, pause, handoff, or restart snapshot;
 - persist delivery state for an authorized engagement.
 
 It may load implicitly when you ask for a project briefing, but implicit use
-stays read-only. Ingest, Update, Integrate, repair, and Snapshot need either an
+stays read-only. Ingest, Update, Integrate, Repair, and Snapshot need either an
 explicit request or a task whose approved scope already covers memory
 maintenance.
 
 If no coherent memory exists, it says so and may suggest onboarding. It never
 initializes a project on its own.
 
-### Onboarding and repair
+### First adoption
 
 Explicit and infrequent. Covered in [your first five minutes](#your-first-five-minutes)
-above. It never loads merely because memory would be useful — you have to ask
-for it.
+above. It creates a new memory root or adopts existing general documentation.
+It never loads merely because memory would be useful, and it does not repair an
+already adopted root.
+
+### Memory compaction
+
+Also explicit and infrequent. `$projipsa:compact` in Codex and
+`/projipsa:compact` in Claude Code or Grok Build first run a read-only Audit:
+file and byte inventory, exact image hashes, local references, Git
+recoverability, and conservative groups that need semantic or visual review.
+
+Audit is not deletion approval. Compact produces an exact path plan, protects
+the only evidence for an active claim, and requires separate explicit approval
+before Apply. Unmodified tracked files are tied to a Git baseline; modified or
+untracked files require a separate recovery path or acknowledged unrecoverable
+deletion. Removing working-tree files does not shrink existing Git history.
 
 ### Substantial delivery
 
@@ -186,14 +209,21 @@ recommend onboarding rather than building a competing state system of its own.
 
 ## What the memory looks like
 
-Four layers, with different authority:
+Four roles, with different authority. The default folders implement them, but a
+project records its own mapping and visual-asset policy in `docs/AGENTS.md`:
 
-| Layer | Holds | Rule |
-| --- | --- | --- |
-| `raw/` | preserved evidence | never rewritten — correct it with a new source or a linked note |
-| `wiki/` | maintained synthesis | the project-level source of current truth |
-| `logs/` | append-only chronology | never current truth |
-| derived | search, graphs, dashboards | must be rebuildable; never the only home for a fact |
+| Role | Default | Holds | Rule |
+| --- | --- | --- | --- |
+| Evidence | `raw/` or stable links | material needed to verify claims | retain durable, unique evidence; link stable artifacts instead of copying |
+| Events | `logs/` | append-only chronology | never current truth |
+| Synthesis | `wiki/` | maintained project understanding | the project-level source of current truth |
+| Views | derived assets | search, graphs, dashboards, summaries | rebuildable; never the only home for a fact |
+
+Normal memory maintenance never overwrites or deletes retained raw evidence.
+The explicit Compact workflow can remove a whole artifact only after an active
+evidence check, exact path plan, recoverability review, and approval. Temporary,
+intermediate, or readily reproducible captures should not enter memory in the
+first place.
 
 The universal core:
 
@@ -294,7 +324,7 @@ place instead of appending a second copy.
 ## Background
 
 Projipsa's memory layer follows the LLM-wiki pattern — an agent incrementally
-maintaining a synthesized Markdown wiki over immutable sources, so understanding
+maintaining a synthesized Markdown wiki over retained evidence, so understanding
 compounds instead of being rediscovered per query. See
 [Karpathy's llm-wiki sketch](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
 and [LangChain's write-up of wiki memory](https://www.langchain.com/blog/wiki-memory).
