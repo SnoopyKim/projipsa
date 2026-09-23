@@ -9,7 +9,15 @@ then follow links to deeper pages.
 - [Current state](wiki/project/current-state.md)
 - [Open questions](wiki/questions/open-questions.md)
 
+## Research
+
+- [September 2026 project memory references](wiki/areas/project-memory-references.md)
+- [Project knowledge graphs and explanation views](wiki/areas/project-knowledge-views.md)
+
 ## Decisions
+
+- [Evidence-aware project context](wiki/decisions/2026-09-23-evidence-aware-context.md)
+- [Project memory focus](wiki/decisions/2026-09-23-project-memory-focus.md)
 
 - [Explicit memory compaction](wiki/decisions/2026-08-17-explicit-memory-compaction.md)
 - [Rules must earn their place](wiki/decisions/2026-08-13-rules-must-earn-their-place.md)
@@ -21,9 +29,11 @@ then follow links to deeper pages.
 
 ## History And Sources
 
-- [Current project log](logs/2026-08.md)
+- [Current project log](logs/2026-09.md)
+- [August 2026 project log](logs/2026-08.md)
 - [July 2026 project log](logs/2026-07.md)
 
-This project's evidence already lives at stable paths: merged pull requests,
-commits, CI runs, and files under `plugins/`. Maintained pages cite those
-directly, so there is no preserved-source tree yet.
+Evidence lives at stable paths: merged pull requests, commits, CI runs, files
+under `plugins/`, and the dated API snapshot under `research/`. Maintained
+pages cite those directly. External source code is linked at pinned commits
+rather than copied into memory.

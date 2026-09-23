@@ -6,16 +6,28 @@ Use Query to answer a project question without changing files.
 
 1. Read the memory index.
 2. Read `wiki/project/current-state.md`.
-3. Open only directly relevant maintained pages.
+3. Find directly relevant decisions, constraints, prior failures, and open
+   questions using the index, links, and project vocabulary. Search titles or
+   short excerpts first; open full pages when relevant. Broaden a thin search
+   before concluding that knowledge is missing.
 4. Follow linked decisions, questions, assumptions, risks, areas, procedures,
    external dependencies, deliveries, or milestones when relevant.
 5. Open raw sources only when a claim needs verification or provenance.
-6. Check whether current state contradicts older logs or sources.
+6. Check whether current state contradicts older logs or sources. Verify
+   volatile implementation, installation, deployment, or external claims
+   against their live source when the task depends on them. State the observed
+   date or revision when it changes the claim's meaning.
 7. Answer with confirmed facts first, followed by assumptions, stale risks,
    disputed claims, and open questions.
 
 Do not treat a log as current truth when a maintained page or newer decision
 supersedes it.
+
+For a task briefing or changed-source impact, use the read-only helper in
+[context and evidence](context-and-evidence.md). Follow its excerpts to the
+original pages; surface review candidates, supersession, and unchecked external
+evidence in the answer. Use its Mermaid view when the user needs a relationship
+diagram. Query does not write or refresh evidence checkpoints.
 
 ## Ingest
 
@@ -32,7 +44,10 @@ conversation output, external article, source document, or field observation.
      memory.
 2. Preserve retained evidence as closely as practical. Add provenance metadata
    only when it helps identify origin, date, or scope.
-3. Identify affected maintained pages.
+3. Identify affected maintained pages. Classify the new evidence as supporting,
+   extending, correcting, superseding, or conflicting with existing claims.
+   Reconcile the same claim in place; similarity alone does not establish that
+   two claims concern the same entity, decision, or conditions.
 4. Update existing pages or create focused new pages.
 5. Link new or changed claims to the source.
 6. Update the index only when navigation changed.
@@ -43,7 +58,7 @@ read large raw sources by default.
 
 ## Update after work
 
-Use Update after a work session, planning session, research pass, delivery,
+Use Update after a work session, planning session, research pass,
 meeting, review, or handoff.
 
 1. Establish what actually changed and what explicitly did not.
@@ -55,11 +70,13 @@ meeting, review, or handoff.
 5. Replace the affected parts of `wiki/project/current-state.md`, and move out
    what no longer steers the next session.
 6. Update only affected maintained pages.
-7. Add or supersede decision pages for meaningful choices.
+7. Add or supersede decision pages for meaningful choices. Preserve the reason,
+   alternatives, applicability, observed outcome, and a useful revisit condition
+   when available. Separate the original expectation from later evidence.
 8. Update assumptions, risks, mitigations, and open questions.
 9. Record validation evidence and residual gaps.
-10. Update an active delivery page when the work belongs to an authorized
-    delegated engagement.
+10. Update a relevant milestone or existing task record when work must resume
+    in another session. Link decisions and evidence rather than copying them.
 11. Append a compact factual entry to the chronology log.
 
 Example:
@@ -73,8 +90,22 @@ Example:
 ```
 
 Do not turn an unverified implementation claim into confirmed current state.
-Do not copy a complete Delivery Contract into current state; link its delivery
-page and summarize only the project-level consequence.
+An observed correction or a failed approach may change future work even when
+no implementation changed. Record the conditions and evidence in the relevant
+decision, area, or procedure. Repetition alone does not confirm a claim, and
+one successful use does not establish a universal rule. Flag unresolved
+contradictions; do not silently select the newest statement as true.
+
+If established project instructions authorize routine memory maintenance,
+perform this update as part of finishing the work. If no durable understanding
+changed, avoid a redundant page edit or log entry. Do not introduce a background
+capture service or expand into other projects as part of Update.
+
+When evidence was reviewed, finish affected pages and chronology before saving
+their scoped [evidence checkpoints](context-and-evidence.md#evidence-checkpoints).
+Do not clear candidates for pages that were merely retrieved. Connect purpose,
+workflow, constraints, rejected alternatives, and observed outcomes where this
+helps the next worker understand the project; preserve unknowns explicitly.
 
 ### Keep current state current
 
@@ -92,7 +123,7 @@ the line. When the answer is nothing, move it and leave at most a link:
 | Item | Destination |
 |---|---|
 | finished work | the chronology entry that already records it |
-| a closed engagement | its `wiki/deliveries/` page |
+| resumable work or a completed handoff | its existing task artifact or milestone |
 | the reasoning behind a choice | a decision page |
 | a checkpoint worth reconstructing | a milestone page |
 | a standing fact that no longer steers work | an area page for its workstream, or the overview when it is project-wide |
@@ -121,7 +152,7 @@ project assigns one owner to a shared manifest, schema, or lockfile.
 | Page | Owner |
 |---|---|
 | `index.md`, `wiki/project/current-state.md`, `wiki/questions/open-questions.md` | the integrating branch, updated once after merge |
-| `wiki/deliveries/<slug>.md` | the one branch executing that engagement |
+| a task record or milestone | its assigned writer |
 | a decision, risk, assumption, or area page | the branch that created it, or the branch named as its owner before the split |
 | the chronology entry for a session | a log file that branch alone appends |
 
@@ -158,7 +189,7 @@ merged result; otherwise report Integrate as pending instead of running it.
 
 1. Read `wiki/project/current-state.md`, then every chronology entry dated
    after it.
-2. Read the delivery, decision, risk, and area pages those entries created or
+2. Read the milestone, decision, risk, and area pages those entries created or
    changed. They are merged and already correct; do not rewrite them.
 3. Decide what is true of the merged result. A claim that held on one branch
    may not survive beside another branch's work, and that contradiction is the
@@ -208,8 +239,10 @@ Check:
 - duplicate claims likely to drift;
 - raw sources edited instead of appended;
 - optional page families without a real project need;
-- active delivery pages whose contract, state, evidence, or next action has
-  drifted from the work they describe;
+- resumable task records whose state, evidence, or next action has drifted;
+- changed or retracted evidence whose dependent claims still appear current;
+- a date or `confirmed` label being used as a substitute for checking a
+  volatile claim; age alone does not make a durable decision false;
 - a missing, duplicated, or stale `projipsa:memory-pointer` block in the root
   instruction files, including a root `CLAUDE.md` that never points at the
   memory root;
@@ -261,6 +294,7 @@ Create or update a milestone page containing:
 - open questions and important decisions;
 - the exact next useful action.
 
-For delegated work, link the relevant delivery page and record its outer state
-and contract version. Link the milestone from the index when it should remain
-discoverable and append the chronology log.
+Link an existing task artifact when it already holds resumable state. Link the
+milestone from the index when it should remain discoverable and append the
+project's chronology. Preserve existing delivery records without introducing
+an execution lifecycle or inferring acceptance.

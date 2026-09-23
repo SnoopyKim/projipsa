@@ -44,7 +44,6 @@ SKILL_POLICY = {
     "projipsa": {"implicit": True},
     "projipsa-init": {"implicit": False},
     "compact": {"implicit": False},
-    "outsource": {"implicit": True},
 }
 EXPECTED_SKILLS = set(SKILL_POLICY)
 CODEX_PLUGIN_NAMESPACE = "projipsa"
@@ -123,37 +122,6 @@ SKILL_GUARDRAILS = {
         ),
         "compaction cannot decide for the Maker": (
             "does not create or approve project decisions",
-        ),
-    },
-    "outsource": {
-        "automatic loading only qualifies": (
-            "qualification is read-only",
-        ),
-        "automatic loading is not delegation": (
-            "automatic loading is not delegation or consent",
-        ),
-        "Maker opts in before the engagement starts": (
-            "opt in before starting a deep interview",
-        ),
-        "ordinary work routes out": (
-            "ordinary workflow",
-            "leave outsource",
-        ),
-        "verification uses the final user or QA path": (
-            "read the verification reference",
-            "service user",
-            "qa reviewer",
-            "real user or data path",
-            "implementer's helpers",
-        ),
-        "partial evidence cannot become a broad pass": (
-            "proxy",
-            "not_run",
-            "early exit",
-        ),
-        "Maker acceptance cannot rewrite verification": (
-            "maker acceptance",
-            "technical verdict",
         ),
     },
 }
@@ -517,46 +485,21 @@ def validate_templates(errors: list[str]) -> None:
                 "memory validator rejects that page on sight"
             )
 
-    delivery_template = TEMPLATE_ROOT / "delivery.md"
-    if delivery_template.is_file():
-        delivery_text = delivery_template.read_text(encoding="utf-8")
-        for marker in (
-            "status: draft",
-            "confidence: assumed",
-            "Contract status: draft",
-            "Execution status: incomplete | complete",
-            "Verification status: not_run | partial | passed | failed | blocked",
-            "Confirmed by: pending",
-            "## Verification Results",
-            "Plan status: planned | pending_decision | not_applicable",
-            "Evidence level: direct | proxy | reported | not_run",
-            "Technical verdict: passed | partial | failed | blocked | not_applicable",
-        ):
-            if marker not in delivery_text:
-                errors.append(f"delivery template must preserve {marker!r}")
-
 
 def validate_resources(errors: list[str]) -> None:
     required_files = (
         RESOURCE_SKILL_ROOT / "projipsa" / "references" / "memory-contract.md",
-        RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates" / "delivery.md",
         RESOURCE_SKILL_ROOT / "projipsa" / "assets" / "templates" / "root-pointer.md",
         RESOURCE_SKILL_ROOT / "projipsa" / "scripts" / "validate_memory.py",
+        RESOURCE_SKILL_ROOT / "projipsa" / "scripts" / "memory_context.py",
+        RESOURCE_SKILL_ROOT / "projipsa" / "references" / "context-and-evidence.md",
         RESOURCE_SKILL_ROOT / "projipsa-init" / "references" / "initialization.md",
         RESOURCE_SKILL_ROOT / "compact" / "references" / "compaction.md",
         RESOURCE_SKILL_ROOT / "compact" / "scripts" / "audit_compaction.py",
-        RESOURCE_SKILL_ROOT / "outsource" / "references" / "delivery-contract.md",
-        RESOURCE_SKILL_ROOT / "outsource" / "references" / "projipsa-integration.md",
-        RESOURCE_SKILL_ROOT / "outsource" / "references" / "verification.md",
     )
     for path in required_files:
         if not path.is_file():
             errors.append(f"missing Skill resource: {relative(path)}")
-
-    if (
-        RESOURCE_SKILL_ROOT / "outsource" / "references" / "learning-protocol.md"
-    ).exists():
-        errors.append("Outsource must not create an automatic learning-state protocol")
 
 
 def scanned_files() -> list[Path]:

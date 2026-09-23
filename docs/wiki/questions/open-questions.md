@@ -3,10 +3,11 @@ id: question.open-questions
 type: question
 status: active
 confidence: assumed
-updated: 2026-08-17
+updated: 2026-09-23
 sources:
   - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
-  - plugins/projipsa/codex-skills/outsource/references/verification.md
+  - wiki/decisions/2026-09-23-project-memory-focus.md
+  - wiki/areas/project-memory-references.md
   - plugins/projipsa/.codex-plugin/plugin.json
   - tests/test_package_contract.py
 related:
@@ -66,25 +67,25 @@ Resolution: re-run the authoritative Codex plugin validator against
 `plugins/projipsa/` before a first marketplace listing, and record whether
 runtime acceptance and publish-time acceptance agree.
 
-## Is the narrowed `outsource` trigger correct?
+## Do memory workflows improve work across sessions?
 
-The trigger was narrowed to work that spans milestones or sessions, needs a
-durable contract, or is hard to reverse. `outsource` is not in daily use, so
-there is no evidence either way.
+Outsource triggering is no longer an active question after the 2026-09-23
+memory-focus decision. Its earlier uncertainty remains in Git history.
 
-Resolution: use it, and record cases where it should have fired and did not.
+No validator checks whether relevant memory is retrieved, a stale fact is
+rechecked, a new finding is preserved, or a later task benefits. Package and
+memory tests establish structure and compatibility only.
 
-## Should Skill triggering and workflow behavior be tested automatically?
+Resolution: run the multi-session scenarios in the September source review,
+comparing a baseline agent, the earlier Projipsa, and the revised memory-only
+workflow with the same model, tools, and comparable budgets. Record recall
+failures and update omissions before choosing hooks, a derived search index,
+or automated dependency invalidation.
 
-No validator checks whether a Skill fires at the right moment or whether a
-model follows its semantic workflow. The package tests preserve the 0.3.2
-verification reference and delivery-state surface, but they cannot determine
-whether a verifier rejects helper-only or early-exit evidence for a broader
-claim. Triggering evidence remains a manual skill listing under
-`claude --plugin-dir`. Official guidance recommends evaluation scenarios but
-provides no runner.
+## Why did the active task expose an older installed Skill surface?
 
-Resolution: decide whether an evaluation harness belongs in this repository,
-and whether it can run in CI given that it requires model calls. Include both
-triggering cases and verification-behavior regressions covering actual paths,
-preservation invariants, proxy evidence, and Maker-versus-technical verdicts.
+The August record reports a 0.5.0 install, while this 2026-09-23 task was given
+cached Skills under 0.3.0. These are different observations, not proof of the
+cause. Check current host discovery and task/session refresh behavior during a
+separately authorized install/release task; do not infer the active Skill
+version from repository manifests.

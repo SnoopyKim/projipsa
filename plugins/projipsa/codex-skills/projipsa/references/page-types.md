@@ -52,9 +52,9 @@ Stated when it departs from the default, and checked whenever present:
   list says nothing and is better left out.
 
 Most templates ship `confidence: inferred` because a template cannot know the
-project's evidence. Templates for assumptions, questions, risks, and deliveries
+project's evidence. Templates for assumptions, questions, and risks
 ship `confidence: assumed`, because those page types usually track planning
-claims, unresolved unknowns, threats, or delegated state before they are
+claims, unresolved unknowns, or threats before they are
 confirmed. Raise a page to `confirmed` only in the same edit that lists its
 primary evidence in `sources`. A `confirmed` page with an empty `sources` list
 is a validation error, not an acceptable interim state.
@@ -135,10 +135,10 @@ deeper.
 - **Procedure**: repeatable operating steps with validation and recovery.
 - **External**: a party, tool, contract, service, source, API, or dependency.
 - **Milestone**: a launch, event, checkpoint, handoff, pause, or snapshot.
-- **Delivery**: the current contract and resumable state for one substantial
-  explicitly delegated engagement. Keep history in its change log and project
-  chronology; keep draft or changed contracts distinct from confirmed ones;
-  archive or supersede the page when the engagement closes.
+
+Existing optional families, including `wiki/deliveries/` adopted before 0.6.0,
+remain valid. Preserve useful records and stable IDs; new resumable context can
+use a milestone or link an existing task artifact without a delivery protocol.
 
 ## Page ID conventions
 
@@ -153,6 +153,5 @@ deeper.
 - External dependency: `external.<slug>`
 - Question: `question.<slug>`
 - Milestone: `milestone.<slug>`
-- Delivery: `delivery.<slug>`
 
 Prefer stable IDs over path-derived IDs when pages may move.

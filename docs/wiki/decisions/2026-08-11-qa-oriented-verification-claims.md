@@ -1,25 +1,32 @@
 ---
 id: decision.qa-oriented-verification-claims.2026-08-11
 type: decision
-status: active
+status: superseded
 confidence: confirmed
-updated: 2026-08-11
+updated: 2026-09-23
 sources:
-  - plugins/projipsa/shared/outsource.md
-  - plugins/projipsa/codex-skills/outsource/references/verification.md
-  - plugins/projipsa/codex-skills/outsource/references/delivery-contract.md
-  - plugins/projipsa/codex-skills/outsource/references/delivery-protocol.md
-  - plugins/projipsa/codex-skills/projipsa/assets/templates/delivery.md
-  - scripts/validate_package.py
-  - tests/test_package_contract.py
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/plugins/projipsa/shared/outsource.md
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/plugins/projipsa/codex-skills/outsource/references/verification.md
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/plugins/projipsa/codex-skills/outsource/references/delivery-contract.md
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/plugins/projipsa/codex-skills/outsource/references/delivery-protocol.md
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/plugins/projipsa/codex-skills/projipsa/assets/templates/delivery.md
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/scripts/validate_package.py
+  - https://github.com/SnoopyKim/projipsa/blob/v0.5.0/tests/test_package_contract.py
 related:
   - project.current-state
   - project.overview
 supersedes: []
 superseded_by: []
+superseded_by:
+  - decision.project-memory-focus.2026-09-23
 ---
 
 # Verify claims from the user or QA perspective
+
+Historical Outsource policy through 0.5.0. The
+[2026-09-23 scope decision](2026-09-23-project-memory-focus.md) removes that
+workflow; evidence quality remains relevant to memory, without its lifecycle.
+
 
 ## Decision
 

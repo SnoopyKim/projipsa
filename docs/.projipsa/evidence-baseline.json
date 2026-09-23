@@ -1,0 +1,31 @@
+{
+  "pages": {
+    "decision.evidence-aware-context.2026-09-23": {
+      "checked_at": "2026-09-23T09:00:30.638613+00:00",
+      "page_sha256": "013a9b0edb4ce901e590239c8f06d873f64b0972a62ed42ee57e1cf404d02490",
+      "sources": {
+        "file:plugins/projipsa/codex-skills/projipsa/references/context-and-evidence.md": {
+          "availability": "present",
+          "path": "plugins/projipsa/codex-skills/projipsa/references/context-and-evidence.md",
+          "sha256": "1a8c04ac727b4e0d5ff166d213f5c6dbb3379d958c180c277d9451fdfa6f072b"
+        },
+        "file:plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py": {
+          "availability": "present",
+          "path": "plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py",
+          "sha256": "a6afdaefadfd536b0e81c4e5bc335afbd1def904638e8c89904361aea0cd6d0f"
+        },
+        "file:plugins/projipsa/shared/projipsa.md": {
+          "availability": "present",
+          "path": "plugins/projipsa/shared/projipsa.md",
+          "sha256": "d7a77b293fde3b2d883fec4182843d8b019a17a751115e1d124116b8ff67f9b7"
+        },
+        "file:tests/test_memory_context.py": {
+          "availability": "present",
+          "path": "tests/test_memory_context.py",
+          "sha256": "5272e9cf496b5476beb5ecc7e760ea8a9031ffc6965280066f868e6511b6a17d"
+        }
+      }
+    }
+  },
+  "schema_version": 1
+}

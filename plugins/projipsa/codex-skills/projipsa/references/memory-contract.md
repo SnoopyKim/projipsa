@@ -38,6 +38,12 @@ roles, but role is more important than folder name. Record project-specific
 mapping and visual-asset policy in `<memory-root>/AGENTS.md`. Do not make a View
 the only place where a project fact or decision exists.
 
+Optional `.projipsa/evidence-baseline.json` holds operational review state:
+the local hashes last checkpointed for specific pages. It is not a rebuildable
+View or primary factual evidence. Preserve it when freshness comparisons must
+continue; loss means unknown freshness, never an implicit pass. See
+[context and evidence](context-and-evidence.md).
+
 Normal Ingest, Update, and Repair never overwrite or delete retained raw
 evidence. The explicit Compact workflow may remove a whole artifact only after
 an active-evidence check, an exact path plan, recoverability review, and user
@@ -102,10 +108,11 @@ Projipsa may not:
 
 Other agents, plugins, and Projipsa capabilities may consume project memory,
 but the maintained wiki remains the project-level source of current truth.
-Project-mode delegated work may keep its current Delivery Contract and outer
-state in one maintained `wiki/deliveries/` page. It must still link durable
-decisions, risks, questions, milestones, and evidence rather than silently
-duplicating them.
+A handoff links the existing task artifact or a milestone snapshot, along
+with durable decisions, questions, evidence, and the next action. Projipsa
+records this state without managing execution, contracts, or acceptance.
+Existing adopter `wiki/deliveries/` pages remain valid historical or active
+project records; preserve their IDs, evidence, and links during upgrades.
 
 Avoid hard runtime dependencies at first. If Projipsa is unavailable, another
 agent may preserve a compact handoff, but it should not create a second

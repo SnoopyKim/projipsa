@@ -73,46 +73,6 @@ class PackageContractTests(unittest.TestCase):
             )
         )
 
-    def test_delivery_template_keeps_verification_status_independent(self) -> None:
-        template = (
-            validate_package.TEMPLATE_ROOT / "delivery.md"
-        ).read_text(encoding="utf-8")
-        self.assertIn("Execution status: incomplete | complete", template)
-        self.assertIn(
-            "Verification status: not_run | partial | passed | failed | blocked",
-            template,
-        )
-        self.assertIn("Maker decision: pending", template)
-        self.assertIn("## Verification Results", template)
-        self.assertIn(
-            "Plan status: planned | pending_decision | not_applicable",
-            template,
-        )
-        self.assertIn(
-            "Evidence level: direct | proxy | reported | not_run",
-            template,
-        )
-        self.assertIn(
-            "Technical verdict: passed | partial | failed | blocked | not_applicable",
-            template,
-        )
-
-    def test_outsource_ships_qa_oriented_verification_reference(self) -> None:
-        reference = (
-            validate_package.RESOURCE_SKILL_ROOT
-            / "outsource"
-            / "references"
-            / "verification.md"
-        )
-        self.assertTrue(reference.is_file())
-        text = " ".join(reference.read_text(encoding="utf-8").lower().split())
-        self.assertIn("service user", text)
-        self.assertIn("qa reviewer", text)
-        self.assertIn("actual user or data path", text)
-        self.assertIn("proxy", text)
-        self.assertIn("not_run", text)
-        self.assertIn("maker acceptance does not change", text)
-
 
 if __name__ == "__main__":
     unittest.main()

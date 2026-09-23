@@ -3,45 +3,30 @@ id: project.current-state
 type: project
 status: active
 confidence: confirmed
-updated: 2026-08-19
+updated: 2026-09-23
 sources:
-  - AGENTS.md
-  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.4.0
-  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.5.0
-  - https://github.com/SnoopyKim/projipsa/pull/14
-  - https://docs.x.ai/build/features/skills-plugins-marketplaces
   - README.md
   - CONTRIBUTING.md
   - plugins/projipsa/.claude-plugin/plugin.json
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/shared/projipsa.md
-  - plugins/projipsa/shared/projipsa-init.md
-  - plugins/projipsa/shared/compact.md
-  - plugins/projipsa/shared/outsource.md
-  - plugins/projipsa/codex-skills/projipsa/references/memory-contract.md
   - plugins/projipsa/codex-skills/projipsa/references/operations.md
   - plugins/projipsa/codex-skills/projipsa/references/repair-and-upgrade.md
-  - plugins/projipsa/codex-skills/projipsa-init/references/initialization.md
-  - plugins/projipsa/codex-skills/compact/scripts/audit_compaction.py
-  - plugins/projipsa/codex-skills/outsource/references/verification.md
-  - plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
+  - plugins/projipsa/codex-skills/projipsa/assets/templates/decision.md
+  - plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py
+  - plugins/projipsa/codex-skills/projipsa/references/context-and-evidence.md
+  - tests/test_memory_context.py
   - scripts/validate_package.py
-  - tests/test_compact_audit.py
-  - tests/test_package_contract.py
   - tests/test_validate_memory.py
-  - wiki/decisions/2026-08-17-explicit-memory-compaction.md
-  - wiki/decisions/2026-08-13-rules-must-earn-their-place.md
-  - wiki/decisions/2026-08-12-parallel-safe-memory-tree.md
-  - wiki/decisions/2026-08-11-qa-oriented-verification-claims.md
-  - wiki/decisions/2026-08-02-host-adapter-separation.md
+  - research/2026-09-23-github-memory-snapshot.json
+  - logs/2026-08.md
+  - logs/2026-09.md
 related:
   - project.overview
-  - decision.projipsa-adoption.2026-07-31
-  - decision.host-adapter-separation.2026-08-02
-  - decision.qa-oriented-verification-claims.2026-08-11
-  - decision.parallel-safe-memory-tree.2026-08-12
-  - decision.rules-must-earn-their-place.2026-08-13
-  - decision.explicit-memory-compaction.2026-08-17
+  - decision.project-memory-focus.2026-09-23
+  - decision.evidence-aware-context.2026-09-23
+  - area.project-memory-references
+  - area.project-knowledge-views
   - question.open-questions
 ---
 
@@ -49,141 +34,71 @@ related:
 
 ## Summary
 
-0.5.0 is the latest published release. PR #14 merged as `c8cfb53`; annotated
-tag `v0.5.0` and the matching GitHub Release are public. Claude Code and Codex
-report 0.5.0 with four Skills, and Grok Build discovers the same four-Skill
-surface through its official Claude Code compatibility layer.
+The working tree prepares **0.6.0, unreleased**, with a project-memory-only
+scope. It removes Outsource and keeps `projipsa`, `projipsa-init`, and `compact`.
+The latest recorded published release is 0.5.0. No new release or installed-host
+refresh has been performed yet. The Maker has authorized including the new
+context/evidence helper and publishing 0.6.0 in this task.
 
-The release separates first adoption, routine repair, and explicit compaction;
-adds a fourth `compact` Skill whose default is read-only Audit; changes future
-ingestion so temporary or reproducible captures do not automatically
-accumulate under `raw/`; and supports three hosts through two adapter dialects.
-See [the compaction
-decision](../decisions/2026-08-17-explicit-memory-compaction.md).
+The purpose is to carry project understanding across sessions: current facts,
+decision rationale, evidence, corrections, and next work. See the
+[memory-focus decision](../decisions/2026-09-23-project-memory-focus.md).
 
-Projipsa exists so project understanding survives session boundaries and
-substantial work can be delegated against that durable state. Cross-host
-support is a distribution constraint, not the purpose. See [the
-overview](overview.md).
+## Confirmed current
 
-## Confirmed Current
+- Both host adapter trees and package metadata expose three Skills; Grok uses
+  the Claude-compatible adapter. Only `plugins/projipsa/` ships.
+- The memory workflow now emphasizes relevant decisions and prior failures,
+  selective reading, reconciliation of new evidence, current verification of
+  volatile facts, and observed outcomes with revisit conditions.
+- The bundled `memory_context.py` provides explicit relations and reverse
+  dependencies, bounded task briefings, evidence-change candidates, and Mermaid
+  views. Only scoped `checkpoint --page` writes optional review state. See the
+  [implementation decision](../decisions/2026-09-23-evidence-aware-context.md).
+- Existing authorized project-memory scope can cover routine post-work updates.
+  Implicit lookup stays read-only; installation grants no new write scope.
+- Existing adopter delivery pages remain valid records. The plugin no longer
+  ships a delivery template or manages an execution/acceptance lifecycle.
+- Evidence, append-only Events, maintained Synthesis, and rebuildable Views
+  remain the memory roles. Keep shared synthesis to one writer and integrate
+  from merged work.
+- [September research](../areas/project-memory-references.md) records ten
+  candidates, nine focused implementation reviews, and 21 pinned core source
+  references. GitHub totals and dated attention signals are separate; exact
+  September star-growth totals were unavailable.
+  [The knowledge-view addendum](../areas/project-knowledge-views.md) covers the
+  two user-supplied repositories and a Wiki-format compatibility probe.
 
-- The 0.5.0 source package exposes four public Skills: `projipsa`,
-  `projipsa-init`, `compact`, and `outsource`.
-- `projipsa` may load implicitly for read-only context work and owns ongoing
-  Query, Ingest, Update, Integrate, Lint, Repair, and Snapshot. Writes still
-  require authorized project-memory scope.
-- `projipsa-init` is explicit-only and first-adoption-only. It creates a memory
-  root, adopts existing general documentation, or resumes an interrupted first
-  adoption. An existing `projipsa_adoption: true` marker routes Repair and
-  Upgrade back to `projipsa`.
-- `compact` is explicit-only. Its default Audit reports size, exact image
-  duplicate groups, local references, Git baseline and tracking, and
-  conservative semantic-review groups without modifying files. Apply requires
-  an exact path plan and separate explicit approval; a modified tracked or
-  untracked artifact also needs a recovery path or acknowledged unrecoverable
-  approval.
-- Compact never treats age, size, filename, missing references, or hash equality
-  as sufficient deletion authority. It protects the only evidence for an
-  active claim and reports working-tree savings separately from Git history.
-- Memory is modeled by Evidence, Events, Synthesis, and rebuildable Views.
-  These are roles rather than mandatory folders; each project's
-  `docs/AGENTS.md` or equivalent is the initial project profile.
-- Future Ingest links stable project or external artifacts, retains durable
-  unique evidence, follows project policy for replaceable current visuals, and
-  omits temporary or reproducible captures. Normal maintenance never
-  overwrites or deletes retained raw evidence.
-- Existing 0.3.x and 0.4.x adopters upgrade only through authorized Repair.
-  Stable IDs, useful optional pages, customized rules, and chronology remain;
-  plugin installation alone never rewrites adopter memory.
-- Parallel work gives shared synthesis pages one writer, lets each writer own
-  its own chronology, and runs Integrate only on the branch that contains the
-  merged result. Current state is replaced rather than appended, using whether
-  a line changes the next session as its eviction test. See [the parallel-safe
-  decision](../decisions/2026-08-12-parallel-safe-memory-tree.md).
-- The minimum memory contract requires `AGENTS.md`, `index.md`,
-  `wiki/project/current-state.md`, an adoption decision, chronology, and the
-  `id`, `updated`, and `sources` frontmatter keys. Optional pages and fields
-  stay valid when present. Rules are retained only when breaking them would
-  mislead or materially slow a future reader. See [the rule
-  criterion](../decisions/2026-08-13-rules-must-earn-their-place.md).
-- Outsource verification starts from the service user, artifact consumer,
-  operator, or QA perspective and traces the actual user or data path. It keeps
-  execution, technical verification, and Maker acceptance independent. See
-  [the verification
-  decision](../decisions/2026-08-11-qa-oriented-verification-claims.md).
-- Only `plugins/projipsa/` ships. Codex uses its isolated thin adapter; Claude
-  Code and Grok Build use the Claude-compatible adapter over the same shared
-  workflow per Skill. The package contains no default `skills/` directory. See
-  [the host adapter
-  decision](../decisions/2026-08-02-host-adapter-separation.md).
-- `scripts/validate_package.py` checks the shipped package, README, and the two
-  development marketplace manifests. `validate_memory.py` separately owns an
-  adopter's memory root. The Compact analyzer is inventory-only and does not
-  implement deletion.
+## In progress
 
-## In Progress
+- This is a local source change, not a published or installed release.
+- Model-backed evaluation of recall, freshness, and post-work updates remains
+  unperformed. Structural checks do not establish improved agent behavior.
 
-- No 0.5.0 release or installed-host refresh step remains in progress.
+## Active defaults
 
-## Explicitly Not Current
-
-- No adopter memory has been migrated, repaired, or compacted by this
-  implementation.
-- No public marketplace listing exists. Development installs still use this
-  source checkout.
-- This repository has no `raw/` or replaceable visual asset tree because its
-  evidence already has stable versioned paths.
-- No `wiki/deliveries/` tree exists because no delegated engagement is active.
-
-## Active Defaults
-
-- `docs/` is this public repository's memory root. Prefer a pull request,
-  commit, CI run, or repository path over copying an artifact into memory.
-- Read current state before chronology. Open retained evidence only when a
-  claim needs verification or provenance.
-- A docs-only task does not change implementation. Automatic Skill loading is
-  neither write authority, delegation, acceptance, nor deletion approval.
-- Pages created from a template start below `confirmed`. Raise one to
-  `confirmed` only in the edit that lists its primary evidence.
-- Installed copies are version-pinned. Working-tree changes reach a host only
-  after a version bump and a separately authorized install refresh. An
-  already-running Claude Code, Codex, or Grok session still needs a restart or
-  new task to apply the refreshed Skill surface.
+- `docs/` is this public repository's memory root. Read current state before
+  chronology; follow evidence when needed.
+- Link stable artifacts. The research API snapshot is retained evidence under
+  `docs/research/`; external code is referenced at immutable commits.
+- Keep current state concise and move historical detail to the existing log,
+  decision, milestone, or area page.
+- No background capture service, vector index, graph database, automated
+  reflection, or runtime enforcement has been introduced.
+- The current Codex CLI reports `projipsa@personal` 0.3.0 from a separate local
+  plugin source, not this checkout. Publishing this repository will not update
+  that installation. Keep source publication separate from changing its source.
 
 ## Validation
 
-Latest release and installed-host evidence; earlier release evidence stays in
-[the chronology](../../logs/2026-08.md).
+Validation for this change is recorded in [September chronology](../../logs/2026-09.md).
+The August release and installation evidence remains in
+[August chronology](../../logs/2026-08.md).
 
-- `python3 scripts/validate_package.py` passes.
-- `python3 -m unittest discover -s tests` passes: 58 tests on the local Python
-  3.12 runtime, including six Compact analyzer tests and the Grok adapter-root
-  contract test.
-- `python3 plugins/projipsa/codex-skills/projipsa/scripts/validate_memory.py
-  docs` passes after current-state restructuring.
-- `claude plugin validate ./plugins/projipsa --strict` passes.
-- `grok plugin validate ./plugins/projipsa` passes, and filtered runtime
-  inspection exposes all four Skills from the Claude-compatible adapter.
-- `git diff --check` passes.
-- PR #14's push and pull-request workflows pass on Python 3.9 and 3.13. The PR
-  had no review comments, remained mergeable at head `0ef0d1c`, and merged to
-  main as `c8cfb53`.
-- Annotated tag `v0.5.0` resolves to `c8cfb53`, and its GitHub Release is
-  published.
-- `claude plugin details projipsa@projipsa` reports 0.5.0 and four Skills after
-  a user-scope update from 0.4.0. `codex plugin list` reports 0.5.0 installed
-  and enabled. Filtered `grok inspect --json` output reports the enabled plugin
-  and four Skills from `claude-skills/`.
-- The skill-creator quick validator was attempted but could not run because its
-  separate runtime dependency `PyYAML` is absent. The repository package
-  validator independently checks both Compact adapters, loading policies,
-  metadata, links, resources, and contract guardrails.
+## Next work
 
-## Next Work
-
-- Fix the three reproduced `validate_memory.py` gaps recorded in [open
-  questions](../questions/open-questions.md).
-- Decide whether the narrowed Outsource trigger fires appropriately and whether
-  Skill triggering and semantic workflow behavior need a model-backed
-  evaluation harness.
+- Run the multi-session scenarios in the research report before adding memory
+  infrastructure or claiming a behavioral improvement.
+- Fix the three previously reproduced memory-validator gaps in
+  [open questions](../questions/open-questions.md).
+- Finish the authorized 0.6.0 publication and record the actual release result.

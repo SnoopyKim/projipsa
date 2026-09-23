@@ -47,6 +47,15 @@ durable unique evidence retained, replaceable visuals managed by project
 policy, and temporary or reproducible captures kept out of memory. This policy
 changes future ingestion; it does not retroactively authorize deletion.
 
+## Upgrade to 0.6.0
+
+The plugin now provides memory management only. Outsource is no longer a
+public Skill. Preserve existing delivery pages, their stable IDs, source
+artifacts, and chronology. Remove obsolete invocation guidance from active
+project instructions only within authorized Repair; do not run old contracts
+or erase their records. For new handoffs, use a milestone or the project's
+existing task artifact.
+
 ## Validate
 
 Run the memory validator, inspect warnings, inspect the documentation diff, and

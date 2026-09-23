@@ -115,7 +115,7 @@ anything to put in it fills up with template text instead.
    Code discovers the imported or duplicated pointer in `CLAUDE.md`.
 
 Pages created from a template start below `confirmed` — `inferred` for most
-types, `assumed` for `assumption`, `question`, `risk`, and `delivery`. Raise a
+types, `assumed` for `assumption`, `question`, and `risk`. Raise a
 page to `confirmed` only in the same edit that lists its primary evidence in
 `sources`.
 

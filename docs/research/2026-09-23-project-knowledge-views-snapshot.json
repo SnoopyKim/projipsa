@@ -1,0 +1,203 @@
+{
+  "observed_at": "2026-09-23T07:58:43.171319+00:00",
+  "selection": "Two repositories supplied by the user; not a September growth ranking",
+  "method": "GitHub REST metadata and pinned source review; one direct read-only parse_wiki call. No installation, LLM analysis, browser rendering, or comparative benchmark.",
+  "repositories": [
+    {
+      "full_name": "Egonex-AI/Understand-Anything",
+      "html_url": "https://github.com/Egonex-AI/Understand-Anything",
+      "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+      "stargazers_count": 83791,
+      "forks_count": 7062,
+      "pushed_at": "2026-09-12T05:31:43Z",
+      "created_at": "2026-03-15T02:30:51Z",
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      },
+      "archived": false,
+      "observed_at": "2026-09-23T07:52:50.111062+00:00",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "commit_date": "2026-09-12T05:31:43Z",
+      "tree_truncated": false
+    },
+    {
+      "full_name": "tt-a1i/archify",
+      "html_url": "https://github.com/tt-a1i/archify",
+      "description": "Agent skill for beautiful, verifiable architecture, workflow, sequence, data-flow, and lifecycle diagrams—self-contained HTML with motion and crisp export.",
+      "stargazers_count": 70185,
+      "forks_count": 4715,
+      "pushed_at": "2026-09-23T07:49:03Z",
+      "created_at": "2026-04-15T05:27:37Z",
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      },
+      "archived": false,
+      "observed_at": "2026-09-23T07:52:50.108953+00:00",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "commit_date": "2026-09-23T03:12:48Z",
+      "tree_truncated": false
+    }
+  ],
+  "referenced_sources": [
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/skills/understand-knowledge/SKILL.md",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "e2b225a82d0fc59a83b8391afe17d1ff7f84acb831d2cf716f0ab583ba09c010",
+      "bytes": 6191,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/skills/understand-knowledge/SKILL.md"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/skills/understand-knowledge/parse-knowledge-base.py",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "4eb78d9a8a628bb4547a0c88cb57c2b2a22ba595664736a579ad56d9e46d7249",
+      "bytes": 20916,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/skills/understand-knowledge/parse-knowledge-base.py"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/skills/understand-knowledge/merge-knowledge-graph.py",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "97e625234ce28bec7b1b02ec7191c70c6c75a54dda3579f7e94bc06ec10679f3",
+      "bytes": 17330,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/skills/understand-knowledge/merge-knowledge-graph.py"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/agents/article-analyzer.md",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "322609af02f9b2ab8dfd5e22d2062857c23006a31df9545b5fa5ac96b08de6ae",
+      "bytes": 4023,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/agents/article-analyzer.md"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/packages/core/src/types.ts",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "a179206e62d8e5856d3044049f2427bdb649effbbfe459b9b79c55dc1471e53e",
+      "bytes": 7290,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/packages/core/src/types.ts"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/skills/understand/finalize-incremental.mjs",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "07bb6f25b8ecd54db69d61a6d991390df92896aa94fdf55da33e874780824b32",
+      "bytes": 17437,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/skills/understand/finalize-incremental.mjs"
+    },
+    {
+      "repo": "Egonex-AI/Understand-Anything",
+      "path": "understand-anything-plugin/agents/domain-analyzer.md",
+      "commit": "6df3065f1d8ddc2ce3615314d1d493f36d6b1c80",
+      "sha256": "d9a7fa7b1fc2ec4ef410b4c592a34b54a5dc0fc46699b38b77e9179f4732feba",
+      "bytes": 5805,
+      "url": "https://github.com/Egonex-AI/Understand-Anything/blob/6df3065f1d8ddc2ce3615314d1d493f36d6b1c80/understand-anything-plugin/agents/domain-analyzer.md"
+    },
+    {
+      "repo": "tt-a1i/archify",
+      "path": "archify/SKILL.md",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "sha256": "10094272d6d1b4ad0f2c2e0880cb646fe4991454a2dc3d854aecb27e7407ee1f",
+      "bytes": 16396,
+      "url": "https://github.com/tt-a1i/archify/blob/8809b273c278a813a47fa37698864779c0d4cf08/archify/SKILL.md"
+    },
+    {
+      "repo": "tt-a1i/archify",
+      "path": "archify/references/delivery-contract.md",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "sha256": "1b8bc39b364f19d480260f7a0bf69d3b9a8d7591d69178ad17ff276889d9506b",
+      "bytes": 9607,
+      "url": "https://github.com/tt-a1i/archify/blob/8809b273c278a813a47fa37698864779c0d4cf08/archify/references/delivery-contract.md"
+    },
+    {
+      "repo": "tt-a1i/archify",
+      "path": "archify/renderers/shared/repository-evidence.mjs",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "sha256": "e8676fb59df158bdca00e76efdf897285f8d96d23b41a426c9bc575786f0932f",
+      "bytes": 12542,
+      "url": "https://github.com/tt-a1i/archify/blob/8809b273c278a813a47fa37698864779c0d4cf08/archify/renderers/shared/repository-evidence.mjs"
+    },
+    {
+      "repo": "tt-a1i/archify",
+      "path": "archify/bin/archify.mjs",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "sha256": "7236f5ad129cf095bf78e0e612c5f0b2fb99dcefdf6cb752f36a4ed7aa580833",
+      "bytes": 78627,
+      "url": "https://github.com/tt-a1i/archify/blob/8809b273c278a813a47fa37698864779c0d4cf08/archify/bin/archify.mjs"
+    },
+    {
+      "repo": "tt-a1i/archify",
+      "path": "archify/delta/architecture-delta.mjs",
+      "commit": "8809b273c278a813a47fa37698864779c0d4cf08",
+      "sha256": "b2bfd606bd606240d436718bd12dc96ccf4b0a0079fcc5a6a94fe6d2ba2349ef",
+      "bytes": 73530,
+      "url": "https://github.com/tt-a1i/archify/blob/8809b273c278a813a47fa37698864779c0d4cf08/archify/delta/architecture-delta.mjs"
+    }
+  ],
+  "compatibility_probe": {
+    "kind": "read-only parse_wiki call; no graph files written",
+    "stats": {
+      "articles": 12,
+      "sources": 0,
+      "topics": 4,
+      "wikilinks": 0,
+      "unresolved": 0
+    },
+    "edges": 0,
+    "categories": [
+      {
+        "name": "Start Here",
+        "count": 0
+      },
+      {
+        "name": "Research",
+        "count": 0
+      },
+      {
+        "name": "Decisions",
+        "count": 0
+      },
+      {
+        "name": "History And Sources",
+        "count": 0
+      }
+    ],
+    "logEntries": 0,
+    "article_sample": [
+      "article:areas/project-memory-references",
+      "article:decisions/2026-07-30-plugin-ship-boundary",
+      "article:decisions/2026-07-31-projipsa-adoption",
+      "article:decisions/2026-08-02-host-adapter-separation"
+    ],
+    "input_root": "docs",
+    "input_state": "Uncommitted 0.6.0 memory-focus working tree, before adding this research addendum",
+    "project_head": "beed96fb1d687b082cb774e79bb98755590d0aac",
+    "input_sha256": {
+      "docs/index.md": "76fa52743c08fa6cae7a0a6feaf4cbeb7fd78d6d7c8c6b14fe5d61104ee8bab8",
+      "docs/wiki/areas/project-memory-references.md": "9c28c350c61f9a543e50c6a6632764919d6dc3a6ce109ebf4469b07dc0c39898",
+      "docs/wiki/decisions/2026-07-30-plugin-ship-boundary.md": "7aa2a293554a836a9945210466d3f3ace556788b184ba41e6be895a59a2d582b",
+      "docs/wiki/decisions/2026-07-31-projipsa-adoption.md": "cd1c1f2dfec505146a73bd57d100c2b0326303b1a6d20e7d02532f115e6257ca",
+      "docs/wiki/decisions/2026-08-02-host-adapter-separation.md": "2b05b3e1ba4aa26afd4efe2294d38ad328eb285d44271a78080ce2d48f28d911",
+      "docs/wiki/decisions/2026-08-11-qa-oriented-verification-claims.md": "39f7941da176534f2dfc977b1816bf214adcf86a3d4743499269fcb3ad1a2ce7",
+      "docs/wiki/decisions/2026-08-12-parallel-safe-memory-tree.md": "fcabc3a16e8ea895a10bc8c2d27278ca83f3150b82c64463b7f82ce1af3057c0",
+      "docs/wiki/decisions/2026-08-13-rules-must-earn-their-place.md": "2e9f99d854243168e5872368c3d198a4a283c6571fff863aaa5c54668ec9258e",
+      "docs/wiki/decisions/2026-08-17-explicit-memory-compaction.md": "1dfc75123e864cd4ce3f6a427a6a5a0b6f1f1edddc71278aa620641831ff3be0",
+      "docs/wiki/decisions/2026-09-23-project-memory-focus.md": "cc70268362cb31d4e433d5c5ad0eb7343f1547643b6ba2b87b3f4437967bd6fc",
+      "docs/wiki/project/current-state.md": "cf29fbea505ada4da32b2f824e24cd85717e154aef32f8f3d45cb9faaa17fe2a",
+      "docs/wiki/project/overview.md": "2f5c2492b048efa9599f19e7a4444107f1e0eefe3126b6781e10f3cf40bee5e9",
+      "docs/wiki/questions/open-questions.md": "377b8257ab17dc044f605068c13df41ec7255db5728ce25e9b1bbf90f30159c3"
+    }
+  }
+}

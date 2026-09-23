@@ -1,7 +1,7 @@
 {
   "name": "projipsa",
-  "version": "0.5.0",
-  "description": "A project butler with separate skills for project memory, onboarding, compaction, and substantial delivery in Codex, Claude Code, and Grok Build.",
+  "version": "0.6.0",
+  "description": "A project memory butler: source-backed understanding, decisions, history, and continuity across Codex, Claude Code, and Grok Build.",
   "author": {
     "name": "SnoopyDev",
     "url": "https://github.com/SnoopyKim"
@@ -10,18 +10,16 @@
   "license": "MIT",
   "keywords": [
     "project-memory",
-    "project-management",
     "documentation",
+    "knowledge-management",
     "handoff",
-    "butler",
-    "delegation",
-    "delivery"
+    "butler"
   ],
   "skills": "./codex-skills/",
   "interface": {
     "displayName": "Projipsa",
-    "shortDescription": "A project butler for memory and delivery.",
-    "longDescription": "Projipsa is a project butler for Codex, Claude Code, and Grok Build. Separate skills keep source-backed memory current, explicitly onboard existing projects, safely audit or compact accumulated artifacts, and qualify or manage substantial work from discovery through verified review and handoff.",
+    "shortDescription": "A project butler for durable project memory.",
+    "longDescription": "Projipsa keeps project understanding current and source-backed. Query and maintain memory, explicitly onboard existing projects, and audit or compact accumulated artifacts across Codex, Claude Code, and Grok Build.",
     "developerName": "SnoopyDev",
     "category": "Productivity",
     "capabilities": [
@@ -31,8 +29,7 @@
     "defaultPrompt": [
       "Use $projipsa:projipsa to brief me from this project's maintained memory.",
       "Use $projipsa:projipsa-init to onboard this existing project.",
-      "Use $projipsa:compact to audit this project's memory for safe compaction without deleting anything.",
-      "Use $projipsa:outsource to qualify this substantial project and manage it after I opt in."
+      "Use $projipsa:compact to audit this project's memory for safe compaction without deleting anything."
     ]
   }
 }

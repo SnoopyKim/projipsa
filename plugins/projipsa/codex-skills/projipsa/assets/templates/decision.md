@@ -32,3 +32,10 @@ Explain why this decision was needed.
 ## Consequences
 
 - State follow-up requirements, risks, or implementation implications.
+
+## Outcome And Revisit
+
+- When follow-up evidence exists, distinguish the expected result from the
+  observed outcome and link that evidence.
+- State the conditions under which this decision applies and what would
+  justify reconsidering it. Omit this section if it adds no useful information.
