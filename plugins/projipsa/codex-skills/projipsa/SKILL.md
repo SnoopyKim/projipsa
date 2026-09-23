@@ -1,6 +1,6 @@
 ---
 name: projipsa
-description: Query and maintain source-backed project memory for a project that has adopted Projipsa. Use when the user invokes $projipsa:projipsa, or asks for current project context, source ingestion, a post-work memory update, post-merge memory integration, memory lint, repair or contract upgrade, or a milestone, pause, handoff, or restart snapshot. May load implicitly for project briefing or memory lookup; implicit use remains read-only, while ingestion, update, integration, repair, and snapshot require authorized write scope. One-off size and asset cleanup belongs to the separate explicit Compact Skill.
+description: Query and maintain source-backed project memory. Use when the user invokes $projipsa:projipsa, needs project context, prior decisions, source impact, evidence-change review, or relationship diagrams, or asks to record findings, ingest sources, integrate merged work, repair memory, or prepare a handoff. Implicit context lookup is read-only; writes follow established project-memory scope. Explicit initialization and artifact compaction use their own Skills.
 ---
 
 # Projipsa for Codex

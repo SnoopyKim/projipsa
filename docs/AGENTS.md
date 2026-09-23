@@ -13,18 +13,22 @@
   append-only Events, `wiki/**` is maintained Synthesis, and generated indexes
   or reports are rebuildable Views.
 - This public project has no raw or replaceable visual asset tree. Prefer stable
-  repository paths. During normal maintenance, never overwrite or delete
+  repository paths. Dated API research snapshots under `research/` are retained
+  Evidence. During normal maintenance, never overwrite or delete
   retained raw Evidence; explicit Compact still requires an exact plan,
   recoverability review, and approval.
 - Keep current state concise and link to detailed pages. Replace it rather than
   appending: a line that no longer changes what the next session does moves to
-  chronology, a delivery, a decision, a milestone, or an area page, and
+  chronology, a decision, a milestone, or an area page, and
   `sources` are pruned with their claims.
 - When branches, worktrees, or sessions run in parallel, update `index.md`,
   current state, and open questions from the integrating branch after merge;
   each parallel writer appends to its own log file. Ask Projipsa to finish or
   integrate after a merge to get that write.
 - Give maintained pages stable IDs and required frontmatter.
+- Optional `.projipsa/evidence-baseline.json` is operational review state,
+  not a rebuildable View. Checkpoint only pages whose evidence was reviewed;
+  query and graph generation never advance it.
 - Mark assumptions, disputes, staleness, and supersession explicitly.
 - Add optional page families only when this project actually needs them.
 - Preserve project implementation during docs-only work.

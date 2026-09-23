@@ -88,6 +88,12 @@ Canonical references, templates, and `validate_memory.py` currently live under
 links to reach them. Keeping one copy is deliberate; moving them to a
 host-neutral home is deferred, not decided against.
 
+`codex-skills/projipsa/scripts/memory_context.py` shares the memory validator's
+frontmatter and project-boundary helpers. It builds relations and task context
+in memory. Only its explicit `checkpoint --page` command writes optional
+per-page review state; all other commands are read-only. Tests exercise source
+drift, indirect dependencies, supersession, budgets, and failed writes.
+
 The Compact Skill's read-only analyzer lives at
 `codex-skills/compact/scripts/audit_compaction.py`. It inventories candidates;
 it does not implement Apply or accept deletion approval on the user's behalf.
@@ -155,10 +161,11 @@ request, a commit, a file under `plugins/` — over copying content into `raw/`.
   with the Codex plugin validator.
 - Update `docs/wiki/project/current-state.md` and append the chronology log.
 
-## Provenance
+## Scope history
 
-The `outsource` Skill was integrated from
-[`SnoopyKim/Outsource`](https://github.com/SnoopyKim/Outsource) at commit
-`c4a5292e9579b67ecf6eda74558a9785f6305c77`. That repository may remain as a
-temporary compatibility and migration surface, but Projipsa is the intended
-canonical home for the capability.
+Versions through 0.5.0 included an Outsource delivery workflow, originally
+integrated from `SnoopyKim/Outsource`. From 0.6.0 the package concentrates on
+project memory. The previous implementation remains in the
+[0.5.0 source](https://github.com/SnoopyKim/projipsa/tree/v0.5.0/plugins/projipsa/codex-skills/outsource).
+Existing adopter delivery pages remain valid project records; an upgrade must
+not erase them or continue their former execution protocol.

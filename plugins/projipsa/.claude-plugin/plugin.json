@@ -1,8 +1,8 @@
 {
   "name": "projipsa",
   "displayName": "Projipsa",
-  "version": "0.5.0",
-  "description": "A project butler with separate skills for project memory, onboarding, compaction, and substantial delivery in Codex, Claude Code, and Grok Build.",
+  "version": "0.6.0",
+  "description": "A project memory butler: source-backed understanding, decisions, history, and continuity across Codex, Claude Code, and Grok Build.",
   "author": {
     "name": "SnoopyDev",
     "url": "https://github.com/SnoopyKim"
@@ -11,12 +11,10 @@
   "license": "MIT",
   "keywords": [
     "project-memory",
-    "project-management",
     "documentation",
+    "knowledge-management",
     "handoff",
-    "butler",
-    "delegation",
-    "delivery"
+    "butler"
   ],
   "skills": "./claude-skills/"
 }

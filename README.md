@@ -1,30 +1,22 @@
 # Projipsa
 
-> A project butler: durable project memory, and substantial work you can
-> delegate on top of it.
+> A project butler for durable, source-backed project understanding.
 
-An agent rebuilds its understanding of your project at the start of every
-session and throws it away at the end. You pay that cost again next time — and
-worse, you cannot hand the agent anything long. Work that spans sessions has
-nothing to resume from.
+Projipsa helps an agent recover the project's context, understand why decisions
+were made, and leave useful knowledge for the next session. It maintains
+readable Markdown: evidence stays traceable, current understanding gets
+reconciled, and history remains available.
 
-Projipsa keeps the project's understanding in Markdown that an agent maintains:
-evidence preserved, current synthesis kept current, chronology appended. Because
-that memory outlives the session, you can then delegate substantial work against
-it — with a contract, verification, and an acceptance step that stays yours.
-
-Those are not two features. **The memory is the shared state the delegated work
-runs on.** Agent frameworks keep such state inside the process, so it dies with
-the run. Projipsa keeps it in Git, so it survives sessions, hosts, and people.
-
-The name is `project` + `집사` (*jipsa*), Korean for butler. A butler prepares,
-remembers, and recommends. A butler does not decide, approve, or accept on your
-behalf. That distinction is the whole authority model, and it is enforced
-throughout.
+The name is `project` + `집사` (*jipsa*), Korean for butler. Its responsibility
+is the project's memory: decisions, constraints, findings, observed outcomes,
+open questions, and continuity across people, sessions, and agent hosts.
+The host agent handles implementation and execution.
 
 ## Install
 
-Projipsa is version `0.5.0` and is **not listed in a public marketplace yet**.
+This source package is version `0.6.0` and is **not listed in a
+public marketplace yet**. Published versions are on the
+[releases page](https://github.com/SnoopyKim/projipsa/releases).
 Install it from a source checkout:
 
 ```bash
@@ -116,16 +108,15 @@ From then on, `/projipsa:projipsa` is the everyday call. Ask it to brief you,
 and it reads current state before history. Ask it to record a session, and it
 updates the affected pages and appends the log.
 
-## The four Skills
+## The three Skills
 
-One Plugin, four Skills with deliberately different trigger boundaries:
+One Plugin, three Skills with deliberately different trigger boundaries:
 
 | Skill | Codex | Claude Code | Grok Build | Loads automatically |
 | --- | --- | --- | --- | --- |
 | Project memory | `$projipsa:projipsa` | `/projipsa:projipsa` | `/projipsa:projipsa` | Yes — read-only context work |
 | First adoption | `$projipsa:projipsa-init` | `/projipsa:projipsa-init` | `/projipsa:projipsa-init` | No |
 | Memory compaction | `$projipsa:compact` | `/projipsa:compact` | `/projipsa:compact` | No |
-| Substantial delivery | `$projipsa:outsource` | `/projipsa:outsource` | `/projipsa:outsource` | Yes — qualification only |
 
 **Automatic loading is not authority.** It helps the host notice the right
 workflow. It does not authorize writes, external effects, costs, deployment,
@@ -145,7 +136,9 @@ The everyday Skill once a project has adopted Projipsa. It can:
 - integrate shared memory once parallel writer branches have merged;
 - lint and repair structure, freshness, links, evidence, and contract drift;
 - capture a milestone, pause, handoff, or restart snapshot;
-- persist delivery state for an authorized engagement.
+- preserve findings, outcome evidence, and resumable project context.
+- trace source dependencies and related decisions, detect evidence changes,
+  and prepare bounded task briefings or relationship diagrams.
 
 It may load implicitly when you ask for a project briefing, but implicit use
 stays read-only. Ingest, Update, Integrate, Repair, and Snapshot need either an
@@ -154,6 +147,30 @@ maintenance.
 
 If no coherent memory exists, it says so and may suggest onboarding. It never
 initializes a project on its own.
+
+### Related context and changed evidence
+
+Ask Projipsa to brief a task, find records affected by a source change, or draw
+the relationships around a decision. The bundled Python helper reads existing
+Markdown and frontmatter; it needs no server, graph database, or external API:
+
+```bash
+python3 plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py docs brief --query "release policy"
+python3 plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py docs brief --source README.md
+python3 plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py docs graph --page project.current-state --format mermaid
+python3 plugins/projipsa/codex-skills/projipsa/scripts/memory_context.py docs review
+```
+
+These commands are read-only. Briefings retain source paths, supersession and
+historical labels, and review status. They use lexical matching and explicit
+relations; read the original when excerpts are incomplete.
+
+After reviewing evidence in an authorized memory update, Projipsa can checkpoint
+the specific pages in `docs/.projipsa/evidence-baseline.json`. Later byte or
+citation changes create review candidates without invalidating conclusions.
+No checkpoint means unknown freshness. External URL contents are not fetched.
+See [context and evidence](plugins/projipsa/codex-skills/projipsa/references/context-and-evidence.md)
+for commands, budgets, and the checkpoint contract.
 
 ### First adoption
 
@@ -175,37 +192,13 @@ before Apply. Unmodified tracked files are tied to a Git baseline; modified or
 untracked files require a separate recovery path or acknowledged unrecoverable
 deletion. Removing working-tree files does not shrink existing Git history.
 
-### Substantial delivery
+### Moving from 0.5.0
 
-For work that is broad, ambiguous, risky, multi-milestone, or likely to span
-sessions and handoffs. It:
-
-- qualifies the work as Ordinary, Scoped, or Project;
-- runs an adaptive interview for consequential uncertainty;
-- proposes and versions a Delivery Contract;
-- picks the simplest topology that still verifies — direct, sequential,
-  parallel, graph, or human-gated;
-- verifies from the service user, artifact consumer, or QA perspective by
-  tracing the real user or data path and trying consequential regressions;
-- records `direct`, `proxy`, `reported`, and `not_run` evidence without
-  promoting a partial path or implementer self-check into a broader passing
-  claim;
-- separates *executed*, *verified*, and *Maker-accepted* outcomes;
-- manages feedback, change, pause, review, acceptance, and handoff;
-- writes durable outcomes into Projipsa memory when that is authorized.
-
-More on how it uses memory in [delegating substantial work](#delegating-substantial-work).
-
-A host may load it automatically when a request spans multiple milestones or
-sessions, needs a durable contract, or is hard to reverse. That trigger is
-deliberately narrower than the range of work Outsource can handle: a host that
-fires it for anything broad-sounding spends your context on an engagement you
-never asked for. The automatic load buys read-only qualification and a
-recommendation — nothing else. Even an explicit invocation begins qualification
-rather than granting blanket approval for later writes, costs, or acceptance.
-
-Outsource works when Projipsa memory is absent. For Project-mode work it may
-recommend onboarding rather than building a competing state system of its own.
+`outsource` is no longer included. Projipsa concentrates on project memory;
+execution strategy, work orchestration, and acceptance stay with the host and
+user. Existing delivery pages remain valid project records. Updating the plugin
+never deletes them or rewrites adopter memory. Use a milestone or an existing
+task artifact for new handoffs.
 
 ## What the memory looks like
 
@@ -250,7 +243,8 @@ the current branch actually holds the merge before running Integrate.
 
 Optional page families get added only when a project actually needs them —
 `wiki/areas/`, `assumptions/`, `risks/`, `procedures/`, `external/`,
-`milestones/`, `deliveries/`. Empty folders for symmetry are a smell.
+`milestones/`. Existing custom page families remain valid. Empty folders for
+symmetry are a smell.
 
 Every maintained page carries frontmatter with a stable `id`, an `updated` date,
 and a `sources` list. `status` defaults to `active` and `confidence` defaults to
@@ -259,30 +253,22 @@ raised to `confirmed` only in the same edit that lists its evidence. Six months
 later you can still ask whether a claim was verified or guessed — and get an
 answer.
 
-## Delegating substantial work
+## Make memory useful in everyday work
 
-Delegated work needs somewhere to keep its state: the current contract, what has
-been verified, what the Maker said, and the exact next action. Keep that inside
-the process and it vanishes when the run ends.
+Before meaningful work, retrieve the relevant decisions, constraints, earlier
+failures, and open questions. Start with short context and follow links when
+needed. Check changing facts against the current checkout or live source.
 
-Projipsa keeps it in the memory tree. Each active Project-mode engagement gets
-one maintained `wiki/deliveries/<slug>.md` page holding its contract version,
-current stage, milestone, acceptance evidence, feedback, risks, approvals, and
-next action. Durable decisions, questions, risks, and milestones stay in their
-own canonical pages and are linked, not copied — duplication is how this kind of
-state rots.
+After work, preserve what changes the next session's understanding: a decision
+and its reason, a verified finding, an unsuccessful approach and its conditions,
+a correction, or a next action. Reconcile existing pages before adding another.
+Observed outcomes can refine earlier decisions without erasing their history.
 
-Three consequences follow, and they are the point:
-
-- **A pause is cheap.** State is on disk, so resuming is reading a file.
-- **A handoff is possible.** A different agent, on a different host, on a
-  different day, can pick the engagement up.
-- **Completion means something.** Executed is not verified, and verified is not
-  accepted. The engagement does not end because retries were exhausted or
-  because an agent reported success.
-
-If memory writes are not authorized, Outsource returns a compact proposed
-handoff instead of quietly creating a second long-lived state tree.
+A project may explicitly authorize routine post-work memory maintenance in its
+instructions. Projipsa honors that established scope without asking again.
+Installation itself grants no write scope. This package has no background
+capture hook, daemon, or automatic session recorder; its operations are carried
+out by the host agent.
 
 ## Cross-host discovery
 
@@ -331,11 +317,10 @@ and [LangChain's write-up of wiki memory](https://www.langchain.com/blog/wiki-me
 Projipsa adds append-only chronology, explicit confidence and provenance, and a
 cross-host discovery pointer.
 
-Its delivery layer takes the design vocabulary that grew around agent loops and
-multi-node agent graphs — see the
-[graph engineering guide](https://www.aibuilderclub.com/blog/graph-engineering-guide-2026)
-— and answers the question those leave open: where the shared state lives when
-the run is over.
+The [September 2026 source review](docs/wiki/areas/project-memory-references.md)
+records further design references and the distinction between adopted workflow
+changes and proposed infrastructure. It is repository research, outside the
+shipped plugin.
 
 ## Contributing
 

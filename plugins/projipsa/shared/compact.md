@@ -52,6 +52,9 @@ Supplement the deterministic report with judgment:
 
 Never delete the only evidence for an active claim. Never infer that an old
 capture is obsolete solely from its age, size, name, or hash relationship.
+The optional `.projipsa/evidence-baseline.json` is operational review state,
+not a rebuildable graph cache. Removing it loses freshness comparisons; do not
+classify it as disposable output merely because it contains hashes.
 
 ## Produce an exact plan
 

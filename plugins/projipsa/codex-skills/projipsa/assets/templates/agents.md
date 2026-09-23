@@ -4,9 +4,8 @@
 
 1. Read `index.md`.
 2. Read `wiki/project/current-state.md`.
-3. Read a linked active delivery page when the requested work belongs to it.
-4. Open only other relevant maintained pages.
-5. Open raw sources only for evidence or provenance.
+3. Find relevant decisions, constraints, prior failures, and open questions.
+4. Open evidence when a claim matters; verify volatile facts against current state.
 
 ## Maintenance rules
 
@@ -21,16 +20,19 @@
   project memory.
 - Keep current state concise and link to detailed pages. Replace it rather than
   appending: a line that no longer changes what the next session does moves to
-  chronology, a delivery, a decision, a milestone, or an area page.
+  chronology, a decision, a milestone, or an area page.
 - When branches, worktrees, or sessions run in parallel, update `index.md`,
   current state, and open questions from the integrating branch after merge;
   each parallel writer appends to its own log file. Ask Projipsa to finish or
   integrate after a merge to get that write.
 - Give maintained pages stable IDs and required frontmatter.
+- If evidence checkpoints are used, preserve `.projipsa/evidence-baseline.json`
+  as review state. Only checkpoint pages whose evidence was actually reviewed;
+  read-only queries never clear review candidates.
 - Mark assumptions, disputes, staleness, and supersession explicitly.
 - Add optional page families only when the project needs them.
-- Keep one maintained delivery page for each active substantial delegated
-  engagement; do not turn it into a transcript.
+- Preserve useful decisions, outcomes, and corrections with their evidence and
+  applicability; avoid storing complete transcripts as current understanding.
 - Preserve project implementation during docs-only work.
 
 ## Updates
