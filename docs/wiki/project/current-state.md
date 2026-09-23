@@ -5,6 +5,9 @@ status: active
 confidence: confirmed
 updated: 2026-09-23
 sources:
+  - https://github.com/SnoopyKim/projipsa/releases/tag/v0.6.0
+  - https://github.com/SnoopyKim/projipsa/pull/16
+  - https://github.com/SnoopyKim/projipsa/actions/runs/35840674629
   - README.md
   - CONTRIBUTING.md
   - plugins/projipsa/.claude-plugin/plugin.json
@@ -34,11 +37,10 @@ related:
 
 ## Summary
 
-The working tree prepares **0.6.0, unreleased**, with a project-memory-only
-scope. It removes Outsource and keeps `projipsa`, `projipsa-init`, and `compact`.
-The latest recorded published release is 0.5.0. No new release or installed-host
-refresh has been performed yet. The Maker has authorized including the new
-context/evidence helper and publishing 0.6.0 in this task.
+**0.6.0 is published**, tagged at merge commit `4f862758a1d4`. It removes
+Outsource and keeps `projipsa`, `projipsa-init`, and `compact`, including the
+new context/evidence helper. The source release does not update a separately
+configured host installation.
 
 The purpose is to carry project understanding across sessions: current facts,
 decision rationale, evidence, corrections, and next work. See the
@@ -71,9 +73,12 @@ decision rationale, evidence, corrections, and next work. See the
 
 ## In progress
 
-- This is a local source change, not a published or installed release.
 - Model-backed evaluation of recall, freshness, and post-work updates remains
   unperformed. Structural checks do not establish improved agent behavior.
+- The generic Codex scaffold checker assumes a default `skills/` directory;
+  it does not validate this project's intentional host-directory split. The
+  host-aware package checks and Skill validators pass. No fresh Codex runtime
+  installation was performed for this release.
 
 ## Active defaults
 
@@ -92,6 +97,9 @@ decision rationale, evidence, corrections, and next work. See the
 ## Validation
 
 Validation for this change is recorded in [September chronology](../../logs/2026-09.md).
+All 73 tests passed locally on Python 3.9.6 and 3.12.14; GitHub checks passed
+on Python 3.9 and 3.13 for the release PR and merged commit. Package, memory,
+Claude strict, Grok, and Codex Skill checks passed within the scope above.
 The August release and installation evidence remains in
 [August chronology](../../logs/2026-08.md).
 
@@ -101,4 +109,5 @@ The August release and installation evidence remains in
   infrastructure or claiming a behavioral improvement.
 - Fix the three previously reproduced memory-validator gaps in
   [open questions](../questions/open-questions.md).
-- Finish the authorized 0.6.0 publication and record the actual release result.
+- Align the separately configured installation source in a dedicated install
+  update if the Maker requests it; GitHub publication alone does not do so.
