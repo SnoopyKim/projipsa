@@ -10,6 +10,7 @@ sources:
   - https://github.com/SnoopyKim/projipsa/actions/runs/35840674629
   - README.md
   - CONTRIBUTING.md
+  - .agents/plugins/marketplace.json
   - plugins/projipsa/.claude-plugin/plugin.json
   - plugins/projipsa/.codex-plugin/plugin.json
   - plugins/projipsa/shared/projipsa.md
@@ -39,8 +40,8 @@ related:
 
 **0.6.0 is published**, tagged at merge commit `4f862758a1d4`. It removes
 Outsource and keeps `projipsa`, `projipsa-init`, and `compact`, including the
-new context/evidence helper. The source release does not update a separately
-configured host installation.
+new context/evidence helper. The local Codex installation now uses 0.6.0 from
+this checkout's marketplace; a fresh runtime discovers all three Skills.
 
 The purpose is to carry project understanding across sessions: current facts,
 decision rationale, evidence, corrections, and next work. See the
@@ -75,10 +76,6 @@ decision rationale, evidence, corrections, and next work. See the
 
 - Model-backed evaluation of recall, freshness, and post-work updates remains
   unperformed. Structural checks do not establish improved agent behavior.
-- The generic Codex scaffold checker assumes a default `skills/` directory;
-  it does not validate this project's intentional host-directory split. The
-  host-aware package checks and Skill validators pass. No fresh Codex runtime
-  installation was performed for this release.
 
 ## Active defaults
 
@@ -90,9 +87,10 @@ decision rationale, evidence, corrections, and next work. See the
   decision, milestone, or area page.
 - No background capture service, vector index, graph database, automated
   reflection, or runtime enforcement has been introduced.
-- The current Codex CLI reports `projipsa@personal` 0.3.0 from a separate local
-  plugin source, not this checkout. Publishing this repository will not update
-  that installation. Keep source publication separate from changing its source.
+- Codex uses `projipsa@projipsa` 0.6.0 through this checkout's local marketplace.
+  The old `projipsa@personal` installation was removed; its source folder was
+  preserved. Installation is user-wide. Use a new task to load the updated
+  Skills; publishing future releases alone does not refresh the installed cache.
 
 ## Validation
 
@@ -100,6 +98,12 @@ Validation for this change is recorded in [September chronology](../../logs/2026
 All 73 tests passed locally on Python 3.9.6 and 3.12.14; GitHub checks passed
 on Python 3.9 and 3.13 for the release PR and merged commit. Package, memory,
 Claude strict, Grok, and Codex Skill checks passed within the scope above.
+The installed package matches all 38 source files. A fresh Codex app-server
+discovers exactly the three enabled Skills from `codex-skills/` both in this
+repository and outside it, with no Projipsa load errors. The installed evidence
+review helper also runs successfully. The generic scaffold checker's default
+`skills/` assumption remains incompatible with the intentional adapter split;
+native discovery verifies the declared path.
 The August release and installation evidence remains in
 [August chronology](../../logs/2026-08.md).
 
@@ -109,5 +113,3 @@ The August release and installation evidence remains in
   infrastructure or claiming a behavioral improvement.
 - Fix the three previously reproduced memory-validator gaps in
   [open questions](../questions/open-questions.md).
-- Align the separately configured installation source in a dedicated install
-  update if the Maker requests it; GitHub publication alone does not do so.
